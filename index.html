@@ -799,7 +799,15 @@ if (typeof module !== 'undefined') {
             <h1 class="font-bold text-sm sm:text-lg leading-tight tracking-tight text-stone-900 dark:text-stone-50 flex items-center gap-1.5 truncate">
               <span>Detox</span><span class="hidden xs:inline sm:inline"> Primavera</span>
               <span class="text-[10px] sm:text-xs px-1.5 py-0.2 rounded-full font-semibold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex-shrink-0">
-                Día {{ selectedDay }}
+                <template v-if="challengeInfo.started && !challengeInfo.isFuture && !challengeInfo.isFinished">
+                  Día {{ selectedDay }} <span v-if="selectedDay === challengeInfo.currentDay" class="opacity-75">• Hoy</span>
+                </template>
+                <template v-else-if="challengeInfo.isFuture">
+                  Previa • Inicia en {{ challengeInfo.daysUntil }}d
+                </template>
+                <template v-else>
+                  Día {{ selectedDay }}
+                </template>
               </span>
             </h1>
             <p class="hidden sm:block text-xs text-stone-500 dark:text-stone-400">Guía interactiva & Tracker • Isa Caparra</p>
@@ -908,6 +916,124 @@ if (typeof module !== 'undefined') {
       <!-- ========================================== -->
       <section v-show="activeTab === 'dia'" class="space-y-6">
         
+        <!-- Tarjeta de Control & Estado de Inicio del Reto -->
+        <div class="bg-gradient-to-r from-emerald-50 to-sage-50 dark:from-stone-900 dark:to-emerald-950/40 rounded-2xl p-4 sm:p-5 border border-emerald-200/80 dark:border-emerald-800/60 shadow-xs transition-all">
+          
+          <!-- Caso 1: Todavía no fijó fecha de inicio -->
+          <div v-if="!startDate" class="space-y-3">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-400/20 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-xl flex-shrink-0">
+                  🎯
+                </div>
+                <div>
+                  <h3 class="text-sm sm:text-base font-bold text-stone-900 dark:text-stone-100">
+                    ¿Cuándo querés arrancar tu reto?
+                  </h3>
+                  <p class="text-xs text-stone-600 dark:text-stone-400">
+                    Podés explorar todo el contenido libremente o fijar una fecha para que la app sincronice tu día a día de forma automática.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+              <button 
+                @click="startChallengeToday()" 
+                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-xs transition flex items-center gap-1.5">
+                <span>🚀</span>
+                <span>Empezar Hoy (Día 1)</span>
+              </button>
+
+              <button 
+                @click="showDateSettings = !showDateSettings" 
+                class="px-3.5 py-2 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 active:scale-95 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-700 font-medium text-xs sm:text-sm rounded-xl transition flex items-center gap-1.5">
+                <span>📅</span>
+                <span>Elegir otra fecha</span>
+              </button>
+            </div>
+
+            <!-- Selector de fecha desplegable -->
+            <div v-if="showDateSettings" class="mt-3 p-3 bg-white/90 dark:bg-stone-800/90 rounded-xl border border-stone-200 dark:border-stone-700 flex flex-wrap items-center gap-3 text-xs">
+              <span class="font-medium text-stone-700 dark:text-stone-300">Fecha de inicio:</span>
+              <input 
+                type="date" 
+                :value="todayStr" 
+                @change="setStartDate($event.target.value)" 
+                class="bg-stone-100 dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-lg px-2.5 py-1 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-sans text-xs">
+              <span class="text-[11px] text-stone-500 dark:text-stone-400">Podés elegir hoy, el próximo lunes o cualquier fecha deseada.</span>
+            </div>
+          </div>
+
+          <!-- Caso 2: Reto con fecha fijada -->
+          <div v-else class="space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-xl">
+                  {{ challengeInfo.isFuture ? '⏳' : challengeInfo.isFinished ? '🏆' : '🔥' }}
+                </span>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs uppercase font-extrabold tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                      {{ challengeInfo.isFuture ? 'Programado' : challengeInfo.isFinished ? 'Completado' : 'Reto en Curso' }}
+                    </span>
+                    <span class="text-xs text-stone-500 dark:text-stone-400">
+                      Inicio: <strong>{{ challengeInfo.formattedStartDate }}</strong>
+                    </span>
+                  </div>
+                  <p class="text-xs sm:text-sm font-semibold text-stone-900 dark:text-stone-100 mt-0.5">
+                    <template v-if="challengeInfo.isFuture">
+                      Faltan {{ challengeInfo.daysUntil }} días para empezar. Aprovechá el <strong>Paso 0 (Previa & Compras)</strong>.
+                    </template>
+                    <template v-else-if="challengeInfo.isFinished">
+                      ¡Felicitaciones! Completaste los 21 días del Detox de Primavera.
+                    </template>
+                    <template v-else>
+                      Hoy es tu <strong>Día {{ challengeInfo.currentDay }}</strong> de 21.
+                    </template>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Acciones de sincronización y configuración -->
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <button 
+                  v-if="!challengeInfo.isFuture && !challengeInfo.isFinished && selectedDay !== challengeInfo.currentDay"
+                  @click="selectedDay = challengeInfo.currentDay"
+                  class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold text-xs rounded-xl shadow-2xs transition flex items-center gap-1">
+                  <span>📍</span>
+                  <span>Ir a Hoy (Día {{ challengeInfo.currentDay }})</span>
+                </button>
+                <button 
+                  @click="showDateSettings = !showDateSettings" 
+                  class="p-1.5 sm:px-2.5 sm:py-1.5 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 rounded-xl border border-stone-200 dark:border-stone-700 text-xs transition flex items-center gap-1"
+                  title="Cambiar fecha de inicio">
+                  <span>⚙️</span>
+                  <span class="hidden sm:inline">Modificar</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Panel desplegable para cambiar o resetear fecha -->
+            <div v-if="showDateSettings" class="pt-2 border-t border-stone-200 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-stone-600 dark:text-stone-300">Cambiar fecha de inicio:</span>
+                <input 
+                  type="date" 
+                  :value="startDate" 
+                  @change="setStartDate($event.target.value)" 
+                  class="bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-lg px-2.5 py-1 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-sans text-xs">
+              </div>
+              <button 
+                @click="resetStartDate()" 
+                class="text-xs text-rose-600 dark:text-rose-400 hover:underline font-medium">
+                Desvincular fecha
+              </button>
+            </div>
+          </div>
+
+        </div>
+
         <!-- Selector Horizontal de Dias -->
         <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 overflow-hidden">
           <div class="flex items-center justify-between flex-wrap gap-2">
@@ -939,9 +1065,12 @@ if (typeof module !== 'undefined') {
             <button 
               @click="selectedDay = 0"
               :class="selectedDay === 0 ? 'ring-2 ring-amber-500 bg-amber-500 text-white font-bold shadow-sm' : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'"
-              class="snap-start flex flex-col items-center justify-center min-w-[70px] h-[64px] rounded-xl text-center px-2 transition-all active:scale-95 shadow-2xs flex-shrink-0">
+              class="snap-start relative flex flex-col items-center justify-center min-w-[70px] h-[64px] rounded-xl text-center px-2 transition-all active:scale-95 shadow-2xs flex-shrink-0">
               <span class="text-[10px] uppercase font-bold tracking-wider">Paso 0</span>
               <span class="text-xs font-semibold">Previa</span>
+              <span v-if="challengeInfo.isFuture" class="text-[8px] leading-tight font-extrabold uppercase px-1 rounded bg-amber-400 text-amber-950 absolute bottom-1">
+                HOY
+              </span>
             </button>
 
             <!-- Días 1 al 21 -->
@@ -956,6 +1085,11 @@ if (typeof module !== 'undefined') {
               class="snap-start relative flex flex-col items-center justify-center min-w-[56px] h-[64px] rounded-xl text-center px-1 transition-all active:scale-95 flex-shrink-0">
               <span class="text-[10px] opacity-75 font-medium">Día</span>
               <span class="text-base font-bold">{{ d }}</span>
+              <!-- Indicador si este día es HOY en el calendario -->
+              <span v-if="challengeInfo.started && !challengeInfo.isFuture && !challengeInfo.isFinished && d === challengeInfo.currentDay" 
+                    class="text-[8px] leading-tight font-extrabold uppercase px-1 rounded bg-amber-400 text-amber-950 absolute bottom-1">
+                HOY
+              </span>
               <!-- Checkmark si el día está completo -->
               <span v-if="completedMissions[`day_${d}`] && Object.values(completedMissions[`day_${d}`]).filter(Boolean).length === data.gamification.dailyMissions.length" 
                     class="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-stone-900">
@@ -1856,9 +1990,11 @@ const app = createApp({
     const isDarkMode = ref(getInitialDarkMode());
     const activeTab = ref(localStorage.getItem('detox_active_tab') || 'dia');
 
-    // 3. Estado de Gamificacion y Seguimiento
+    // 3. Estado de Gamificacion, Fecha de Inicio y Seguimiento
     const selectedDay = ref(parseInt(localStorage.getItem('detox_selected_day') || '1', 10));
     const startMode = ref(localStorage.getItem('detox_start_mode') || 'monodieta3'); // monodieta3, monodieta2, monodieta1, directo
+    const startDate = ref(localStorage.getItem('detox_start_date') || null); // YYYY-MM-DD
+    const showDateSettings = ref(false);
     const completedMissions = ref(JSON.parse(localStorage.getItem('detox_completed_missions') || '{}'));
     const shoppingChecked = ref(JSON.parse(localStorage.getItem('detox_shopping_checked') || '{}'));
     const unlockedBadges = ref(JSON.parse(localStorage.getItem('detox_unlocked_badges') || '[]'));
@@ -1899,6 +2035,10 @@ const app = createApp({
     });
     watch(selectedDay, (val) => localStorage.setItem('detox_selected_day', val));
     watch(startMode, (val) => localStorage.setItem('detox_start_mode', val));
+    watch(startDate, (val) => {
+      if (val) localStorage.setItem('detox_start_date', val);
+      else localStorage.removeItem('detox_start_date');
+    });
     watch(completedMissions, (val) => localStorage.setItem('detox_completed_missions', JSON.stringify(val)), { deep: true });
     watch(shoppingChecked, (val) => localStorage.setItem('detox_shopping_checked', JSON.stringify(val)), { deep: true });
     watch(unlockedBadges, (val) => localStorage.setItem('detox_unlocked_badges', JSON.stringify(val)), { deep: true });
@@ -1922,6 +2062,103 @@ const app = createApp({
         });
       }
     };
+
+    // Gestión Dinámica de Fecha de Inicio y Calendario
+    const todayStr = computed(() => {
+      const d = new Date();
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    });
+
+    const challengeInfo = computed(() => {
+      if (!startDate.value) {
+        return { started: false, daysDiff: 0, currentDay: null, formattedStartDate: '' };
+      }
+      const parts = startDate.value.split('-').map(Number);
+      const start = new Date(parts[0], parts[1] - 1, parts[2]);
+      start.setHours(0, 0, 0, 0);
+
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+
+      const diffMs = now.getTime() - start.getTime();
+      const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24)); // 0 en el día de inicio
+
+      const [y, m, d] = startDate.value.split('-');
+      const formattedStartDate = `${d}/${m}/${y}`;
+
+      if (diffDays < 0) {
+        return {
+          started: true,
+          isFuture: true,
+          isFinished: false,
+          daysUntil: Math.abs(diffDays),
+          currentDay: 0,
+          daysPassed: diffDays,
+          formattedStartDate
+        };
+      } else if (diffDays <= 20) {
+        return {
+          started: true,
+          isFuture: false,
+          isFinished: false,
+          currentDay: diffDays + 1,
+          daysPassed: diffDays,
+          formattedStartDate
+        };
+      } else {
+        return {
+          started: true,
+          isFuture: false,
+          isFinished: true,
+          currentDay: 21,
+          daysPassed: diffDays,
+          formattedStartDate
+        };
+      }
+    });
+
+    const startChallengeToday = () => {
+      startDate.value = todayStr.value;
+      selectedDay.value = 1;
+      triggerToast('🚀 ¡Reto iniciado con éxito! Hoy es tu Día 1.');
+      fireConfetti();
+    };
+
+    const setStartDate = (dateString) => {
+      if (!dateString) return;
+      startDate.value = dateString;
+      const info = challengeInfo.value;
+      if (info.isFuture) {
+        selectedDay.value = 0;
+        triggerToast(`📅 Inicio programado para el ${info.formattedStartDate} (en ${info.daysUntil} días).`);
+      } else if (!info.isFinished) {
+        selectedDay.value = info.currentDay;
+        triggerToast(`📅 Fecha fijada: hoy es tu Día ${info.currentDay}.`);
+      } else {
+        selectedDay.value = 21;
+        triggerToast(`📅 Fecha fijada: reto finalizado el ${info.formattedStartDate}.`);
+      }
+      showDateSettings.value = false;
+    };
+
+    const resetStartDate = () => {
+      startDate.value = null;
+      showDateSettings.value = false;
+      triggerToast('Fecha de inicio desvinculada. Podés volver a elegir cuándo arrancar.');
+    };
+
+    onMounted(() => {
+      if (startDate.value && challengeInfo.value.started) {
+        if (!challengeInfo.value.isFuture && !challengeInfo.value.isFinished) {
+          selectedDay.value = challengeInfo.value.currentDay;
+        } else if (challengeInfo.value.isFuture) {
+          selectedDay.value = 0;
+        }
+      }
+    });
 
     // Computados de Gamificación
     const dayMissionsStatus = computed(() => {
@@ -2305,6 +2542,8 @@ const app = createApp({
       isDarkMode,
       selectedDay,
       startMode,
+      startDate,
+      showDateSettings,
       completedMissions,
       shoppingChecked,
       unlockedBadges,
@@ -2323,6 +2562,8 @@ const app = createApp({
       toastMessage,
       showToast,
       // Computados
+      todayStr,
+      challengeInfo,
       dayMissionsStatus,
       currentDayCompletionPercent,
       isCurrentDayFullyCompleted,
@@ -2336,6 +2577,9 @@ const app = createApp({
       shoppingStats,
       globalSearchResults,
       // Metodos
+      startChallengeToday,
+      setStartDate,
+      resetStartDate,
       toggleMission,
       isMissionDone,
       isBadgeUnlocked,

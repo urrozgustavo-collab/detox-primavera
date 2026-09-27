@@ -17,9 +17,11 @@ const app = createApp({
     const isDarkMode = ref(getInitialDarkMode());
     const activeTab = ref(localStorage.getItem('detox_active_tab') || 'dia');
 
-    // 3. Estado de Gamificacion y Seguimiento
+    // 3. Estado de Gamificacion, Fecha de Inicio y Seguimiento
     const selectedDay = ref(parseInt(localStorage.getItem('detox_selected_day') || '1', 10));
     const startMode = ref(localStorage.getItem('detox_start_mode') || 'monodieta3'); // monodieta3, monodieta2, monodieta1, directo
+    const startDate = ref(localStorage.getItem('detox_start_date') || null); // YYYY-MM-DD
+    const showDateSettings = ref(false);
     const completedMissions = ref(JSON.parse(localStorage.getItem('detox_completed_missions') || '{}'));
     const shoppingChecked = ref(JSON.parse(localStorage.getItem('detox_shopping_checked') || '{}'));
     const unlockedBadges = ref(JSON.parse(localStorage.getItem('detox_unlocked_badges') || '[]'));
@@ -60,6 +62,10 @@ const app = createApp({
     });
     watch(selectedDay, (val) => localStorage.setItem('detox_selected_day', val));
     watch(startMode, (val) => localStorage.setItem('detox_start_mode', val));
+    watch(startDate, (val) => {
+      if (val) localStorage.setItem('detox_start_date', val);
+      else localStorage.removeItem('detox_start_date');
+    });
     watch(completedMissions, (val) => localStorage.setItem('detox_completed_missions', JSON.stringify(val)), { deep: true });
     watch(shoppingChecked, (val) => localStorage.setItem('detox_shopping_checked', JSON.stringify(val)), { deep: true });
     watch(unlockedBadges, (val) => localStorage.setItem('detox_unlocked_badges', JSON.stringify(val)), { deep: true });
@@ -83,6 +89,103 @@ const app = createApp({
         });
       }
     };
+
+    // Gestión Dinámica de Fecha de Inicio y Calendario
+    const todayStr = computed(() => {
+      const d = new Date();
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    });
+
+    const challengeInfo = computed(() => {
+      if (!startDate.value) {
+        return { started: false, daysDiff: 0, currentDay: null, formattedStartDate: '' };
+      }
+      const parts = startDate.value.split('-').map(Number);
+      const start = new Date(parts[0], parts[1] - 1, parts[2]);
+      start.setHours(0, 0, 0, 0);
+
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+
+      const diffMs = now.getTime() - start.getTime();
+      const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24)); // 0 en el día de inicio
+
+      const [y, m, d] = startDate.value.split('-');
+      const formattedStartDate = `${d}/${m}/${y}`;
+
+      if (diffDays < 0) {
+        return {
+          started: true,
+          isFuture: true,
+          isFinished: false,
+          daysUntil: Math.abs(diffDays),
+          currentDay: 0,
+          daysPassed: diffDays,
+          formattedStartDate
+        };
+      } else if (diffDays <= 20) {
+        return {
+          started: true,
+          isFuture: false,
+          isFinished: false,
+          currentDay: diffDays + 1,
+          daysPassed: diffDays,
+          formattedStartDate
+        };
+      } else {
+        return {
+          started: true,
+          isFuture: false,
+          isFinished: true,
+          currentDay: 21,
+          daysPassed: diffDays,
+          formattedStartDate
+        };
+      }
+    });
+
+    const startChallengeToday = () => {
+      startDate.value = todayStr.value;
+      selectedDay.value = 1;
+      triggerToast('🚀 ¡Reto iniciado con éxito! Hoy es tu Día 1.');
+      fireConfetti();
+    };
+
+    const setStartDate = (dateString) => {
+      if (!dateString) return;
+      startDate.value = dateString;
+      const info = challengeInfo.value;
+      if (info.isFuture) {
+        selectedDay.value = 0;
+        triggerToast(`📅 Inicio programado para el ${info.formattedStartDate} (en ${info.daysUntil} días).`);
+      } else if (!info.isFinished) {
+        selectedDay.value = info.currentDay;
+        triggerToast(`📅 Fecha fijada: hoy es tu Día ${info.currentDay}.`);
+      } else {
+        selectedDay.value = 21;
+        triggerToast(`📅 Fecha fijada: reto finalizado el ${info.formattedStartDate}.`);
+      }
+      showDateSettings.value = false;
+    };
+
+    const resetStartDate = () => {
+      startDate.value = null;
+      showDateSettings.value = false;
+      triggerToast('Fecha de inicio desvinculada. Podés volver a elegir cuándo arrancar.');
+    };
+
+    onMounted(() => {
+      if (startDate.value && challengeInfo.value.started) {
+        if (!challengeInfo.value.isFuture && !challengeInfo.value.isFinished) {
+          selectedDay.value = challengeInfo.value.currentDay;
+        } else if (challengeInfo.value.isFuture) {
+          selectedDay.value = 0;
+        }
+      }
+    });
 
     // Computados de Gamificación
     const dayMissionsStatus = computed(() => {
@@ -466,6 +569,8 @@ const app = createApp({
       isDarkMode,
       selectedDay,
       startMode,
+      startDate,
+      showDateSettings,
       completedMissions,
       shoppingChecked,
       unlockedBadges,
@@ -484,6 +589,8 @@ const app = createApp({
       toastMessage,
       showToast,
       // Computados
+      todayStr,
+      challengeInfo,
       dayMissionsStatus,
       currentDayCompletionPercent,
       isCurrentDayFullyCompleted,
@@ -497,6 +604,9 @@ const app = createApp({
       shoppingStats,
       globalSearchResults,
       // Metodos
+      startChallengeToday,
+      setStartDate,
+      resetStartDate,
       toggleMission,
       isMissionDone,
       isBadgeUnlocked,
