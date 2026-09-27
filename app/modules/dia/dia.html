@@ -1,0 +1,804 @@
+<!-- ========================================== -->
+      <!-- PESTANA 1: MI DIA & TRACKER 21 DIAS        -->
+      <!-- ========================================== -->
+      <section v-show="activeTab === 'dia'" class="space-y-6">
+        
+        <!-- Tarjeta de Control & Estado de Inicio del Reto -->
+        <div class="bg-gradient-to-r from-emerald-50 to-sage-50 dark:from-stone-900 dark:to-emerald-950/40 rounded-2xl p-4 sm:p-5 border border-emerald-200/80 dark:border-emerald-800/60 shadow-xs transition-all">
+          
+          <!-- Caso 1: Todavía no fijó fecha de inicio -->
+          <div v-if="!startDate" class="space-y-3">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-400/20 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-xl flex-shrink-0">
+                  🎯
+                </div>
+                <div>
+                  <h3 class="text-sm sm:text-base font-bold text-stone-900 dark:text-stone-100">
+                    ¿Cuándo querés arrancar tu reto?
+                  </h3>
+                  <p class="text-xs text-stone-600 dark:text-stone-400">
+                    Podés explorar todo el contenido libremente o fijar una fecha para que la app sincronice tu día a día de forma automática.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+              <button 
+                @click="startChallengeToday()" 
+                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-xs transition flex items-center gap-1.5">
+                <span>🚀</span>
+                <span>Empezar Hoy (Día 1)</span>
+              </button>
+
+              <button 
+                @click="toggleDatePicker()" 
+                class="px-3.5 py-2 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 active:scale-95 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-700 font-medium text-xs sm:text-sm rounded-xl transition flex items-center gap-1.5">
+                <span>📅</span>
+                <span>Elegir otra fecha</span>
+              </button>
+            </div>
+
+            <!-- Selector de fecha desplegable -->
+            <div v-if="showDateSettings" class="mt-3 p-3.5 bg-white/95 dark:bg-stone-800/95 rounded-xl border border-emerald-300/80 dark:border-emerald-700/80 shadow-xs space-y-3 text-xs">
+              <div class="flex items-center justify-between gap-2 flex-wrap">
+                <span class="font-semibold text-stone-800 dark:text-stone-200 flex items-center gap-1.5">
+                  <span>📅</span>
+                  <span>Elegir fecha de inicio:</span>
+                </span>
+                <!-- Atajos rápidos -->
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <button 
+                    type="button"
+                    @click="setQuickDate('today')" 
+                    class="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-stone-700 dark:text-stone-200 text-[11px] font-medium transition">
+                    Hoy
+                  </button>
+                  <button 
+                    type="button"
+                    @click="setQuickDate('tomorrow')" 
+                    class="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-stone-700 dark:text-stone-200 text-[11px] font-medium transition">
+                    Mañana
+                  </button>
+                  <button 
+                    type="button"
+                    @click="setQuickDate('nextMonday')" 
+                    class="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-stone-700 dark:text-stone-200 text-[11px] font-medium transition">
+                    Próx. Lunes
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 flex-wrap">
+                <input 
+                  type="date" 
+                  v-model="tempStartDate"
+                  class="bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-lg px-2.5 py-1.5 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-sans text-xs">
+
+                <button 
+                  type="button"
+                  @click="applySelectedDate()" 
+                  class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold text-xs rounded-lg shadow-2xs transition flex items-center gap-1">
+                  <span>✓</span>
+                  <span>Confirmar fecha</span>
+                </button>
+
+                <button 
+                  type="button"
+                  @click="showDateSettings = false" 
+                  class="px-2.5 py-1.5 bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 dark:hover:bg-stone-600 active:scale-95 text-stone-600 dark:text-stone-300 font-medium text-xs rounded-lg transition">
+                  Cancelar
+                </button>
+              </div>
+
+              <p class="text-[11px] text-stone-500 dark:text-stone-400">
+                Podés escribir la fecha o elegir del calendario. Al presionar <strong>Confirmar fecha</strong> se programará tu día 1 sin sorpresas.
+              </p>
+            </div>
+          </div>
+
+          <!-- Caso 2: Reto con fecha fijada -->
+          <div v-else class="space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-xl">
+                  {{ challengeInfo.isFuture ? '⏳' : challengeInfo.isFinished ? '🏆' : '🔥' }}
+                </span>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs uppercase font-extrabold tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                      {{ challengeInfo.isFuture ? 'Programado' : challengeInfo.isFinished ? 'Completado' : 'Reto en Curso' }}
+                    </span>
+                    <span class="text-xs text-stone-500 dark:text-stone-400">
+                      Inicio: <strong>{{ challengeInfo.formattedStartDate }}</strong>
+                    </span>
+                  </div>
+                  <p class="text-xs sm:text-sm font-semibold text-stone-900 dark:text-stone-100 mt-0.5">
+                    <template v-if="challengeInfo.isFuture">
+                      Faltan {{ challengeInfo.daysUntil }} días para empezar. Aprovechá el <strong>Paso 0 (Previa & Compras)</strong>.
+                    </template>
+                    <template v-else-if="challengeInfo.isFinished">
+                      ¡Felicitaciones! Completaste los 21 días del Detox de Primavera.
+                    </template>
+                    <template v-else>
+                      Hoy es tu <strong>Día {{ challengeInfo.currentDay }}</strong> de 21.
+                    </template>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Acciones de sincronización y configuración -->
+              <div class="flex items-center gap-2 flex-shrink-0 flex-wrap">
+                <button 
+                  v-if="!challengeInfo.isFuture && !challengeInfo.isFinished && selectedDay !== challengeInfo.currentDay"
+                  @click="selectedDay = challengeInfo.currentDay"
+                  class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold text-xs rounded-xl shadow-2xs transition flex items-center gap-1">
+                  <span>📍</span>
+                  <span>Ir a Hoy (Día {{ challengeInfo.currentDay }})</span>
+                </button>
+                <button 
+                  @click="cancelChallengeStart()" 
+                  class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 rounded-xl border border-amber-200 dark:border-amber-800/60 text-xs font-semibold transition flex items-center gap-1 active:scale-95"
+                  title="Cancelar inicio y volver a foja cero para elegir cuándo arrancar">
+                  <span>↩️</span>
+                  <span>Cancelar inicio</span>
+                </button>
+                <button 
+                  @click="toggleDatePicker()" 
+                  class="p-1.5 sm:px-2.5 sm:py-1.5 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-medium transition flex items-center gap-1"
+                  title="Ajustar fecha de inicio">
+                  <span>📅</span>
+                  <span class="hidden sm:inline">Fecha</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Panel desplegable para cambiar o resetear fecha -->
+            <div v-if="showDateSettings" class="pt-3 border-t border-stone-200 dark:border-stone-800 space-y-3 text-xs">
+              <div class="flex items-center justify-between gap-2 flex-wrap">
+                <span class="font-semibold text-stone-800 dark:text-stone-200 flex items-center gap-1.5">
+                  <span>📅</span>
+                  <span>Cambiar fecha de inicio:</span>
+                </span>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <button 
+                    type="button"
+                    @click="setQuickDate('today')" 
+                    class="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-stone-700 dark:text-stone-200 text-[11px] font-medium transition">
+                    Hoy
+                  </button>
+                  <button 
+                    type="button"
+                    @click="setQuickDate('tomorrow')" 
+                    class="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-stone-700 dark:text-stone-200 text-[11px] font-medium transition">
+                    Mañana
+                  </button>
+                  <button 
+                    type="button"
+                    @click="setQuickDate('nextMonday')" 
+                    class="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-stone-700 dark:text-stone-200 text-[11px] font-medium transition">
+                    Próx. Lunes
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 flex-wrap">
+                <input 
+                  type="date" 
+                  v-model="tempStartDate" 
+                  class="bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-lg px-2.5 py-1.5 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-sans text-xs">
+
+                <button 
+                  type="button"
+                  @click="applySelectedDate()" 
+                  class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold text-xs rounded-lg shadow-2xs transition flex items-center gap-1">
+                  <span>✓</span>
+                  <span>Guardar fecha</span>
+                </button>
+
+                <button 
+                  type="button"
+                  @click="showDateSettings = false" 
+                  class="px-2.5 py-1.5 bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 dark:hover:bg-stone-600 active:scale-95 text-stone-600 dark:text-stone-300 font-medium text-xs rounded-lg transition">
+                  Cerrar
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between gap-3 pt-2 border-t border-stone-100 dark:border-stone-800/80 flex-wrap">
+                <button 
+                  @click="cancelChallengeStart()" 
+                  class="text-xs text-amber-700 dark:text-amber-400 hover:underline font-medium flex items-center gap-1">
+                  <span>↩️</span>
+                  <span>Cancelar inicio (volver a foja cero)</span>
+                </button>
+                <button 
+                  @click="resetChallenge(true)" 
+                  class="text-xs text-rose-600 dark:text-rose-400 hover:underline font-semibold flex items-center gap-1">
+                  <span>⚠️</span>
+                  <span>Borrar todo y empezar de cero</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Tarjeta de Inspiración Clínica Diaria -->
+        <div v-if="currentDailyQuote" class="bg-gradient-to-r from-sage-50/90 to-stone-50/90 dark:from-stone-900/90 dark:to-sage-950/30 rounded-2xl p-4 sm:p-5 border border-sage-200/90 dark:border-stone-800 shadow-2xs space-y-2.5 transition-all">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-sage-200/70 dark:bg-sage-900/80 text-sage-900 dark:text-sage-200 border border-sage-300 dark:border-sage-800 flex items-center gap-1.5">
+              <span>📜</span>
+              <span>Día {{ selectedDay }} • {{ currentDailyQuote.tema }}</span>
+            </span>
+            <button @click="copyQuote(currentDailyQuote)" class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-xs flex items-center gap-1 px-2 py-0.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition" title="Copiar cita al portapapeles">
+              <span>📋</span> <span class="hidden sm:inline text-[11px]">Copiar</span>
+            </button>
+          </div>
+          <blockquote class="italic text-sm sm:text-base font-serif text-stone-800 dark:text-stone-200 leading-relaxed pl-3 border-l-2 border-sage-500 dark:border-sage-400">
+            “{{ currentDailyQuote.frase }}”
+          </blockquote>
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-stone-200/50 dark:border-stone-800 text-xs">
+            <p class="font-semibold text-sage-800 dark:text-sage-300">— {{ currentDailyQuote.autor }}</p>
+            <p class="text-[11px] text-stone-500 dark:text-stone-400">{{ currentDailyQuote.contexto }}</p>
+          </div>
+        </div>
+
+        <!-- Selector Horizontal de Dias -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 overflow-hidden">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h2 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>Línea de Tiempo del Detox</span>
+                <span class="text-xs px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 font-normal">
+                  Progreso Global: {{ overallProgressPercent }}%
+                </span>
+              </h2>
+              <p class="text-xs text-stone-500 dark:text-stone-400">Seleccioná el día para registrar tus misiones o revisar la pauta de esa jornada.</p>
+            </div>
+
+            <!-- Selector de Modo de Inicio -->
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-stone-500 dark:text-stone-400">Monodieta inicial:</span>
+              <select v-model="startMode" class="bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg px-2.5 py-1 text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-1 focus:ring-sage-500">
+                <option value="monodieta3">3 Días (Recomendado)</option>
+                <option value="monodieta2">2 Días</option>
+                <option value="monodieta1">1 Día</option>
+                <option value="directo">0 Días (Directo menú general)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Carrusel de Botones de Días con Snap Táctil -->
+          <div class="flex gap-2 overflow-x-auto pb-2 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-1 px-1">
+            <!-- Día 0: Preparación -->
+            <button 
+              @click="selectedDay = 0"
+              :class="selectedDay === 0 ? 'ring-2 ring-amber-500 bg-amber-500 text-white font-bold shadow-sm' : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'"
+              class="snap-start relative flex flex-col items-center justify-center min-w-[70px] h-[64px] rounded-xl text-center px-2 transition-all active:scale-95 shadow-2xs flex-shrink-0">
+              <span class="text-[10px] uppercase font-bold tracking-wider">Paso 0</span>
+              <span class="text-xs font-semibold">Previa</span>
+              <span v-if="challengeInfo.isFuture" class="text-[8px] leading-tight font-extrabold uppercase px-1 rounded bg-amber-400 text-amber-950 absolute bottom-1">
+                HOY
+              </span>
+            </button>
+
+            <!-- Días 1 al 21 -->
+            <button 
+              v-for="d in 21" 
+              :key="d"
+              @click="selectedDay = d"
+              :class="[
+                selectedDay === d ? 'ring-2 ring-sage-600 bg-sage-600 text-white font-bold shadow-md' : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700',
+                d <= 3 && startMode === 'monodieta3' ? 'border-b-2 border-emerald-400' : ''
+              ]"
+              class="snap-start relative flex flex-col items-center justify-center min-w-[56px] h-[64px] rounded-xl text-center px-1 transition-all active:scale-95 flex-shrink-0">
+              <span class="text-[10px] opacity-75 font-medium">Día</span>
+              <span class="text-base font-bold">{{ d }}</span>
+              <!-- Indicador si este día es HOY en el calendario -->
+              <span v-if="challengeInfo.started && !challengeInfo.isFuture && !challengeInfo.isFinished && d === challengeInfo.currentDay" 
+                    class="text-[8px] leading-tight font-extrabold uppercase px-1 rounded bg-amber-400 text-amber-950 absolute bottom-1">
+                HOY
+              </span>
+              <!-- Checkmark si el día está completo -->
+              <span v-if="completedMissions[`day_${d}`] && Object.values(completedMissions[`day_${d}`]).filter(Boolean).length === data.gamification.dailyMissions.length" 
+                    class="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-stone-900">
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Banner de la Fase Actual -->
+        <div class="p-5 rounded-2xl border shadow-xs transition-all"
+             :class="currentPhaseInfo.tipo === 'preparacion' 
+                      ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/50' 
+                      : currentPhaseInfo.tipo === 'monodieta' 
+                        ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50'
+                        : 'bg-teal-50/70 dark:bg-teal-950/30 border-teal-200 dark:border-teal-800/50'">
+          <div class="flex items-start justify-between flex-wrap gap-3">
+            <div>
+              <span class="text-xs uppercase font-extrabold tracking-wider px-2.5 py-0.5 rounded-full bg-white/80 dark:bg-stone-900/80 shadow-2xs"
+                    :class="currentPhaseInfo.tipo === 'preparacion' ? 'text-amber-800 dark:text-amber-300' : 'text-emerald-800 dark:text-emerald-300'">
+                {{ currentPhaseInfo.fase }}
+              </span>
+              <h3 class="text-lg font-bold text-stone-900 dark:text-stone-100 mt-2">
+                {{ selectedDay === 0 ? 'Reducción Progresiva de Cafeína' : (currentPhaseInfo.tipo === 'monodieta' ? 'Monodieta de Manzana y Arroz Yamaní' : 'Régimen Alcalino & Depuración de 21 Días') }}
+              </h3>
+              <p class="text-sm text-stone-600 dark:text-stone-300 mt-1 max-w-3xl leading-relaxed">
+                {{ currentPhaseInfo.desc }}
+              </p>
+            </div>
+
+            <!-- Atajos rápidos según fase -->
+            <div class="flex gap-2">
+              <button v-if="currentPhaseInfo.tipo === 'monodieta'" 
+                      @click="activeTab = 'recetas'; recipeSearch = 'nituke'"
+                      class="px-3 py-1.5 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs font-semibold text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 shadow-2xs flex items-center gap-1.5 transition">
+                <span>🍎</span> Ver receta de Nituke
+              </button>
+              <button v-if="currentPhaseInfo.tipo === 'general'" 
+                      @click="activeTab = 'recetas'; recipeSearch = 'caldo'"
+                      class="px-3 py-1.5 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs font-semibold text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 shadow-2xs flex items-center gap-1.5 transition">
+                <span>🥣</span> Ver Caldo Détox
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Misiones Diarias del Día Seleccionado -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>Misiones de Hábitos — Día {{ selectedDay }}</span>
+                <span class="text-xs font-medium px-2 py-0.5 rounded-full"
+                      :class="isCurrentDayFullyCompleted ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'">
+                  {{ currentDayCompletionPercent }}% cumplido
+                </span>
+              </h3>
+              <p class="text-xs text-stone-500 dark:text-stone-400">Cada misión suma +15 XP. Completar todas las misiones del día suma +50 XP bonus y mantiene tu racha.</p>
+            </div>
+
+            <div class="w-full sm:w-48 bg-stone-100 dark:bg-stone-800 h-2.5 rounded-full overflow-hidden">
+              <div class="bg-emerald-500 h-full rounded-full transition-all duration-300"
+                   :style="{ width: `${currentDayCompletionPercent}%` }">
+              </div>
+            </div>
+          </div>
+
+          <!-- Lista de Hábitos Checkbox -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+            <div 
+              v-for="m in data.gamification.dailyMissions" 
+              :key="m.id"
+              @click="toggleMission(m.id)"
+              class="flex items-start gap-3.5 p-3.5 rounded-xl border transition-all cursor-pointer select-none"
+              :class="isMissionDone(m.id) 
+                      ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800 text-stone-800 dark:text-stone-100 shadow-2xs' 
+                      : 'bg-stone-50/60 dark:bg-stone-800/40 border-stone-200/70 dark:border-stone-800 text-stone-600 dark:text-stone-300 hover:border-stone-300 dark:hover:border-stone-700'">
+              
+              <!-- Checkbox Estilizado -->
+              <input 
+                type="checkbox" 
+                :checked="isMissionDone(m.id)" 
+                class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
+                @click.stop="toggleMission(m.id)">
+
+              <div class="flex-1">
+                <p class="text-sm font-semibold" :class="isMissionDone(m.id) ? 'line-through opacity-75' : ''">
+                  {{ m.text }}
+                </p>
+                <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                  💡 {{ m.tip }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Banner de Felicitación si el día está completo -->
+          <div v-if="isCurrentDayFullyCompleted" 
+               class="p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-emerald-500/10 border border-emerald-300 dark:border-emerald-800 flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">🎉</span>
+              <div>
+                <h4 class="text-sm font-bold text-emerald-900 dark:text-emerald-200">¡Objetivo diario superado con honores!</h4>
+                <p class="text-xs text-emerald-800/80 dark:text-emerald-300/80">Mantuviste tu cuerpo en depuración profunda y ganaste tu bono diario de XP.</p>
+              </div>
+            </div>
+            <button @click="selectedDay < 21 ? selectedDay++ : null" 
+                    v-if="selectedDay < 21"
+                    class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition">
+              Pasar al Día {{ selectedDay + 1 }} →
+            </button>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECCIÓN: REGISTRO DE COMIDAS DEL DÍA       -->
+        <!-- ========================================== -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>🍽️ Comidas e Ingestas — Día {{ selectedDay }}</span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
+                  {{ ['desayuno', 'almuerzo', 'merienda', 'cena'].filter(s => currentDayMeals[s] && currentDayMeals[s].done).length }} / 4 registradas
+                </span>
+              </h3>
+              <p class="text-xs text-stone-500 dark:text-stone-400">
+                Registrá qué comiste en cada momento o seleccioná una receta sugerida de la guía. Podés escribir libremente si hiciste alguna adaptación.
+              </p>
+            </div>
+          </div>
+
+          <!-- Grilla de los 4 momentos del día -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
+            <div 
+              v-for="slot in data.journalOptions.mealSlots" 
+              :key="slot.id"
+              class="p-4 rounded-xl border transition-all space-y-2.5"
+              :class="currentDayMeals[slot.id]?.done 
+                      ? 'bg-sage-50/50 dark:bg-sage-950/20 border-sage-300 dark:border-sage-800/80' 
+                      : 'bg-stone-50/50 dark:bg-stone-800/30 border-stone-200/70 dark:border-stone-800'">
+              
+              <!-- Cabecera del Slot -->
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-lg">{{ slot.icon }}</span>
+                  <span class="text-xs font-bold uppercase tracking-wider text-stone-800 dark:text-stone-200">{{ slot.label }}</span>
+                </div>
+                <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-semibold select-none text-stone-600 dark:text-stone-300">
+                  <input 
+                    type="checkbox" 
+                    :checked="currentDayMeals[slot.id]?.done"
+                    @change="updateMealSlot(slot.id, { done: $event.target.checked })"
+                    class="rounded text-sage-600 focus:ring-sage-500 w-4 h-4 cursor-pointer">
+                  <span>{{ currentDayMeals[slot.id]?.done ? 'Consumido ✓' : 'Marcar consumo' }}</span>
+                </label>
+              </div>
+
+              <!-- Input de Texto Libre -->
+              <div>
+                <input 
+                  type="text" 
+                  :value="currentDayMeals[slot.id]?.text || ''"
+                  @input="updateMealSlot(slot.id, { text: $event.target.value })"
+                  :placeholder="slot.id === 'desayuno' ? 'Ej: Manzana tibia con canela e infusión de jengibre' : (slot.id === 'almuerzo' ? 'Ej: Arroz yamaní al nituke con semillas' : (slot.id === 'merienda' ? 'Ej: Infusión de melisa y compota' : 'Ej: Caldo détox caliente con perejil'))"
+                  class="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700/80 rounded-lg px-3 py-2 text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-sage-500 transition">
+              </div>
+
+              <!-- Sugerencias de recetas para este momento -->
+              <div class="space-y-1">
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Sugerencias recomendadas:</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <button 
+                    v-for="sug in getMealSuggestions(slot.id)" 
+                    :key="sug.id"
+                    @click="updateMealSlot(slot.id, { text: sug.titulo, done: true })"
+                    class="text-[10px] px-2 py-0.5 rounded-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-sage-400 hover:text-sage-700 dark:hover:text-sage-300 shadow-2xs transition active:scale-95 flex items-center gap-1">
+                    <span>+</span> <span>{{ sug.titulo }}</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECCIÓN: BITÁCORA CLÍNICA & DIARIO          -->
+        <!-- ========================================== -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-5">
+          <!-- Cabecera con selector de vistas y botón de exportar -->
+          <div class="flex items-center justify-between flex-wrap gap-3 pb-1 border-b border-stone-200/60 dark:border-stone-800">
+            <div>
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>📓 Bitácora Clínica & Sensaciones</span>
+                <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                  Registro del proceso
+                </span>
+              </h3>
+              <p class="text-xs text-stone-500 dark:text-stone-400">
+                Monitoreá tu energía, respuesta digestiva y crisis curativas para evaluar tu evolución biológica.
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <!-- Selector de Vistas: Día / Semana / Global -->
+              <div class="inline-flex p-1 bg-stone-100 dark:bg-stone-800 rounded-xl border border-stone-200/80 dark:border-stone-700 text-xs">
+                <button 
+                  @click="journalView = 'dia'"
+                  class="px-2.5 py-1 rounded-lg font-semibold transition"
+                  :class="journalView === 'dia' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+                  Día {{ selectedDay }}
+                </button>
+                <button 
+                  @click="journalView = 'semana'"
+                  class="px-2.5 py-1 rounded-lg font-semibold transition"
+                  :class="journalView === 'semana' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+                  Semana
+                </button>
+                <button 
+                  @click="journalView = 'global'"
+                  class="px-2.5 py-1 rounded-lg font-semibold transition"
+                  :class="journalView === 'global' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+                  Global
+                </button>
+              </div>
+
+              <!-- Botón Exportar Informe -->
+              <button 
+                @click="showExportModal = true"
+                class="px-3 py-1.5 bg-sage-600 hover:bg-sage-700 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition active:scale-95"
+                title="Exportar informe para tu nutricionista o médico">
+                <span>📤</span>
+                <span class="hidden sm:inline">Exportar</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- VISTA 1: DÍA SELECCIONADO -->
+          <div v-if="journalView === 'dia'" class="space-y-4">
+            
+            <!-- 1. Nivel de Energía -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+                ⚡ Nivel de Energía Vital
+              </label>
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                <button 
+                  v-for="lvl in data.journalOptions.energyLevels" 
+                  :key="lvl.id"
+                  @click="updateCurrentJournal({ energy: lvl.id })"
+                  class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between"
+                  :class="currentDayJournal.energy === lvl.id 
+                          ? 'bg-sage-100/80 dark:bg-sage-950/60 border-sage-500 dark:border-sage-500 text-sage-900 dark:text-sage-100 shadow-2xs ring-1 ring-sage-500' 
+                          : 'bg-stone-50/60 dark:bg-stone-800/40 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:border-stone-300'">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xl">{{ lvl.icon }}</span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/70 dark:bg-stone-900/70">{{ lvl.id }}/5</span>
+                  </div>
+                  <div class="mt-1">
+                    <p class="text-xs font-bold">{{ lvl.label }}</p>
+                    <p class="text-[10px] opacity-75 leading-tight">{{ lvl.desc }}</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Estado de Digestión -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+                🌱 Digestión & Asimilación
+              </label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button 
+                  v-for="dig in data.journalOptions.digestionStates" 
+                  :key="dig.id"
+                  @click="updateCurrentJournal({ digestion: dig.id })"
+                  class="p-2.5 rounded-xl border text-left transition flex items-center gap-2.5"
+                  :class="currentDayJournal.digestion === dig.id 
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-100 shadow-2xs ring-1 ring-emerald-500' 
+                          : 'bg-stone-50/60 dark:bg-stone-800/40 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:border-stone-300'">
+                  <span class="text-lg">{{ dig.icon }}</span>
+                  <span class="text-xs font-semibold leading-tight">{{ dig.label }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. Síntomas Frecuentes / Señales depurativas -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+                🔍 Señales Depurativas & Síntomas
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  v-for="sym in data.journalOptions.commonSymptoms" 
+                  :key="sym"
+                  @click="toggleJournalSymptom(sym)"
+                  class="px-3 py-1.5 rounded-xl border text-xs font-medium transition active:scale-95 flex items-center gap-1.5"
+                  :class="currentDayJournal.symptoms?.includes(sym)
+                          ? (sym === 'Despejado / Cero síntomas' 
+                             ? 'bg-emerald-100 dark:bg-emerald-950/80 border-emerald-400 text-emerald-800 dark:text-emerald-200 font-bold' 
+                             : 'bg-amber-100 dark:bg-amber-950/80 border-amber-400 text-amber-800 dark:text-amber-200 font-bold')
+                          : 'bg-stone-50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:border-stone-300'">
+                  <span>{{ currentDayJournal.symptoms?.includes(sym) ? '✓' : '+' }}</span>
+                  <span>{{ sym }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 4. Notas Libres y Emociones -->
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+                  ✍️ Sensaciones, Sueño & Notas Libres
+                </label>
+                <span class="text-[10px] text-stone-400">Guardado automático en tiempo real</span>
+              </div>
+              <textarea 
+                :value="currentDayJournal.notes || ''"
+                @input="updateCurrentJournal({ notes: $event.target.value })"
+                rows="3"
+                placeholder="¿Cómo te sentiste hoy física y emocionalmente? ¿Hubo cambios en tu claridad mental, descanso nocturno o apetito? Escribí acá todo lo que consideres relevante..."
+                class="w-full bg-stone-50 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-700 rounded-xl p-3 text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-sage-500 transition leading-relaxed"></textarea>
+            </div>
+
+          </div>
+
+          <!-- VISTA 2: SEMANAL (GOLPE DE VISTA DE 7 DÍAS) -->
+          <div v-else-if="journalView === 'semana'" class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300">
+                Resumen Semanal • Días {{ currentWeekDays[0]?.day }} al {{ currentWeekDays[currentWeekDays.length - 1]?.day }}
+              </h4>
+              <span class="text-[11px] text-stone-400">Tocá cualquier día para editarlo</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-7 gap-2.5">
+              <div 
+                v-for="item in currentWeekDays" 
+                :key="item.day"
+                @click="selectedDay = item.day; journalView = 'dia'"
+                class="p-3 rounded-xl border transition cursor-pointer text-xs space-y-2 flex flex-col justify-between"
+                :class="item.day === selectedDay 
+                        ? 'border-sage-500 bg-sage-50/70 dark:bg-sage-950/40 shadow-xs ring-1 ring-sage-400' 
+                        : (item.journal || item.meals ? 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800 hover:border-stone-300' : 'bg-stone-50/40 dark:bg-stone-800/20 border-stone-200/50 dark:border-stone-800/50 opacity-70')">
+                
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs" :class="item.day === selectedDay ? 'text-sage-800 dark:text-sage-200' : 'text-stone-700 dark:text-stone-300'">
+                    Día {{ item.day }}
+                  </span>
+                  <span v-if="item.journal?.energy" class="text-sm">
+                    {{ data.journalOptions.energyLevels.find(e => e.id === Number(item.journal.energy))?.icon || '⚡' }}
+                  </span>
+                </div>
+
+                <div class="space-y-1 text-[11px]">
+                  <p v-if="item.journal?.digestion" class="text-stone-500 dark:text-stone-400 flex items-center gap-1">
+                    <span>{{ data.journalOptions.digestionStates.find(d => d.id === item.journal.digestion)?.icon }}</span>
+                    <span class="truncate">{{ data.journalOptions.digestionStates.find(d => d.id === item.journal.digestion)?.label }}</span>
+                  </p>
+                  <p v-if="item.journal?.symptoms?.length" class="text-amber-700 dark:text-amber-400 text-[10px] font-medium truncate">
+                    {{ item.journal.symptoms.length }} señal(es)
+                  </p>
+                  <p v-if="item.journal?.notes" class="text-stone-400 dark:text-stone-500 text-[10px] italic line-clamp-2">
+                    "{{ item.journal.notes }}"
+                  </p>
+                  <div v-if="!item.journal && !item.meals" class="text-stone-300 dark:text-stone-600 text-[10px] italic text-center py-2">
+                    Sin datos
+                  </div>
+                </div>
+
+                <div class="pt-1 border-t border-stone-100 dark:border-stone-800 text-[10px] text-stone-400 flex items-center justify-between">
+                  <span>{{ item.meals ? Object.values(item.meals).filter(m => m && m.done).length : 0 }}/4 comidas</span>
+                  <span class="text-sage-600 dark:text-sage-400 font-bold">Ver →</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VISTA 3: HISTORIAL GLOBAL (TODOS LOS REGISTROS APILADOS) -->
+          <div v-else-if="journalView === 'global'" class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300">
+                Historial Clínico Completo (Días 1 al 21)
+              </h4>
+              <button 
+                @click="showExportModal = true"
+                class="text-xs text-sage-600 dark:text-sage-400 hover:underline font-semibold flex items-center gap-1">
+                <span>📋 Exportar informe completo</span>
+              </button>
+            </div>
+
+            <!-- Listado Apilado -->
+            <div class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+              <div 
+                v-for="d in 21" 
+                :key="d"
+                v-show="dailyJournal[`dia_${d}`] || dailyMeals[`dia_${d}`]"
+                class="p-3.5 bg-stone-50 dark:bg-stone-800/40 rounded-xl border border-stone-200/80 dark:border-stone-800 text-xs space-y-2">
+                
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded-md bg-stone-200 dark:bg-stone-700 font-bold text-stone-800 dark:text-stone-200 text-[11px]">
+                      Día {{ d }}
+                    </span>
+                    <span v-if="dailyJournal[`dia_${d}`]?.energy" class="text-xs font-medium text-stone-600 dark:text-stone-300 flex items-center gap-1">
+                      <span>{{ data.journalOptions.energyLevels.find(e => e.id === Number(dailyJournal[`dia_${d}`].energy))?.icon }}</span>
+                      <span>Energía: {{ data.journalOptions.energyLevels.find(e => e.id === Number(dailyJournal[`dia_${d}`].energy))?.label }}</span>
+                    </span>
+                  </div>
+                  <button 
+                    @click="selectedDay = d; journalView = 'dia'"
+                    class="text-[11px] text-sage-600 dark:text-sage-400 hover:underline font-medium">
+                    Editar día {{ d }} →
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1">
+                  <!-- Columna izquierda: Diario -->
+                  <div v-if="dailyJournal[`dia_${d}`]" class="space-y-1">
+                    <p v-if="dailyJournal[`dia_${d}`].digestion" class="text-stone-600 dark:text-stone-300">
+                      <strong>Digestión:</strong> {{ data.journalOptions.digestionStates.find(x => x.id === dailyJournal[`dia_${d}`].digestion)?.label }}
+                    </p>
+                    <p v-if="dailyJournal[`dia_${d}`].symptoms?.length" class="text-amber-800 dark:text-amber-300">
+                      <strong>Señales:</strong> {{ dailyJournal[`dia_${d}`].symptoms.join(', ') }}
+                    </p>
+                    <p v-if="dailyJournal[`dia_${d}`].notes" class="text-stone-500 dark:text-stone-400 italic">
+                      "{{ dailyJournal[`dia_${d}`].notes }}"
+                    </p>
+                  </div>
+
+                  <!-- Columna derecha: Comidas -->
+                  <div v-if="dailyMeals[`dia_${d}`]" class="space-y-0.5 border-t sm:border-t-0 sm:border-l border-stone-200 dark:border-stone-700 sm:pl-2 pt-1 sm:pt-0">
+                    <p class="font-semibold text-stone-600 dark:text-stone-400 text-[10px] uppercase">Comidas:</p>
+                    <div v-for="slot in ['desayuno', 'almuerzo', 'merienda', 'cena']" :key="slot">
+                      <p v-if="dailyMeals[`dia_${d}`][slot]?.text" class="text-stone-600 dark:text-stone-300 truncate">
+                        <span class="capitalize font-medium">{{ slot }}:</span> {{ dailyMeals[`dia_${d}`][slot].text }}
+                        <span v-if="dailyMeals[`dia_${d}`][slot].done" class="text-emerald-600 dark:text-emerald-400">✓</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Estado vacío si no hay ningún día registrado -->
+              <div 
+                v-if="!Object.keys(dailyJournal).length && !Object.keys(dailyMeals).length" 
+                class="p-6 text-center text-stone-400 dark:text-stone-500 italic space-y-1">
+                <p class="text-xl">📓</p>
+                <p>Todavía no hay entradas guardadas en la bitácora.</p>
+                <p class="text-[11px]">Completá tu primer registro en la pestaña del día para comenzar a armar tu historial.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Vitrina de Logros / Medallas Desbloqueables -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>🏆 Salón de Medallas & Logros</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold">
+                  {{ unlockedBadges.length }} / {{ data.gamification.badges.length }}
+                </span>
+              </h3>
+              <p class="text-xs text-stone-500 dark:text-stone-400">Desbloqueá hitos a medida que avanzás en los 21 días de desintoxicación.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            <div 
+              v-for="b in data.gamification.badges" 
+              :key="b.id"
+              class="p-3.5 rounded-xl border text-center flex flex-col items-center justify-center transition-all"
+              :class="isBadgeUnlocked(b.id) 
+                      ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700/60 text-stone-900 dark:text-stone-100 shadow-2xs animate-badge ring-1 ring-amber-400/40' 
+                      : 'bg-stone-50/50 dark:bg-stone-800/30 border-stone-200/60 dark:border-stone-800 text-stone-400 opacity-60 grayscale'">
+              
+              <div class="text-3xl mb-1.5">
+                <span v-if="b.id === 'inicio'">🌱</span>
+                <span v-else-if="b.id === 'monodieta'">🍎</span>
+                <span v-else-if="b.id === 'adios_cafeina'">⚡</span>
+                <span v-else-if="b.id === 'semana1'">🔥</span>
+                <span v-else-if="b.id === 'maestro_nituke'">🍲</span>
+                <span v-else-if="b.id === 'detox_champion'">👑</span>
+                <span v-else>🏅</span>
+              </div>
+
+              <h4 class="text-xs font-bold leading-tight">{{ b.title }}</h4>
+              <p class="text-[10px] text-stone-500 dark:text-stone-400 mt-1 leading-tight line-clamp-2">{{ b.desc }}</p>
+              
+              <span class="mt-2 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded"
+                    :class="isBadgeUnlocked(b.id) ? 'bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-200' : 'bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300'">
+                {{ isBadgeUnlocked(b.id) ? 'Desbloqueado' : `Requiere día ${b.requiredDays}` }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </section>

@@ -1,0 +1,87 @@
+<!-- ========================================== -->
+      <!-- PESTANA 4: SEMAFORO ¿PUEDO COMER ESTO?     -->
+      <!-- ========================================== -->
+      <section v-show="activeTab === 'semaforo'" class="space-y-6">
+        
+        <!-- Header con Buscador y Filtro Verde/Amarillo/Rojo -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>Semáforo Nutricional del Detox</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 font-medium">
+                  Guía Rápida de Dudas
+                </span>
+              </h2>
+              <p class="text-xs text-stone-500 dark:text-stone-400">Consultá en segundos si un alimento está permitido, restringido o si requiere moderación según el protocolo de Isa.</p>
+            </div>
+
+            <!-- Buscador instantáneo -->
+            <div class="w-full sm:w-80 relative">
+              <input 
+                type="text" 
+                v-model="foodSearch" 
+                placeholder="Escribí: mate, pollo, café, miel, avena..."
+                class="w-full pl-9 pr-4 py-2 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs sm:text-sm text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-sage-500">
+              <span class="absolute left-3 top-2.5 text-stone-400">🔍</span>
+              <button v-if="foodSearch" @click="foodSearch = ''" class="absolute right-3 top-2.5 text-xs text-stone-400 hover:text-stone-600">✕</button>
+            </div>
+          </div>
+
+          <!-- Filtro Semáforo Pills (Grid 2x2 en móvil para ergonomía táctil sin desbordes, flex en desktop) -->
+          <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 text-xs">
+            <button 
+              @click="foodStatusFilter = 'todos'"
+              :class="foodStatusFilter === 'todos' ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold shadow-xs' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
+              class="px-3 py-2 sm:py-1.5 rounded-xl sm:rounded-lg transition text-center flex items-center justify-center gap-1 font-medium active:scale-95">
+              <span>Todos</span> <span class="opacity-80">({{ data.foodTrafficLight.length }})</span>
+            </button>
+            <button 
+              @click="foodStatusFilter = 'green'"
+              :class="foodStatusFilter === 'green' ? 'bg-emerald-600 text-white font-bold ring-2 ring-emerald-300 dark:ring-emerald-800 shadow-xs' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80 hover:bg-emerald-100 dark:hover:bg-emerald-900/40'"
+              class="px-3 py-2 sm:py-1.5 rounded-xl sm:rounded-lg transition flex items-center justify-center gap-1 font-medium active:scale-95">
+              <span>🟢</span> <span>Permitidos<span class="hidden sm:inline"> / Libres</span></span>
+            </button>
+            <button 
+              @click="foodStatusFilter = 'yellow'"
+              :class="foodStatusFilter === 'yellow' ? 'bg-amber-500 text-white font-bold ring-2 ring-amber-300 dark:ring-amber-800 shadow-xs' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/80 hover:bg-amber-100 dark:hover:bg-amber-900/40'"
+              class="px-3 py-2 sm:py-1.5 rounded-xl sm:rounded-lg transition flex items-center justify-center gap-1 font-medium active:scale-95">
+              <span>🟡</span> <span>Moderación<span class="hidden sm:inline"> / Opcionales</span></span>
+            </button>
+            <button 
+              @click="foodStatusFilter = 'red'"
+              :class="foodStatusFilter === 'red' ? 'bg-rose-600 text-white font-bold ring-2 ring-rose-300 dark:ring-rose-800 shadow-xs' : 'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/80 hover:bg-rose-100 dark:hover:bg-rose-900/40'"
+              class="px-3 py-2 sm:py-1.5 rounded-xl sm:rounded-lg transition flex items-center justify-center gap-1 font-medium active:scale-95">
+              <span>🔴</span> <span>Prohibidos</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tarjetas del Semáforo -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div 
+            v-for="(f, idx) in filteredFoods" 
+            :key="idx"
+            class="p-4 rounded-xl border shadow-2xs transition-card flex flex-col justify-between"
+            :class="f.estado === 'green' 
+                    ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/60' 
+                    : f.estado === 'yellow' 
+                      ? 'bg-amber-50/40 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/60' 
+                      : 'bg-rose-50/40 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/60'">
+            
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full"
+                      :class="f.estado === 'green' ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200' : f.estado === 'yellow' ? 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200' : 'bg-rose-100 dark:bg-rose-900 text-rose-800 dark:text-rose-200'">
+                  {{ f.estado === 'green' ? '🟢 PERMITIDO' : f.estado === 'yellow' ? '🟡 MODERACIÓN' : '🔴 EXCLUIDO' }}
+                </span>
+                <span class="text-[11px] text-stone-500 font-medium">{{ f.cat }}</span>
+              </div>
+
+              <h4 class="text-sm font-bold text-stone-900 dark:text-stone-100">{{ f.nombre }}</h4>
+              <p class="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">{{ f.desc }}</p>
+            </div>
+          </div>
+        </div>
+
+      </section>

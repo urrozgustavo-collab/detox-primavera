@@ -1,0 +1,78 @@
+<!-- ========================================== -->
+        <!-- SUBVISTA 4: GESTOR DE REMOJOS Y TIEMPOS    -->
+        <!-- ========================================== -->
+        <div v-show="recipeSubView === 'remojos'" class="space-y-6">
+          
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-2">
+            <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <span>⏳ Gestor de Remojos, Activación & Tiempos Previos</span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                11 reglas bioquímicas
+              </span>
+            </h3>
+            <p class="text-xs text-stone-500 dark:text-stone-400 max-w-2xl leading-relaxed">
+              La activación adecuada neutraliza el ácido fítico y los inhibidores enzimáticos de las semillas, granos y legumbres. Esta tabla te indica exactamente cuánto tiempo requiere cada insumo y si tenés que descartar o conservar el agua.
+            </p>
+          </div>
+
+          <!-- Grilla de Insumos y Reglas de Remojo -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div 
+              v-for="rule in (fridgeEngineData?.soakingAndPreTimes || [])" 
+              :key="rule.id"
+              class="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200/80 dark:border-stone-800 shadow-xs space-y-3 flex flex-col justify-between">
+              
+              <div class="space-y-2.5">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
+                        :class="rule.tiempoOptimoHoras >= 48 
+                                ? 'bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300' 
+                                : (rule.tiempoOptimoHoras >= 8 
+                                   ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300' 
+                                   : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300')">
+                    ⏱️ {{ rule.tiempoRemojoTexto }}
+                  </span>
+                  <span class="text-[10px] font-mono text-stone-400">
+                    {{ rule.temperatura }}
+                  </span>
+                </div>
+
+                <div>
+                  <h4 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+                    <span>{{ rule.icono }}</span> <span>{{ rule.alimento }}</span>
+                  </h4>
+                  <p class="text-xs text-stone-600 dark:text-stone-300 mt-1 leading-relaxed">
+                    {{ rule.metodo }}
+                  </p>
+                </div>
+
+                <!-- Alerta de Agua: ¿Descartar o Conservar? -->
+                <div class="p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2"
+                     :class="rule.descartarAgua 
+                             ? 'bg-rose-50/70 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-300' 
+                             : 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-300'">
+                  <span class="text-base">{{ rule.descartarAgua ? '🚰' : '🥣' }}</span>
+                  <div class="text-[11px] leading-tight">
+                    <p class="font-bold">{{ rule.descartarAgua ? 'DESCARTAR EL AGUA' : 'NO DESCARTAR EL AGUA' }}</p>
+                    <p class="text-[10px] opacity-80 mt-0.5">{{ rule.descartarAgua ? 'Enjuagar enérgicamente antes de cocinar' : 'El gel / mucílago contiene los nutrientes activos' }}</p>
+                  </div>
+                </div>
+
+                <!-- Motivo Bioquímico -->
+                <div class="space-y-1 text-xs">
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-stone-400">Fundamento Clínico:</p>
+                  <p class="text-stone-600 dark:text-stone-300 text-[11px] leading-relaxed">
+                    {{ rule.motivoBioquimico }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Recetas Asociadas -->
+              <div class="pt-2 border-t border-stone-100 dark:border-stone-800 text-[10px] text-stone-400">
+                Aplica a: <span class="text-stone-600 dark:text-stone-300 font-medium">{{ rule.recetasAsociadas.join(', ') }}</span>
+              </div>
+
+            </div>
+          </div>
+
+        </div>

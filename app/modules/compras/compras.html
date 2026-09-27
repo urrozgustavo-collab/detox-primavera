@@ -1,0 +1,101 @@
+<!-- ========================================== -->
+      <!-- PESTANA 3: LISTA DE COMPRAS INTERACTIVA    -->
+      <!-- ========================================== -->
+      <section v-show="activeTab === 'compras'" class="space-y-6">
+        
+        <!-- Header con Contadores y Boton WhatsApp -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>Lista de Compras — Detox de Primavera</span>
+                <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold">
+                  {{ shoppingStats.percent }}% comprado
+                </span>
+              </h2>
+              <p class="text-xs text-stone-500 dark:text-stone-400">
+                {{ shoppingStats.completed }} de {{ shoppingStats.total }} items conseguidos • {{ shoppingStats.pending }} pendientes
+              </p>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex items-center gap-2">
+              <button 
+                @click="copyShoppingList" 
+                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-2 transition">
+                <span>💬</span> Copiar pendientes a WhatsApp
+              </button>
+            </div>
+          </div>
+
+          <!-- Barra de Progreso de Compras -->
+          <div class="w-full bg-stone-100 dark:bg-stone-800 h-2.5 rounded-full overflow-hidden">
+            <div class="bg-emerald-500 h-full rounded-full transition-all duration-300"
+                 :style="{ width: `${shoppingStats.percent}%` }">
+            </div>
+          </div>
+
+          <!-- Filtros por Comercio / Lugar de Compra -->
+          <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-stone-100 dark:border-stone-800 text-xs">
+            <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-1">
+              <button 
+                v-for="cat in ['todas', 'Verdulería', 'Dietética', 'Herboristería', 'Panadería', 'Farmacia', 'Pescadería']" 
+                :key="cat"
+                @click="shoppingFilterCategory = cat"
+                :class="shoppingFilterCategory === cat ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
+                class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">
+                {{ cat === 'todas' ? 'Todos los comercios' : cat }}
+              </button>
+            </div>
+
+            <label class="flex items-center gap-2 text-stone-600 dark:text-stone-400 cursor-pointer select-none">
+              <input type="checkbox" v-model="shoppingOnlyPending" class="rounded text-emerald-600 focus:ring-emerald-500">
+              <span>Ocultar ya comprados</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Lista de Items Agrupados / Filtrados -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl shadow-xs border border-stone-200/80 dark:border-stone-800 divide-y divide-stone-100 dark:divide-stone-800 overflow-hidden">
+          <div 
+            v-for="item in filteredShopping" 
+            :key="item.id"
+            @click="toggleShopping(item.id)"
+            class="p-4 flex items-center justify-between gap-3 hover:bg-stone-50/80 dark:hover:bg-stone-800/40 cursor-pointer transition select-none"
+            :class="shoppingChecked[item.id] ? 'bg-stone-50/50 dark:bg-stone-900/50 opacity-60' : ''">
+            
+            <div class="flex items-center gap-3.5">
+              <input 
+                type="checkbox" 
+                :checked="!!shoppingChecked[item.id]" 
+                class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
+                @click.stop="toggleShopping(item.id)">
+              
+              <div>
+                <p class="text-sm font-semibold text-stone-900 dark:text-stone-100"
+                   :class="shoppingChecked[item.id] ? 'line-through text-stone-400 dark:text-stone-500' : ''">
+                  {{ item.item }}
+                </p>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span class="text-[10px] px-2 py-0.2 rounded font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400">
+                    {{ item.cat }}
+                  </span>
+                  <span v-if="item.esencial" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                    ★ Esencial
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cantidad sugerida -->
+            <span class="text-xs font-mono font-medium text-stone-600 dark:text-stone-400 bg-stone-100 dark:bg-stone-800 px-2.5 py-1 rounded-md">
+              {{ item.cant }}
+            </span>
+          </div>
+
+          <div v-if="filteredShopping.length === 0" class="p-8 text-center text-stone-400 text-sm">
+            No hay items pendientes en esta categoría.
+          </div>
+        </div>
+
+      </section>

@@ -87,6 +87,7 @@
 <body class="bg-warmcream text-stone-800 dark:bg-stone-950 dark:text-stone-100 min-h-screen transition-colors duration-200 overflow-x-hidden w-full">
   <div id="app" v-cloak class="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
     
+    <!-- Topbar Header -->
     <!-- Topbar Header (Compacto y nativo) -->
     <header class="sticky top-0 z-30 bg-white/90 dark:bg-stone-900/90 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800 pt-safe transition-colors w-full">
       <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
@@ -222,9 +223,11 @@
       </div>
     </nav>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 min-w-0 max-w-6xl w-full mx-auto px-3.5 sm:px-4 py-3 sm:py-6 pb-28 md:pb-8">
 
+    <!-- Main Content Area -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 pt-5 pb-24 sm:pb-28">
+
+      <!-- PESTAÑA 1: MI DIA & TRACKER 21 DIAS -->
       <!-- ========================================== -->
       <!-- PESTANA 1: MI DIA & TRACKER 21 DIAS        -->
       <!-- ========================================== -->
@@ -1030,12 +1033,9 @@
 
       </section>
 
-      <!-- ========================================== -->
-      <!-- ========================================== -->
-      <!-- PESTANA 2: RECETARIO & COCINA INTELIGENTE   -->
-      <!-- ========================================== -->
+
+      <!-- PESTAÑA 2: RECETARIO & COCINA INTELIGENTE -->
       <section v-show="activeTab === 'recetas'" class="space-y-6">
-        
         <!-- Segmented Switcher de Cocina Inteligente -->
         <div class="flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-2xl mx-auto overflow-x-auto no-scrollbar">
           <button 
@@ -1067,8 +1067,7 @@
           </button>
         </div>
 
-        <!-- ========================================== -->
-        <!-- SUBVISTA 1: CATÁLOGO CLÁSICO DE RECETAS    -->
+<!-- SUBVISTA 1: CATÁLOGO CLÁSICO DE RECETAS    -->
         <!-- ========================================== -->
         <div v-show="recipeSubView === 'catalogo'" class="space-y-6">
           
@@ -1587,6 +1586,7 @@
 
       </section>
 
+      <!-- PESTAÑA 3: LISTA DE COMPRAS INTERACTIVA -->
       <!-- ========================================== -->
       <!-- PESTANA 3: LISTA DE COMPRAS INTERACTIVA    -->
       <!-- ========================================== -->
@@ -1689,6 +1689,8 @@
 
       </section>
 
+
+      <!-- PESTAÑA 4: SEMAFORO NUTRICIONAL -->
       <!-- ========================================== -->
       <!-- PESTANA 4: SEMAFORO ¿PUEDO COMER ESTO?     -->
       <!-- ========================================== -->
@@ -1777,6 +1779,8 @@
 
       </section>
 
+
+      <!-- PESTAÑA 5: BOTIQUIN SOS / SINTOMAS -->
       <!-- ========================================== -->
       <!-- PESTANA 5: BOTIQUIN SOS / SINTOMAS         -->
       <!-- ========================================== -->
@@ -1840,6 +1844,8 @@
 
       </section>
 
+
+      <!-- PESTAÑA 6: HERBOLARIO & HUB DEL TALLER -->
       <!-- ========================================== -->
       <!-- PESTANA 6: HERBOLARIO & HUB DEL TALLER     -->
       <!-- ========================================== -->
@@ -1948,8 +1954,10 @@
 
       </section>
 
+
     </main>
 
+    <!-- Footer -->
     <!-- Footer -->
     <footer class="mt-auto border-t border-stone-200 dark:border-stone-800 py-6 text-center text-xs text-stone-500 dark:text-stone-400 bg-white/50 dark:bg-stone-900/50">
       <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -1960,6 +1968,8 @@
       </div>
     </footer>
 
+
+    <!-- Modales Globales & Toasts -->
     <!-- ========================================== -->
     <!-- MODAL: DETALLES DE RECETA (BOTTOM SHEET EN MOVIL) -->
     <!-- ========================================== -->
@@ -2337,6 +2347,8 @@
       <span>{{ toastMessage }}</span>
     </div>
 
+
+    <!-- Barra de Navegacion Inferior Móvil -->
     <!-- ========================================== -->
     <!-- BARRA DE NAVEGACION INFERIOR (CELULAR)     -->
     <!-- ========================================== -->
@@ -2404,9 +2416,20 @@
       </div>
     </nav>
 
+
   </div>
 
-  <!-- Scripts -->
+  <!-- Scripts Modulares -->
+  <script src="core/core.js"></script>
+  <script src="modules/dia/dia.js"></script>
+  <script src="modules/recetas/recetas.js"></script>
+  <script src="modules/heladera/heladera.js"></script>
+  <script src="modules/batch/batch.js"></script>
+  <script src="modules/remojos/remojos.js"></script>
+  <script src="modules/compras/compras.js"></script>
+  <script src="modules/semaforo/semaforo.js"></script>
+  <script src="modules/sos/sos.js"></script>
+  <script src="modules/herbolario/herbolario.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

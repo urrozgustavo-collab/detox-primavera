@@ -1,0 +1,66 @@
+<!-- ========================================== -->
+    <!-- BARRA DE NAVEGACION INFERIOR (CELULAR)     -->
+    <!-- ========================================== -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-stone-900/95 backdrop-blur-lg border-t border-stone-200/80 dark:border-stone-800 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] pb-safe transition-colors">
+      <div class="grid grid-cols-5 h-14 items-center px-1">
+        
+        <!-- Tab 1: Mi Día -->
+        <button 
+          @click="activeTab = 'dia'" 
+          class="flex flex-col items-center justify-center h-full gap-0.5 py-1 transition-all active:scale-90" 
+          :class="activeTab === 'dia' ? 'text-sage-700 dark:text-sage-400 font-bold' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 font-medium'">
+          <div class="relative flex items-center justify-center w-7 h-7 rounded-full transition-colors" :class="activeTab === 'dia' ? 'bg-sage-100 dark:bg-sage-950/80' : ''">
+            <span class="text-base">📅</span>
+          </div>
+          <span class="text-[10px] leading-tight">Mi Día</span>
+        </button>
+
+        <!-- Tab 2: Recetas -->
+        <button 
+          @click="activeTab = 'recetas'" 
+          class="flex flex-col items-center justify-center h-full gap-0.5 py-1 transition-all active:scale-90" 
+          :class="activeTab === 'recetas' ? 'text-sage-700 dark:text-sage-400 font-bold' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 font-medium'">
+          <div class="relative flex items-center justify-center w-7 h-7 rounded-full transition-colors" :class="activeTab === 'recetas' ? 'bg-sage-100 dark:bg-sage-950/80' : ''">
+            <span class="text-base">🥗</span>
+          </div>
+          <span class="text-[10px] leading-tight">Recetas</span>
+        </button>
+
+        <!-- Tab 3: Compras -->
+        <button 
+          @click="activeTab = 'compras'" 
+          class="flex flex-col items-center justify-center h-full gap-0.5 py-1 transition-all active:scale-90" 
+          :class="activeTab === 'compras' ? 'text-sage-700 dark:text-sage-400 font-bold' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 font-medium'">
+          <div class="relative flex items-center justify-center w-7 h-7 rounded-full transition-colors" :class="activeTab === 'compras' ? 'bg-sage-100 dark:bg-sage-950/80' : ''">
+            <span class="text-base">🛒</span>
+            <span v-if="shoppingStats.pending > 0" class="absolute -top-1 -right-1.5 px-1.5 py-0.2 rounded-full text-[9px] bg-amber-500 text-white font-extrabold shadow-2xs leading-tight">
+              {{ shoppingStats.pending }}
+            </span>
+          </div>
+          <span class="text-[10px] leading-tight">Compras</span>
+        </button>
+
+        <!-- Tab 4: Semáforo -->
+        <button 
+          @click="activeTab = 'semaforo'" 
+          class="flex flex-col items-center justify-center h-full gap-0.5 py-1 transition-all active:scale-90" 
+          :class="activeTab === 'semaforo' ? 'text-sage-700 dark:text-sage-400 font-bold' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 font-medium'">
+          <div class="relative flex items-center justify-center w-7 h-7 rounded-full transition-colors" :class="activeTab === 'semaforo' ? 'bg-sage-100 dark:bg-sage-950/80' : ''">
+            <span class="text-base">🚦</span>
+          </div>
+          <span class="text-[10px] leading-tight">Semáforo</span>
+        </button>
+
+        <!-- Tab 5: SOS & Taller -->
+        <button 
+          @click="activeTab = (activeTab === 'taller' ? 'taller' : 'sos')" 
+          class="flex flex-col items-center justify-center h-full gap-0.5 py-1 transition-all active:scale-90" 
+          :class="(activeTab === 'sos' || activeTab === 'taller') ? 'text-sage-700 dark:text-sage-400 font-bold' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 font-medium'">
+          <div class="relative flex items-center justify-center w-7 h-7 rounded-full transition-colors" :class="(activeTab === 'sos' || activeTab === 'taller') ? 'bg-sage-100 dark:bg-sage-950/80' : ''">
+            <span class="text-base">🆘</span>
+          </div>
+          <span class="text-[10px] leading-tight">SOS & Guía</span>
+        </button>
+
+      </div>
+    </nav>
