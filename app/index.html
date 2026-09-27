@@ -361,6 +361,26 @@
 
         </div>
 
+        <!-- Tarjeta de Inspiración Clínica Diaria -->
+        <div v-if="currentDailyQuote" class="bg-gradient-to-r from-sage-50/90 to-stone-50/90 dark:from-stone-900/90 dark:to-sage-950/30 rounded-2xl p-4 sm:p-5 border border-sage-200/90 dark:border-stone-800 shadow-2xs space-y-2.5 transition-all">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-sage-200/70 dark:bg-sage-900/80 text-sage-900 dark:text-sage-200 border border-sage-300 dark:border-sage-800 flex items-center gap-1.5">
+              <span>📜</span>
+              <span>Día {{ selectedDay }} • {{ currentDailyQuote.tema }}</span>
+            </span>
+            <button @click="copyQuote(currentDailyQuote)" class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-xs flex items-center gap-1 px-2 py-0.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition" title="Copiar cita al portapapeles">
+              <span>📋</span> <span class="hidden sm:inline text-[11px]">Copiar</span>
+            </button>
+          </div>
+          <blockquote class="italic text-sm sm:text-base font-serif text-stone-800 dark:text-stone-200 leading-relaxed pl-3 border-l-2 border-sage-500 dark:border-sage-400">
+            “{{ currentDailyQuote.frase }}”
+          </blockquote>
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-stone-200/50 dark:border-stone-800 text-xs">
+            <p class="font-semibold text-sage-800 dark:text-sage-300">— {{ currentDailyQuote.autor }}</p>
+            <p class="text-[11px] text-stone-500 dark:text-stone-400">{{ currentDailyQuote.contexto }}</p>
+          </div>
+        </div>
+
         <!-- Selector Horizontal de Dias -->
         <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 overflow-hidden">
           <div class="flex items-center justify-between flex-wrap gap-2">
@@ -528,6 +548,350 @@
               Pasar al Día {{ selectedDay + 1 }} →
             </button>
           </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECCIÓN: REGISTRO DE COMIDAS DEL DÍA       -->
+        <!-- ========================================== -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>🍽️ Comidas e Ingestas — Día {{ selectedDay }}</span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
+                  {{ ['desayuno', 'almuerzo', 'merienda', 'cena'].filter(s => currentDayMeals[s] && currentDayMeals[s].done).length }} / 4 registradas
+                </span>
+              </h3>
+              <p class="text-xs text-stone-500 dark:text-stone-400">
+                Registrá qué comiste en cada momento o seleccioná una receta sugerida de la guía. Podés escribir libremente si hiciste alguna adaptación.
+              </p>
+            </div>
+          </div>
+
+          <!-- Grilla de los 4 momentos del día -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
+            <div 
+              v-for="slot in data.journalOptions.mealSlots" 
+              :key="slot.id"
+              class="p-4 rounded-xl border transition-all space-y-2.5"
+              :class="currentDayMeals[slot.id]?.done 
+                      ? 'bg-sage-50/50 dark:bg-sage-950/20 border-sage-300 dark:border-sage-800/80' 
+                      : 'bg-stone-50/50 dark:bg-stone-800/30 border-stone-200/70 dark:border-stone-800'">
+              
+              <!-- Cabecera del Slot -->
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-lg">{{ slot.icon }}</span>
+                  <span class="text-xs font-bold uppercase tracking-wider text-stone-800 dark:text-stone-200">{{ slot.label }}</span>
+                </div>
+                <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-semibold select-none text-stone-600 dark:text-stone-300">
+                  <input 
+                    type="checkbox" 
+                    :checked="currentDayMeals[slot.id]?.done"
+                    @change="updateMealSlot(slot.id, { done: $event.target.checked })"
+                    class="rounded text-sage-600 focus:ring-sage-500 w-4 h-4 cursor-pointer">
+                  <span>{{ currentDayMeals[slot.id]?.done ? 'Consumido ✓' : 'Marcar consumo' }}</span>
+                </label>
+              </div>
+
+              <!-- Input de Texto Libre -->
+              <div>
+                <input 
+                  type="text" 
+                  :value="currentDayMeals[slot.id]?.text || ''"
+                  @input="updateMealSlot(slot.id, { text: $event.target.value })"
+                  :placeholder="slot.id === 'desayuno' ? 'Ej: Manzana tibia con canela e infusión de jengibre' : (slot.id === 'almuerzo' ? 'Ej: Arroz yamaní al nituke con semillas' : (slot.id === 'merienda' ? 'Ej: Infusión de melisa y compota' : 'Ej: Caldo détox caliente con perejil'))"
+                  class="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700/80 rounded-lg px-3 py-2 text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-sage-500 transition">
+              </div>
+
+              <!-- Sugerencias de recetas para este momento -->
+              <div class="space-y-1">
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Sugerencias recomendadas:</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <button 
+                    v-for="sug in getMealSuggestions(slot.id)" 
+                    :key="sug.id"
+                    @click="updateMealSlot(slot.id, { text: sug.titulo, done: true })"
+                    class="text-[10px] px-2 py-0.5 rounded-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-sage-400 hover:text-sage-700 dark:hover:text-sage-300 shadow-2xs transition active:scale-95 flex items-center gap-1">
+                    <span>+</span> <span>{{ sug.titulo }}</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECCIÓN: BITÁCORA CLÍNICA & DIARIO          -->
+        <!-- ========================================== -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-5">
+          <!-- Cabecera con selector de vistas y botón de exportar -->
+          <div class="flex items-center justify-between flex-wrap gap-3 pb-1 border-b border-stone-200/60 dark:border-stone-800">
+            <div>
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>📓 Bitácora Clínica & Sensaciones</span>
+                <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                  Registro del proceso
+                </span>
+              </h3>
+              <p class="text-xs text-stone-500 dark:text-stone-400">
+                Monitoreá tu energía, respuesta digestiva y crisis curativas para evaluar tu evolución biológica.
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <!-- Selector de Vistas: Día / Semana / Global -->
+              <div class="inline-flex p-1 bg-stone-100 dark:bg-stone-800 rounded-xl border border-stone-200/80 dark:border-stone-700 text-xs">
+                <button 
+                  @click="journalView = 'dia'"
+                  class="px-2.5 py-1 rounded-lg font-semibold transition"
+                  :class="journalView === 'dia' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+                  Día {{ selectedDay }}
+                </button>
+                <button 
+                  @click="journalView = 'semana'"
+                  class="px-2.5 py-1 rounded-lg font-semibold transition"
+                  :class="journalView === 'semana' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+                  Semana
+                </button>
+                <button 
+                  @click="journalView = 'global'"
+                  class="px-2.5 py-1 rounded-lg font-semibold transition"
+                  :class="journalView === 'global' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+                  Global
+                </button>
+              </div>
+
+              <!-- Botón Exportar Informe -->
+              <button 
+                @click="showExportModal = true"
+                class="px-3 py-1.5 bg-sage-600 hover:bg-sage-700 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition active:scale-95"
+                title="Exportar informe para tu nutricionista o médico">
+                <span>📤</span>
+                <span class="hidden sm:inline">Exportar</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- VISTA 1: DÍA SELECCIONADO -->
+          <div v-if="journalView === 'dia'" class="space-y-4">
+            
+            <!-- 1. Nivel de Energía -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+                ⚡ Nivel de Energía Vital
+              </label>
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                <button 
+                  v-for="lvl in data.journalOptions.energyLevels" 
+                  :key="lvl.id"
+                  @click="updateCurrentJournal({ energy: lvl.id })"
+                  class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between"
+                  :class="currentDayJournal.energy === lvl.id 
+                          ? 'bg-sage-100/80 dark:bg-sage-950/60 border-sage-500 dark:border-sage-500 text-sage-900 dark:text-sage-100 shadow-2xs ring-1 ring-sage-500' 
+                          : 'bg-stone-50/60 dark:bg-stone-800/40 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:border-stone-300'">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xl">{{ lvl.icon }}</span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/70 dark:bg-stone-900/70">{{ lvl.id }}/5</span>
+                  </div>
+                  <div class="mt-1">
+                    <p class="text-xs font-bold">{{ lvl.label }}</p>
+                    <p class="text-[10px] opacity-75 leading-tight">{{ lvl.desc }}</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Estado de Digestión -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+                🌱 Digestión & Asimilación
+              </label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button 
+                  v-for="dig in data.journalOptions.digestionStates" 
+                  :key="dig.id"
+                  @click="updateCurrentJournal({ digestion: dig.id })"
+                  class="p-2.5 rounded-xl border text-left transition flex items-center gap-2.5"
+                  :class="currentDayJournal.digestion === dig.id 
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-100 shadow-2xs ring-1 ring-emerald-500' 
+                          : 'bg-stone-50/60 dark:bg-stone-800/40 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:border-stone-300'">
+                  <span class="text-lg">{{ dig.icon }}</span>
+                  <span class="text-xs font-semibold leading-tight">{{ dig.label }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. Síntomas Frecuentes / Señales depurativas -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+                🔍 Señales Depurativas & Síntomas
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  v-for="sym in data.journalOptions.commonSymptoms" 
+                  :key="sym"
+                  @click="toggleJournalSymptom(sym)"
+                  class="px-3 py-1.5 rounded-xl border text-xs font-medium transition active:scale-95 flex items-center gap-1.5"
+                  :class="currentDayJournal.symptoms?.includes(sym)
+                          ? (sym === 'Despejado / Cero síntomas' 
+                             ? 'bg-emerald-100 dark:bg-emerald-950/80 border-emerald-400 text-emerald-800 dark:text-emerald-200 font-bold' 
+                             : 'bg-amber-100 dark:bg-amber-950/80 border-amber-400 text-amber-800 dark:text-amber-200 font-bold')
+                          : 'bg-stone-50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:border-stone-300'">
+                  <span>{{ currentDayJournal.symptoms?.includes(sym) ? '✓' : '+' }}</span>
+                  <span>{{ sym }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 4. Notas Libres y Emociones -->
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+                  ✍️ Sensaciones, Sueño & Notas Libres
+                </label>
+                <span class="text-[10px] text-stone-400">Guardado automático en tiempo real</span>
+              </div>
+              <textarea 
+                :value="currentDayJournal.notes || ''"
+                @input="updateCurrentJournal({ notes: $event.target.value })"
+                rows="3"
+                placeholder="¿Cómo te sentiste hoy física y emocionalmente? ¿Hubo cambios en tu claridad mental, descanso nocturno o apetito? Escribí acá todo lo que consideres relevante..."
+                class="w-full bg-stone-50 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-700 rounded-xl p-3 text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-sage-500 transition leading-relaxed"></textarea>
+            </div>
+
+          </div>
+
+          <!-- VISTA 2: SEMANAL (GOLPE DE VISTA DE 7 DÍAS) -->
+          <div v-else-if="journalView === 'semana'" class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300">
+                Resumen Semanal • Días {{ currentWeekDays[0]?.day }} al {{ currentWeekDays[currentWeekDays.length - 1]?.day }}
+              </h4>
+              <span class="text-[11px] text-stone-400">Tocá cualquier día para editarlo</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-7 gap-2.5">
+              <div 
+                v-for="item in currentWeekDays" 
+                :key="item.day"
+                @click="selectedDay = item.day; journalView = 'dia'"
+                class="p-3 rounded-xl border transition cursor-pointer text-xs space-y-2 flex flex-col justify-between"
+                :class="item.day === selectedDay 
+                        ? 'border-sage-500 bg-sage-50/70 dark:bg-sage-950/40 shadow-xs ring-1 ring-sage-400' 
+                        : (item.journal || item.meals ? 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800 hover:border-stone-300' : 'bg-stone-50/40 dark:bg-stone-800/20 border-stone-200/50 dark:border-stone-800/50 opacity-70')">
+                
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs" :class="item.day === selectedDay ? 'text-sage-800 dark:text-sage-200' : 'text-stone-700 dark:text-stone-300'">
+                    Día {{ item.day }}
+                  </span>
+                  <span v-if="item.journal?.energy" class="text-sm">
+                    {{ data.journalOptions.energyLevels.find(e => e.id === Number(item.journal.energy))?.icon || '⚡' }}
+                  </span>
+                </div>
+
+                <div class="space-y-1 text-[11px]">
+                  <p v-if="item.journal?.digestion" class="text-stone-500 dark:text-stone-400 flex items-center gap-1">
+                    <span>{{ data.journalOptions.digestionStates.find(d => d.id === item.journal.digestion)?.icon }}</span>
+                    <span class="truncate">{{ data.journalOptions.digestionStates.find(d => d.id === item.journal.digestion)?.label }}</span>
+                  </p>
+                  <p v-if="item.journal?.symptoms?.length" class="text-amber-700 dark:text-amber-400 text-[10px] font-medium truncate">
+                    {{ item.journal.symptoms.length }} señal(es)
+                  </p>
+                  <p v-if="item.journal?.notes" class="text-stone-400 dark:text-stone-500 text-[10px] italic line-clamp-2">
+                    "{{ item.journal.notes }}"
+                  </p>
+                  <div v-if="!item.journal && !item.meals" class="text-stone-300 dark:text-stone-600 text-[10px] italic text-center py-2">
+                    Sin datos
+                  </div>
+                </div>
+
+                <div class="pt-1 border-t border-stone-100 dark:border-stone-800 text-[10px] text-stone-400 flex items-center justify-between">
+                  <span>{{ item.meals ? Object.values(item.meals).filter(m => m && m.done).length : 0 }}/4 comidas</span>
+                  <span class="text-sage-600 dark:text-sage-400 font-bold">Ver →</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VISTA 3: HISTORIAL GLOBAL (TODOS LOS REGISTROS APILADOS) -->
+          <div v-else-if="journalView === 'global'" class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300">
+                Historial Clínico Completo (Días 1 al 21)
+              </h4>
+              <button 
+                @click="showExportModal = true"
+                class="text-xs text-sage-600 dark:text-sage-400 hover:underline font-semibold flex items-center gap-1">
+                <span>📋 Exportar informe completo</span>
+              </button>
+            </div>
+
+            <!-- Listado Apilado -->
+            <div class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+              <div 
+                v-for="d in 21" 
+                :key="d"
+                v-show="dailyJournal[`dia_${d}`] || dailyMeals[`dia_${d}`]"
+                class="p-3.5 bg-stone-50 dark:bg-stone-800/40 rounded-xl border border-stone-200/80 dark:border-stone-800 text-xs space-y-2">
+                
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded-md bg-stone-200 dark:bg-stone-700 font-bold text-stone-800 dark:text-stone-200 text-[11px]">
+                      Día {{ d }}
+                    </span>
+                    <span v-if="dailyJournal[`dia_${d}`]?.energy" class="text-xs font-medium text-stone-600 dark:text-stone-300 flex items-center gap-1">
+                      <span>{{ data.journalOptions.energyLevels.find(e => e.id === Number(dailyJournal[`dia_${d}`].energy))?.icon }}</span>
+                      <span>Energía: {{ data.journalOptions.energyLevels.find(e => e.id === Number(dailyJournal[`dia_${d}`].energy))?.label }}</span>
+                    </span>
+                  </div>
+                  <button 
+                    @click="selectedDay = d; journalView = 'dia'"
+                    class="text-[11px] text-sage-600 dark:text-sage-400 hover:underline font-medium">
+                    Editar día {{ d }} →
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1">
+                  <!-- Columna izquierda: Diario -->
+                  <div v-if="dailyJournal[`dia_${d}`]" class="space-y-1">
+                    <p v-if="dailyJournal[`dia_${d}`].digestion" class="text-stone-600 dark:text-stone-300">
+                      <strong>Digestión:</strong> {{ data.journalOptions.digestionStates.find(x => x.id === dailyJournal[`dia_${d}`].digestion)?.label }}
+                    </p>
+                    <p v-if="dailyJournal[`dia_${d}`].symptoms?.length" class="text-amber-800 dark:text-amber-300">
+                      <strong>Señales:</strong> {{ dailyJournal[`dia_${d}`].symptoms.join(', ') }}
+                    </p>
+                    <p v-if="dailyJournal[`dia_${d}`].notes" class="text-stone-500 dark:text-stone-400 italic">
+                      "{{ dailyJournal[`dia_${d}`].notes }}"
+                    </p>
+                  </div>
+
+                  <!-- Columna derecha: Comidas -->
+                  <div v-if="dailyMeals[`dia_${d}`]" class="space-y-0.5 border-t sm:border-t-0 sm:border-l border-stone-200 dark:border-stone-700 sm:pl-2 pt-1 sm:pt-0">
+                    <p class="font-semibold text-stone-600 dark:text-stone-400 text-[10px] uppercase">Comidas:</p>
+                    <div v-for="slot in ['desayuno', 'almuerzo', 'merienda', 'cena']" :key="slot">
+                      <p v-if="dailyMeals[`dia_${d}`][slot]?.text" class="text-stone-600 dark:text-stone-300 truncate">
+                        <span class="capitalize font-medium">{{ slot }}:</span> {{ dailyMeals[`dia_${d}`][slot].text }}
+                        <span v-if="dailyMeals[`dia_${d}`][slot].done" class="text-emerald-600 dark:text-emerald-400">✓</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Estado vacío si no hay ningún día registrado -->
+              <div 
+                v-if="!Object.keys(dailyJournal).length && !Object.keys(dailyMeals).length" 
+                class="p-6 text-center text-stone-400 dark:text-stone-500 italic space-y-1">
+                <p class="text-xl">📓</p>
+                <p>Todavía no hay entradas guardadas en la bitácora.</p>
+                <p class="text-[11px]">Completá tu primer registro en la pestaña del día para comenzar a armar tu historial.</p>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <!-- Vitrina de Logros / Medallas Desbloqueables -->
@@ -1052,7 +1416,7 @@
     <!-- Footer -->
     <footer class="mt-auto border-t border-stone-200 dark:border-stone-800 py-6 text-center text-xs text-stone-500 dark:text-stone-400 bg-white/50 dark:bg-stone-900/50">
       <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p>Detox de Primavera • <span class="font-mono font-semibold text-sage-600 dark:text-sage-400">v1.0.1</span> • Material de referencia Septiembre 2026</p>
+        <p>Detox de Primavera • <span class="font-mono font-semibold text-sage-600 dark:text-sage-400">v1.1.0</span> • Material de referencia Septiembre 2026</p>
         <button @click="resetAllData" class="text-rose-500 hover:text-rose-700 text-xs font-medium underline">
           Reiniciar Progreso de la App
         </button>
@@ -1370,6 +1734,60 @@
 
           </div>
 
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL DE EXPORTACIÓN CLÍNICA & BITÁCORA     -->
+    <!-- ========================================== -->
+    <div v-if="showExportModal" 
+         class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-stone-950/60 backdrop-blur-xs transition-opacity animate-fade-in"
+         @click.self="showExportModal = false">
+      
+      <div class="bg-white dark:bg-stone-900 w-full sm:max-w-lg rounded-t-3xl sm:rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden flex flex-col max-h-[90vh] animate-slide-up sm:animate-scale-up">
+        
+        <!-- Header del Modal -->
+        <div class="p-4 sm:p-5 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-sage-100 dark:bg-sage-950/80 text-sage-700 dark:text-sage-300 flex items-center justify-center text-lg">
+              📄
+            </div>
+            <div>
+              <h3 class="font-bold text-sm sm:text-base text-stone-900 dark:text-stone-100">Exportar Informe Clínico</h3>
+              <p class="text-[11px] text-stone-500 dark:text-stone-400">Bitácora de sensaciones, digestión y registro de comidas</p>
+            </div>
+          </div>
+          <button @click="showExportModal = false" class="p-1.5 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 text-lg rounded-lg">✕</button>
+        </div>
+
+        <!-- Contenido del Modal -->
+        <div class="p-4 sm:p-5 overflow-y-auto space-y-4 text-xs">
+          <p class="text-stone-600 dark:text-stone-300 leading-relaxed">
+            Podés copiar este reporte estructurado para enviarlo por WhatsApp a tu nutricionista o pegarlo en Google Docs, Word o tu historia clínica.
+          </p>
+
+          <!-- Previsualización de Texto -->
+          <div class="relative">
+            <pre class="w-full max-h-64 overflow-y-auto p-3.5 bg-stone-50 dark:bg-stone-950 rounded-xl border border-stone-200 dark:border-stone-800 font-mono text-[11px] text-stone-800 dark:text-stone-200 whitespace-pre-wrap leading-relaxed select-all">{{ generateReportText() }}</pre>
+          </div>
+
+          <!-- Acciones de Exportación -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <button 
+              @click="copyJournalReport()"
+              class="w-full py-2.5 bg-sage-600 hover:bg-sage-700 active:scale-95 text-white font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-2 text-xs">
+              <span>📋</span>
+              <span>Copiar Texto Formateado</span>
+            </button>
+            <button 
+              @click="printJournalReport()"
+              class="w-full py-2.5 bg-stone-800 hover:bg-stone-700 dark:bg-stone-200 dark:hover:bg-white dark:text-stone-900 active:scale-95 text-white font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-2 text-xs">
+              <span>🖨️</span>
+              <span>Imprimir / Guardar PDF</span>
+            </button>
+          </div>
         </div>
 
       </div>

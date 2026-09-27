@@ -530,7 +530,274 @@ const DETOX_DATA = {
     { id: "pr1", item: "Pescado fresco (merluza o abadejo)", cat: "Pescadería", cant: "1 kg", esencial: false },
     { id: "pr2", item: "Huevos de campo pastoriles", cat: "Granja", cant: "1 docena", esencial: false },
     { id: "pr3", item: "Huesos pastoriles para caldo", cat: "Carnicería pastura", cant: "1 kg", esencial: false }
+  ],
+  dailyQuotes: [
+  {
+    "dia": 0,
+    "fase": "Previa",
+    "tema": "Desapego y Preparación del Terreno",
+    "frase": "Antes de curar a alguien, pregúntale si está dispuesto a renunciar a las cosas que lo enfermaron.",
+    "autor": "Hipócrates de Cos",
+    "contexto": "Vaciar la despensa y suspender consumos automáticos es el primer acto consciente de sanación."
+  },
+  {
+    "dia": 1,
+    "fase": "Fase 1",
+    "tema": "El Reposo Digestivo y la Fuerza Vital",
+    "frase": "El cuerpo es su propio mejor médico; cuando dejamos de sobrecargarlo, la fuerza vital asume la limpieza.",
+    "autor": "Arnold Ehret",
+    "contexto": "La monodieta inicial suspende el gasto metabólico pesado para redirigir la energía a la depuración celular."
+  },
+  {
+    "dia": 2,
+    "fase": "Fase 1",
+    "tema": "Paciencia ante la Crisis Curativa",
+    "frase": "La enfermedad no es más que el esfuerzo que hace la naturaleza para librar al cuerpo de las materias tóxicas.",
+    "autor": "Thomas Sydenham",
+    "contexto": "La cefalea o el desgano transitorio son signos normales del organismo movilizando toxinas hacia las vías de salida."
+  },
+  {
+    "dia": 3,
+    "fase": "Fase 1",
+    "tema": "Depuración Hepática en Primavera",
+    "frase": "La primavera corresponde al elemento madera y al hígado; depurar su cauce permite que la sangre y la energía fluyan sin obstrucción.",
+    "autor": "Huangdi Neijing (Canon del Emperador Amarillo)",
+    "contexto": "Culminar la fase inicial descomprime el hígado y prepara los tejidos para recibir nutrición viva."
+  },
+  {
+    "dia": 4,
+    "fase": "Fase 1",
+    "tema": "La Alquimia del Alimento Vivo",
+    "frase": "El alimento que ingieres puede ser la forma más segura y potente de medicina, o la forma más lenta de veneno.",
+    "autor": "Dra. Ann Wigmore",
+    "contexto": "La incorporación de hojas amargas, crucíferas y clorofila alcaliniza la sangre y estimula el drenaje biliar."
+  },
+  {
+    "dia": 5,
+    "fase": "Fase 1",
+    "tema": "La Regla de Oro de la Moderación",
+    "frase": "Ningún hombre sabio come hasta saciarse por completo; el verdadero sustento reside en lo que el organismo digiere con serenidad.",
+    "autor": "Maimónides",
+    "contexto": "Comer al ochenta por ciento de la capacidad gástrica evita la fermentación y optimiza la función del bazo."
+  },
+  {
+    "dia": 6,
+    "fase": "Fase 1",
+    "tema": "Desinflamación y Pureza del Medio Interno",
+    "frase": "El microbio no es nada; el terreno lo es todo.",
+    "autor": "Claude Bernard",
+    "contexto": "Al cambiar el medio interno con vegetales cocidos y caldos limpios, se desactiva la inflamación celular de bajo grado."
+  },
+  {
+    "dia": 7,
+    "fase": "Fase 1",
+    "tema": "La Raíz Intestinal de la Inmunidad",
+    "frase": "Toda enfermedad comienza en el intestino, y es en la pureza de sus paredes donde germina la verdadera vitalidad.",
+    "autor": "Dr. Bernard Jensen",
+    "contexto": "Cerrar la primera semana consolida el desinflamado de la mucosa digestiva y restablece la microbiota protectora."
+  },
+  {
+    "dia": 8,
+    "fase": "Fase 2",
+    "tema": "Claridad Mental y Energía Serena",
+    "frase": "Cuando la alimentación es mala, la medicina no funciona; cuando la alimentación es correcta, la medicina no es necesaria.",
+    "autor": "Proverbio Ayurvédico (Tradición Charaka)",
+    "contexto": "Iniciando la consolidación, se disipa la niebla tóxica y emerge un nivel de energía lúcido y constante."
+  },
+  {
+    "dia": 9,
+    "fase": "Fase 2",
+    "tema": "Reconexión con el Hambre Fisiológica",
+    "frase": "La mayor parte de los alimentos que consumimos satisfacen nuestra ansiedad o apego sensorial, no nuestras necesidades vitales.",
+    "autor": "Mahatma Gandhi",
+    "contexto": "Diferenciar el impulso emocional del requerimiento biológico genuino devuelve la soberanía sobre el apetito."
+  },
+  {
+    "dia": 10,
+    "fase": "Fase 2",
+    "tema": "El Poder Terapéutico de la Simplicidad",
+    "frase": "La naturaleza es sobria y se complace en la simplicidad; nunca recurre a adornos superfluos para cumplir su cometido.",
+    "autor": "Sir Isaac Newton",
+    "contexto": "Las combinaciones sencillas de cereales integrales, legumbres y hortalizas maximizan la asimilación nutricional."
+  },
+  {
+    "dia": 11,
+    "fase": "Fase 2",
+    "tema": "La Dosis y la Pureza del Alimento",
+    "frase": "Todas las sustancias son venenosas; sólo la dosis y la pureza determinan si algo se convierte en veneno o en remedio.",
+    "autor": "Paracelso",
+    "contexto": "Elegir alimentos limpios de agroquímicos y cocciones suaves preserva la integridad de los órganos de filtración."
+  },
+  {
+    "dia": 12,
+    "fase": "Fase 2",
+    "tema": "La Masticación Consciente",
+    "frase": "Mastica tus líquidos y bebe tus sólidos; quien no mastica bien obliga al estómago a una labor antinatural.",
+    "autor": "Horace Fletcher",
+    "contexto": "Comer sin prisas e insalivar cada bocado activa las enzimas digestivas y previene la hinchazón abdominal."
+  },
+  {
+    "dia": 13,
+    "fase": "Fase 2",
+    "tema": "El Agua como Canal de Renovación",
+    "frase": "El agua es el solvente universal de la vida; depura por dentro con la misma templanza con que renueva la tierra.",
+    "autor": "Sebastian Kneipp",
+    "contexto": "Tomar agua tibia y tisanas digestivas a lo largo del día moviliza los depósitos linfáticos hacia la excreción renal."
+  },
+  {
+    "dia": 14,
+    "fase": "Fase 2",
+    "tema": "La Armonía entre Mente y Órganos",
+    "frase": "La salud es nuestro patrimonio esencial; es la completa y armoniosa unión entre alma, mente y biología.",
+    "autor": "Dr. Edward Bach",
+    "contexto": "Alcanzar dos semanas de depuración pacifica el sistema neurovegetativo y reconcilia la relación con el cuerpo."
+  },
+  {
+    "dia": 15,
+    "fase": "Fase 3",
+    "tema": "La Regeneración del Fluido Extracelular",
+    "frase": "La célula es intrínsecamente sana; es el fluido en el que flota lo que degenera. Renueva ese medio y la vida recupera su vigor.",
+    "autor": "Dr. Alexis Carrel (Premio Nobel)",
+    "contexto": "En la fase de sostenimiento, la matriz extracelular se limpia a fondo, permitiendo una regeneración tisular profunda."
+  },
+  {
+    "dia": 16,
+    "fase": "Fase 3",
+    "tema": "La Maestría de la Constancia",
+    "frase": "Somos lo que hacemos repetidamente día a día; la vitalidad no es un acontecimiento aislado, sino un hábito cultivado.",
+    "autor": "Will Durant (sobre la filosofía de Aristóteles)",
+    "contexto": "La constancia de estas semanas ha transformado el esfuerzo inicial en una segunda naturaleza espontánea."
+  },
+  {
+    "dia": 17,
+    "fase": "Fase 3",
+    "tema": "La Brújula de la Intuición Somática",
+    "frase": "Escucha los susurros de tu organismo tras cada ingesta; quien aprende a leer su liviandad jamás necesitará recetas ajenas.",
+    "autor": "Proverbio Oriental de Longevidad",
+    "contexto": "Observar cómo responde tu digestión a cada alimento consolida tu intuición como guía alimentaria definitiva."
+  },
+  {
+    "dia": 18,
+    "fase": "Fase 3",
+    "tema": "Cronobiología y Descanso Celular",
+    "frase": "Sincroniza tus comidas con el fuego solar y tu descanso con la luna; la verdadera reparación tisular sucede en el reposo nocturno.",
+    "autor": "Sushruta Samhita",
+    "contexto": "Cenar temprano y en porciones livianas activa la autofagia nocturna y optimiza la depuración hepática profunda."
+  },
+  {
+    "dia": 19,
+    "fase": "Fase 3",
+    "tema": "La Sabiduría de la Medicina Preventiva",
+    "frase": "El médico del futuro no administrará fármacos, sino que interesará a sus pacientes en el cuidado de su cuerpo, la nutrición y la prevención.",
+    "autor": "Thomas Alva Edison",
+    "contexto": "Comprender la raíz de tu bienestar convierte cada comida cotidiana en un acto médico de alta precisión."
+  },
+  {
+    "dia": 20,
+    "fase": "Fase 3",
+    "tema": "La Ausencia de Obstrucción",
+    "frase": "La vitalidad duradera no se adquiere en el exterior; florece cuando eliminamos las obstrucciones acumuladas en los canales del cuerpo.",
+    "autor": "Paul Bragg",
+    "contexto": "A las puertas de la graduación, el organismo opera con ligereza, despojado de sobrecargas digestivas e inflamatorias."
+  },
+  {
+    "dia": 21,
+    "fase": "Graduación",
+    "tema": "Soberanía Biológica y Nuevo Comienzo",
+    "frase": "Las fuerzas naturales que residen dentro de nosotros son las verdaderas sanadoras. Quien conquista su propio templo biológico conquista su libertad.",
+    "autor": "Hipócrates de Cos",
+    "contexto": "Completas el programa con un terreno celular renovado, mente despejada y el criterio soberano para cuidar tu templo."
+  }
+],
+
+  journalOptions: {
+  "energyLevels": [
+    {
+      "id": 1,
+      "label": "Baja / En crisis",
+      "icon": "🌧️",
+      "desc": "Fatiga o malestar depurativo"
+    },
+    {
+      "id": 2,
+      "label": "Tranquila",
+      "icon": "⛅",
+      "desc": "Cuerpo pesado o desgano"
+    },
+    {
+      "id": 3,
+      "label": "Estable",
+      "icon": "🌤️",
+      "desc": "Ritmo normal y sereno"
+    },
+    {
+      "id": 4,
+      "label": "Buena",
+      "icon": "☀️",
+      "desc": "Liviano y despejado"
+    },
+    {
+      "id": 5,
+      "label": "Radiante",
+      "icon": "✨",
+      "desc": "Vitalidad plena y mente lúcida"
+    }
+  ],
+  "digestionStates": [
+    {
+      "id": "liviano",
+      "label": "Liviano y ágil",
+      "icon": "🪶"
+    },
+    {
+      "id": "gases",
+      "label": "Hinchazón / Gases",
+      "icon": "🎈"
+    },
+    {
+      "id": "lenta",
+      "label": "Digestión pesada",
+      "icon": "⏳"
+    },
+    {
+      "id": "optima",
+      "label": "Evacuación óptima",
+      "icon": "🌿"
+    }
+  ],
+  "commonSymptoms": [
+    "Cefalea leve",
+    "Lengua saburral",
+    "Sed intensa",
+    "Hambre emocional",
+    "Dolor muscular",
+    "Frío en extremidades",
+    "Náuseas leves",
+    "Despejado / Cero síntomas"
+  ],
+  "mealSlots": [
+    {
+      "id": "desayuno",
+      "label": "Desayuno",
+      "icon": "🌅"
+    },
+    {
+      "id": "almuerzo",
+      "label": "Almuerzo",
+      "icon": "☀️"
+    },
+    {
+      "id": "merienda",
+      "label": "Merienda",
+      "icon": "🍵"
+    },
+    {
+      "id": "cena",
+      "label": "Cena",
+      "icon": "🌙"
+    }
   ]
+}
 };
 
 if (typeof window !== 'undefined') {

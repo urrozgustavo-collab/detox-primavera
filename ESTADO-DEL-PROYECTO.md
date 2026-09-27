@@ -1,7 +1,7 @@
 # 🌿 Detox Primavera — Estado del Proyecto & Guía de Continuidad
 
 > **Última actualización:** 27 de septiembre de 2026  
-> **Versión Actual:** `v1.0.1` *(SemVer: 1 Major, 0 Minor, 1 Patch)*  
+> **Versión Actual:** `v1.1.0` *(SemVer: 1 Major, 1 Minor, 0 Patch)*  
 > **Líder Operativa:** Blair Vance (COO)  
 > **Repositorio GitHub:** [`urrozgustavo-collab/detox-primavera`](https://github.com/urrozgustavo-collab/detox-primavera)  
 > **Enlace de Producción (Webapp PWA):** [https://urrozgustavo-collab.github.io/detox-primavera/](https://urrozgustavo-collab.github.io/detox-primavera/)
@@ -95,25 +95,26 @@ git add . ; git commit -m "feat: actualización" ; git push origin main
 A continuación se consolidan los requerimientos estratégicos y funcionales solicitados por el CEO para evolucionar la herramienta hacia un producto robusto y comercializable para profesionales de salud/nutrición (B2B2C):
 
 ### A. Inspiración & Mentalidad
-1. **Frase Motivacional Diaria:**
+1. **Frase Motivacional Diaria:** `[COMPLETADO EN v1.1.0]`
    - Una píldora de sabiduría y enfoque al comenzar cada jornada ("Mi Día").
-   - Citas célebres y profundas de autores alineados a la medicina natural, depuración y salud digestiva/holística (Hipócrates, Paracelso, Ann Wigmore, Bernard Jensen, Arnold Ehret, etc.).
-   - Tono sobrio, inspirador y sin clichés de autoayuda genérica.
+   - 22 citas célebres y profundas de autores alineados a la medicina natural, depuración y salud digestiva/holística (Hipócrates, Paracelso, Ann Wigmore, Bernard Jensen, Arnold Ehret, Alexis Carrel, Gandhi, etc.).
+   - Tono sobrio, inspirador y sin clichés de autoayuda genérica, con botón de copia rápida.
 
 ### B. Seguimiento Clínico y Registro Personal
-2. **Diario de a Bordo / Bitácora de Sensaciones & Síntomas:**
-   - Registro cualitativo diario: nivel de energía, digestión, síntomas de crisis depurativa, peso o sensaciones corporales.
+2. **Diario de a Bordo / Bitácora de Sensaciones & Síntomas:** `[COMPLETADO EN v1.1.0]`
+   - Registro cualitativo diario: nivel de energía vital (1 a 5), estado digestivo (4 categorías), señales depurativas frecuentes (píldoras interactivas) y notas libres.
    - **Tres vistas ergonómicas:**
-     - *Vista Diaria:* Foco exclusivo en la jornada en curso (arranca limpia cada día).
+     - *Vista Diaria:* Foco exclusivo en la jornada en curso con edición inmediata y autoguardado.
      - *Vista Semanal:* Panorama compacto de los 7 días de la fase para correlacionar avances.
      - *Vista Global / Historial:* Registro cronológico completo apilado de los 21 días.
-   - **Exportación Universal:** Generador de reportes listo para compartir con el terapeuta/nutricionista en formato PDF imprimible, Google Docs / Word o portapapeles.
+   - **Exportación Universal:** Generador de reportes clínicos estructurados para compartir con el terapeuta/nutricionista en formato WhatsApp / Google Docs / Word o imprimir en PDF.
 
-3. **Historial de Ingestas & Registro Libre de Comidas:**
-   - Trazabilidad de platos preparados a partir del recetario en cada comida (desayuno, almuerzo, merienda, cena).
-   - Posibilidad de registrar manualmente qué comió la persona si no siguió la receta al pie de la letra o comió fuera de casa.
+3. **Historial de Ingestas & Registro Libre de Comidas:** `[COMPLETADO EN v1.1.0]`
+   - Trazabilidad de 4 momentos diarios (desayuno, almuerzo, merienda, cena).
+   - Checkbox de confirmación de ingesta pautada.
+   - Input de texto libre con sugerencias de recetas de la guía con un solo clic.
 
-### C. Inteligencia en la Cocina y Optimización de Compras
+### C. Inteligencia en la Cocina y Optimización de Compras (En Desarrollo - v1.2.0)
 4. **Heladera / Despensa Inteligente ("¿Qué cocino hoy con lo que tengo?"):**
    - Buscador por selección o tipeo de alimentos disponibles en la cocina del usuario.
    - **Matching porcentual sensato:** Ponderación diferenciada de ingredientes principales (calabaza, mijo, arroz) vs. condimentos básicos (sal marina, aceite de oliva, orégano) para evitar falsos positivos del 100%.
@@ -132,6 +133,14 @@ A continuación se consolidan los requerimientos estratégicos y funcionales sol
 
 ## 6. Historial de Versiones (SemVer 2.0.0)
 
+- **`v1.1.0` (27/09/2026):**
+  - **Inspiración Clínica Diaria:** 22 citas de autores célebres y profundos de la medicina natural e higienismo (Día 0 al 21), sincronizadas con cada jornada y botón de copia rápida.
+  - **Bitácora Clínica & Diario de Sensaciones:** Registro de vitalidad (1 a 5), estado digestivo (4 niveles), síntomas/crisis curativas frecuentes y notas libres.
+  - **Tres Vistas Ergonómicas de Bitácora:** Modo Día (foco diario), Modo Semana (resumen de 7 días) y Modo Global (historial clínico completo apilado).
+  - **Modal de Exportación Universal:** Previsualización en texto estructurado, copiado directo para WhatsApp / Docs e impresión / guardado en PDF para nutricionistas.
+  - **Registro de Comidas & Ingestas:** 4 momentos diarios (desayuno, almuerzo, merienda, cena) con tilde de consumido, texto libre y sugerencias directas de recetas de la guía.
+  - **Persistencia y Sincronización:** Registro y comidas completamente integrados en el esquema de persistencia local y sincronización universal en la nube (`kvdb.io`).
+  - **Script de Compilación Autónomo:** Incorporación de `bundle.py` en la raíz del repositorio para empaquetado standalone determinista.
 - **`v1.0.1` (27/09/2026):**
   - Fix crítico: Restauración del scroll estándar en la versión web de escritorio (ajuste de ancho de barra a 10px, estados hover y eliminación de restricciones `100vw`).
   - Fix crítico: Persistencia de sincronización en caliente ante cierres de navegador móvil (triple capa con LocalStorage, Cookies, prevención de sobreescritura prematura y retención de `?sync=` en URL).

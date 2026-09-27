@@ -69,6 +69,12 @@ const app = createApp({
     const unlockedBadges = ref(JSON.parse(safeStorage.get('detox_unlocked_badges') || '[]'));
     const xp = ref(parseInt(safeStorage.get('detox_xp') || '0', 10));
 
+    // 3.1. Bitácora Clínica, Diario de Sensaciones y Comidas
+    const dailyJournal = ref(JSON.parse(safeStorage.get('detox_daily_journal') || '{}'));
+    const dailyMeals = ref(JSON.parse(safeStorage.get('detox_daily_meals') || '{}'));
+    const journalView = ref('dia'); // 'dia', 'semana', 'global'
+    const showExportModal = ref(false);
+
     // 4. Filtros de Recetas
     const recipeSearch = ref('');
     const recipeFilterCategory = ref('todas');
@@ -181,6 +187,8 @@ const app = createApp({
             startMode: startMode.value,
             completedMissions: completedMissions.value,
             shoppingChecked: shoppingChecked.value,
+            dailyJournal: dailyJournal.value,
+            dailyMeals: dailyMeals.value,
             streakDays: streakDays.value,
             xp: xp.value,
             unlockedBadges: unlockedBadges.value
@@ -239,6 +247,8 @@ const app = createApp({
         if (cloudData.startMode !== undefined) startMode.value = cloudData.startMode;
         if (cloudData.completedMissions !== undefined) completedMissions.value = cloudData.completedMissions;
         if (cloudData.shoppingChecked !== undefined) shoppingChecked.value = cloudData.shoppingChecked;
+        if (cloudData.dailyJournal !== undefined) dailyJournal.value = cloudData.dailyJournal;
+        if (cloudData.dailyMeals !== undefined) dailyMeals.value = cloudData.dailyMeals;
         if (cloudData.unlockedBadges !== undefined) unlockedBadges.value = cloudData.unlockedBadges;
         if (cloudData.xp !== undefined) xp.value = cloudData.xp;
 
@@ -247,6 +257,8 @@ const app = createApp({
         else safeStorage.remove('detox_start_date');
         safeStorage.set('detox_completed_missions', JSON.stringify(completedMissions.value));
         safeStorage.set('detox_shopping_checked', JSON.stringify(shoppingChecked.value));
+        safeStorage.set('detox_daily_journal', JSON.stringify(dailyJournal.value));
+        safeStorage.set('detox_daily_meals', JSON.stringify(dailyMeals.value));
         safeStorage.set('detox_unlocked_badges', JSON.stringify(unlockedBadges.value));
         safeStorage.set('detox_xp', String(xp.value));
 
@@ -379,6 +391,14 @@ const app = createApp({
       safeStorage.set('detox_xp', String(val));
       pushToCloud();
     });
+    watch(dailyJournal, (val) => {
+      safeStorage.set('detox_daily_journal', JSON.stringify(val));
+      pushToCloud();
+    }, { deep: true });
+    watch(dailyMeals, (val) => {
+      safeStorage.set('detox_daily_meals', JSON.stringify(val));
+      pushToCloud();
+    }, { deep: true });
 
     // Gestión Dinámica de Fecha de Inicio y Calendario
     const todayStr = computed(() => {
@@ -492,6 +512,193 @@ const app = createApp({
           triggerToast('🔄 Fecha reiniciada. Ya podés elegir una nueva fecha de arranque.');
         }
       }
+    };
+
+    // 3.2. Lógica de Inspiración Clínica Diaria, Bitácora y Registro de Comidas
+    const currentDailyQuote = computed(() => {
+      if (!data.dailyQuotes) return null;
+      const day = selectedDay.value !== undefined ? selectedDay.value : 1;
+      return data.dailyQuotes.find(q => q.dia === day) || data.dailyQuotes[0];
+    });
+
+    const copyQuote = (q) => {
+      if (!q) return;
+      const text = `“${q.frase}” — ${q.autor} (${q.tema})`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => triggerToast('📋 Frase copiada al portapapeles.'));
+      } else {
+        triggerToast('📋 ' + text);
+      }
+    };
+
+    // Diario del Día Seleccionado
+    const currentDayJournal = computed(() => {
+      const dayKey = `dia_${selectedDay.value}`;
+      return dailyJournal.value[dayKey] || { energy: null, digestion: null, symptoms: [], notes: '' };
+    });
+
+    const updateCurrentJournal = (patch) => {
+      const dayKey = `dia_${selectedDay.value}`;
+      const current = dailyJournal.value[dayKey] || { energy: null, digestion: null, symptoms: [], notes: '' };
+      dailyJournal.value = {
+        ...dailyJournal.value,
+        [dayKey]: { ...current, ...patch, updatedAt: Date.now() }
+      };
+      safeStorage.set('detox_daily_journal', JSON.stringify(dailyJournal.value));
+      pushToCloud();
+    };
+
+    const toggleJournalSymptom = (sym) => {
+      const current = currentDayJournal.value.symptoms || [];
+      let next = [];
+      if (sym === 'Despejado / Cero síntomas') {
+        next = current.includes(sym) ? [] : [sym];
+      } else {
+        next = current.filter(s => s !== 'Despejado / Cero síntomas');
+        if (next.includes(sym)) {
+          next = next.filter(s => s !== sym);
+        } else {
+          next.push(sym);
+        }
+      }
+      updateCurrentJournal({ symptoms: next });
+    };
+
+    // Comidas del Día Seleccionado
+    const currentDayMeals = computed(() => {
+      const dayKey = `dia_${selectedDay.value}`;
+      return dailyMeals.value[dayKey] || {
+        desayuno: { text: '', done: false },
+        almuerzo: { text: '', done: false },
+        merienda: { text: '', done: false },
+        cena: { text: '', done: false }
+      };
+    });
+
+    const updateMealSlot = (slotId, patch) => {
+      const dayKey = `dia_${selectedDay.value}`;
+      const currentDay = dailyMeals.value[dayKey] || {};
+      const currentSlot = currentDay[slotId] || { text: '', done: false };
+      dailyMeals.value = {
+        ...dailyMeals.value,
+        [dayKey]: {
+          ...currentDay,
+          [slotId]: { ...currentSlot, ...patch }
+        }
+      };
+      safeStorage.set('detox_daily_meals', JSON.stringify(dailyMeals.value));
+      pushToCloud();
+    };
+
+    // Sugerencias de recetas para las comidas según la fase
+    const getMealSuggestions = (slotId) => {
+      if (!data.recipes) return [];
+      if (selectedDay.value <= 3 && startMode.value === 'monodieta3') {
+        return data.recipes.filter(r => r.id === 'r1' || r.id === 'r2' || r.id === 'r5');
+      }
+      if (slotId === 'desayuno') {
+        return data.recipes.filter(r => r.categoria === 'Desayunos' || r.id === 'r1' || r.id === 'r4').slice(0, 3);
+      }
+      if (slotId === 'almuerzo') {
+        return data.recipes.filter(r => r.categoria === 'Almuerzos y Cenas').slice(0, 3);
+      }
+      if (slotId === 'merienda') {
+        return data.recipes.filter(r => r.categoria === 'Desayunos' || r.categoria === 'Dips y Aderezos').slice(0, 3);
+      }
+      if (slotId === 'cena') {
+        return data.recipes.filter(r => r.categoria === 'Caldos y Sopas' || r.categoria === 'Almuerzos y Cenas').slice(2, 5);
+      }
+      return data.recipes.slice(0, 3);
+    };
+
+    // Resumen de la semana para Vista Semanal del Diario
+    const currentWeekDays = computed(() => {
+      const currentDay = selectedDay.value || 1;
+      let startDay = 1;
+      if (currentDay <= 7) startDay = 1;
+      else if (currentDay <= 14) startDay = 8;
+      else startDay = 15;
+
+      const days = [];
+      for (let i = startDay; i < startDay + 7 && i <= 21; i++) {
+        const dayKey = `dia_${i}`;
+        const journal = dailyJournal.value[dayKey] || null;
+        const meals = dailyMeals.value[dayKey] || null;
+        days.push({ day: i, journal, meals });
+      }
+      return days;
+    });
+
+    // Reporte Clínico Formateado para Exportar
+    const generateReportText = () => {
+      let report = `🌿 INFORME CLÍNICO & REGISTRO PERSONAL — DETOX DE PRIMAVERA\n`;
+      report += `Fecha de generación: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n`;
+      report += `Día actual del reto: Día ${selectedDay.value} de 21\n`;
+      report += `Inicio: ${challengeInfo.value.formattedStartDate || 'No fijada'}\n`;
+      report += `Puntos acumulados: ${xp.value} XP | Racha: ${streakDays.value} días\n`;
+      report += `--------------------------------------------------\n\n`;
+
+      let entriesFound = false;
+      for (let d = 1; d <= 21; d++) {
+        const dayKey = `dia_${d}`;
+        const j = dailyJournal.value[dayKey];
+        const m = dailyMeals.value[dayKey];
+        if (j || m) {
+          entriesFound = true;
+          report += `📅 DÍA ${d}:\n`;
+          if (j) {
+            if (j.energy) {
+              const eObj = data.journalOptions?.energyLevels?.find(x => x.id === Number(j.energy));
+              report += `  • Nivel de energía: ${eObj ? eObj.icon + ' ' + eObj.label : j.energy + '/5'}\n`;
+            }
+            if (j.digestion) {
+              const dObj = data.journalOptions?.digestionStates?.find(x => x.id === j.digestion);
+              report += `  • Digestión: ${dObj ? dObj.icon + ' ' + dObj.label : j.digestion}\n`;
+            }
+            if (j.symptoms && j.symptoms.length > 0) {
+              report += `  • Síntomas / Señales: ${j.symptoms.join(', ')}\n`;
+            }
+            if (j.notes && j.notes.trim()) {
+              report += `  • Sensaciones / Notas: "${j.notes.trim()}"\n`;
+            }
+          }
+          if (m) {
+            const mealParts = [];
+            ['desayuno', 'almuerzo', 'merienda', 'cena'].forEach(slot => {
+              if (m[slot] && m[slot].text) {
+                mealParts.push(`${slot.toUpperCase()}: ${m[slot].text} ${m[slot].done ? '(✓)' : ''}`);
+              }
+            });
+            if (mealParts.length > 0) {
+              report += `  • Comidas: ${mealParts.join(' | ')}\n`;
+            }
+          }
+          report += `\n`;
+        }
+      }
+
+      if (!entriesFound) {
+        report += `(Todavía no hay entradas registradas en la bitácora o comidas. Completá tus primeras notas en la pestaña 'Mi Día' para verlas reflejadas acá.)\n`;
+      }
+
+      report += `--------------------------------------------------\n`;
+      report += `Detox de Primavera • Guía de Isabel Caparra • WebApp v1.1.0\n`;
+      return report;
+    };
+
+    const copyJournalReport = () => {
+      const text = generateReportText();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          triggerToast('📋 ¡Informe copiado al portapapeles! Listo para pegar en WhatsApp o Docs.');
+        });
+      } else {
+        triggerToast('📋 Informe generado.');
+      }
+    };
+
+    const printJournalReport = () => {
+      window.print();
     };
 
     onMounted(async () => {
@@ -868,6 +1075,8 @@ const app = createApp({
         completedMissions.value = {};
         shoppingChecked.value = {};
         unlockedBadges.value = [];
+        dailyJournal.value = {};
+        dailyMeals.value = {};
         xp.value = 0;
         selectedDay.value = 1;
         startDate.value = null;
@@ -875,6 +1084,8 @@ const app = createApp({
           'detox_completed_missions',
           'detox_shopping_checked',
           'detox_unlocked_badges',
+          'detox_daily_journal',
+          'detox_daily_meals',
           'detox_xp',
           'detox_selected_day',
           'detox_start_date',
@@ -967,6 +1178,25 @@ const app = createApp({
       filteredShopping,
       shoppingStats,
       globalSearchResults,
+      // Frases e Inspiración Clínica
+      currentDailyQuote,
+      copyQuote,
+      // Bitácora y Diario
+      dailyJournal,
+      currentDayJournal,
+      updateCurrentJournal,
+      toggleJournalSymptom,
+      journalView,
+      currentWeekDays,
+      showExportModal,
+      generateReportText,
+      copyJournalReport,
+      printJournalReport,
+      // Comidas e Ingestas
+      dailyMeals,
+      currentDayMeals,
+      updateMealSlot,
+      getMealSuggestions,
       // Metodos
       startChallengeToday,
       setStartDate,
