@@ -50,26 +50,35 @@ const app = createApp({
     const toastMessage = ref('');
     const showToast = ref(false);
 
-    // Persistencia reactiva a LocalStorage
-    watch(activeTab, (val) => localStorage.setItem('detox_active_tab', val));
-    watch(isDarkMode, (val) => {
-      localStorage.setItem('detox_dark_mode', val);
-      if (val) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
+    // 9. Sincronización Universal en la Nube (Multi-Dispositivo)
+    const KV_BUCKET = 'EE7impjfrWvHaAhuDDuBvU';
+    const KV_BASE_URL = `https://kvdb.io/${KV_BUCKET}/`;
+
+    // Detectar clave de sincronización por URL (?sync=...) o por LocalStorage
+    const getInitialSyncKey = () => {
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlKey = urlParams.get('sync');
+        if (urlKey && urlKey.trim()) {
+          const cleanKey = urlKey.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+          localStorage.setItem('detox_sync_key', cleanKey);
+          // Limpiar la URL sin recargar
+          const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+          window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+          return cleanKey;
+        }
       }
-    });
-    watch(selectedDay, (val) => localStorage.setItem('detox_selected_day', val));
-    watch(startMode, (val) => localStorage.setItem('detox_start_mode', val));
-    watch(startDate, (val) => {
-      if (val) localStorage.setItem('detox_start_date', val);
-      else localStorage.removeItem('detox_start_date');
-    });
-    watch(completedMissions, (val) => localStorage.setItem('detox_completed_missions', JSON.stringify(val)), { deep: true });
-    watch(shoppingChecked, (val) => localStorage.setItem('detox_shopping_checked', JSON.stringify(val)), { deep: true });
-    watch(unlockedBadges, (val) => localStorage.setItem('detox_unlocked_badges', JSON.stringify(val)), { deep: true });
-    watch(xp, (val) => localStorage.setItem('detox_xp', val));
+      return localStorage.getItem('detox_sync_key') || null;
+    };
+
+    const syncKey = ref(getInitialSyncKey());
+    const syncStatus = ref(syncKey.value ? 'synced' : 'local'); // 'local', 'syncing', 'synced', 'error'
+    const lastSyncTime = ref(null);
+    const showSyncModal = ref(false);
+    const syncCodeInput = ref('');
+    const syncErrorMsg = ref('');
+    let syncDebounceTimer = null;
+    let isPulling = false;
 
     // Funciones auxiliares
     const triggerToast = (msg) => {
@@ -89,6 +98,196 @@ const app = createApp({
         });
       }
     };
+
+    // Motor de Envío a la Nube (Debounced Push)
+    const pushToCloud = () => {
+      if (!syncKey.value || isPulling) return;
+      syncStatus.value = 'syncing';
+      if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
+
+      syncDebounceTimer = setTimeout(async () => {
+        try {
+          const payload = {
+            version: 1,
+            updatedAt: Date.now(),
+            startDate: startDate.value,
+            selectedDay: selectedDay.value,
+            startMode: startMode.value,
+            completedMissions: completedMissions.value,
+            shoppingChecked: shoppingChecked.value,
+            streakDays: streakDays.value,
+            xp: xp.value,
+            unlockedBadges: unlockedBadges.value
+          };
+
+          const res = await fetch(`${KV_BASE_URL}${syncKey.value}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(payload)
+          });
+
+          if (res.ok) {
+            syncStatus.value = 'synced';
+            lastSyncTime.value = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          } else {
+            syncStatus.value = 'error';
+          }
+        } catch (err) {
+          console.warn('Sync push error:', err);
+          syncStatus.value = 'error';
+        }
+      }, 700);
+    };
+
+    // Motor de Descarga de la Nube (Pull)
+    const pullFromCloud = async (force = false) => {
+      if (!syncKey.value) return;
+      try {
+        syncStatus.value = 'syncing';
+        const res = await fetch(`${KV_BASE_URL}${syncKey.value}`);
+        if (res.status === 404) {
+          syncStatus.value = 'synced';
+          pushToCloud();
+          return;
+        }
+        if (!res.ok) {
+          syncStatus.value = 'error';
+          return;
+        }
+        const text = await res.text();
+        if (!text || text.trim() === '') return;
+        const data = JSON.parse(text);
+
+        isPulling = true;
+        if (data.startDate !== undefined) startDate.value = data.startDate;
+        if (data.selectedDay !== undefined && (!startDate.value || force)) selectedDay.value = data.selectedDay;
+        if (data.startMode !== undefined) startMode.value = data.startMode;
+        if (data.completedMissions !== undefined) completedMissions.value = data.completedMissions;
+        if (data.shoppingChecked !== undefined) shoppingChecked.value = data.shoppingChecked;
+        if (data.unlockedBadges !== undefined) unlockedBadges.value = data.unlockedBadges;
+        if (data.xp !== undefined) xp.value = data.xp;
+
+        // Persistir copia local
+        if (data.startDate) localStorage.setItem('detox_start_date', data.startDate);
+        else localStorage.removeItem('detox_start_date');
+        localStorage.setItem('detox_completed_missions', JSON.stringify(completedMissions.value));
+        localStorage.setItem('detox_shopping_checked', JSON.stringify(shoppingChecked.value));
+        localStorage.setItem('detox_unlocked_badges', JSON.stringify(unlockedBadges.value));
+        localStorage.setItem('detox_xp', xp.value);
+
+        syncStatus.value = 'synced';
+        lastSyncTime.value = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        setTimeout(() => { isPulling = false; }, 300);
+      } catch (err) {
+        console.warn('Sync pull error:', err);
+        syncStatus.value = 'error';
+        isPulling = false;
+      }
+    };
+
+    // Generar nuevo código de vinculación aleatorio
+    const generateNewSyncKey = () => {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let rand = '';
+      for (let i = 0; i < 4; i++) {
+        rand += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      const newKey = `GUS-${rand}`;
+      pairWithKey(newKey, true);
+    };
+
+    // Vincular con un código existente o nuevo
+    const pairWithKey = async (key, isNew = false) => {
+      if (!key || !key.trim()) return;
+      const cleanKey = key.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+      syncKey.value = cleanKey;
+      localStorage.setItem('detox_sync_key', cleanKey);
+      syncCodeInput.value = '';
+      syncErrorMsg.value = '';
+
+      if (isNew) {
+        pushToCloud();
+        triggerToast(`☁️ ¡Código creado: ${cleanKey}! Sincronizado en la nube.`);
+      } else {
+        triggerToast(`🔄 Conectando con la nube...`);
+        await pullFromCloud(true);
+        triggerToast(`✅ ¡Dispositivo vinculado a ${cleanKey}!`);
+      }
+      showSyncModal.value = false;
+    };
+
+    // Desvincular dispositivo de la nube
+    const disconnectSync = () => {
+      if (window.confirm('¿Desvincular la sincronización en la nube? Este dispositivo volverá a funcionar en modo local independiente.')) {
+        syncKey.value = null;
+        localStorage.removeItem('detox_sync_key');
+        syncStatus.value = 'local';
+        showSyncModal.value = false;
+        triggerToast('Dispositivo desvinculado de la nube.');
+      }
+    };
+
+    // Enlace directo de sincronización y código QR
+    const syncShareUrl = computed(() => {
+      if (!syncKey.value || typeof window === 'undefined') return '';
+      return `${window.location.origin}${window.location.pathname}?sync=${syncKey.value}`;
+    });
+
+    const qrCodeUrl = computed(() => {
+      if (!syncShareUrl.value) return '';
+      return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=${encodeURIComponent(syncShareUrl.value)}`;
+    });
+
+    const copySyncLink = () => {
+      if (!syncShareUrl.value) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(syncShareUrl.value).then(() => {
+          triggerToast('📋 Enlace de sincronización copiado.');
+        });
+      } else {
+        triggerToast(`Enlace: ${syncShareUrl.value}`);
+      }
+    };
+
+    // Persistencia reactiva a LocalStorage y Nube
+    watch(activeTab, (val) => localStorage.setItem('detox_active_tab', val));
+    watch(isDarkMode, (val) => {
+      localStorage.setItem('detox_dark_mode', val);
+      if (val) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    });
+    watch(selectedDay, (val) => {
+      localStorage.setItem('detox_selected_day', val);
+      pushToCloud();
+    });
+    watch(startMode, (val) => {
+      localStorage.setItem('detox_start_mode', val);
+      pushToCloud();
+    });
+    watch(startDate, (val) => {
+      if (val) localStorage.setItem('detox_start_date', val);
+      else localStorage.removeItem('detox_start_date');
+      pushToCloud();
+    });
+    watch(completedMissions, (val) => {
+      localStorage.setItem('detox_completed_missions', JSON.stringify(val));
+      pushToCloud();
+    }, { deep: true });
+    watch(shoppingChecked, (val) => {
+      localStorage.setItem('detox_shopping_checked', JSON.stringify(val));
+      pushToCloud();
+    }, { deep: true });
+    watch(unlockedBadges, (val) => {
+      localStorage.setItem('detox_unlocked_badges', JSON.stringify(val));
+      pushToCloud();
+    }, { deep: true });
+    watch(xp, (val) => {
+      localStorage.setItem('detox_xp', val);
+      pushToCloud();
+    });
 
     // Gestión Dinámica de Fecha de Inicio y Calendario
     const todayStr = computed(() => {
@@ -205,13 +404,36 @@ const app = createApp({
       }
     };
 
-    onMounted(() => {
+    onMounted(async () => {
+      // Si hay clave de sincronización, traer datos frescos de la nube
+      if (syncKey.value) {
+        await pullFromCloud();
+      }
+
       if (startDate.value && challengeInfo.value.started) {
         if (!challengeInfo.value.isFuture && !challengeInfo.value.isFinished) {
           selectedDay.value = challengeInfo.value.currentDay;
         } else if (challengeInfo.value.isFuture) {
           selectedDay.value = 0;
         }
+      }
+
+      // Sincronizar automáticamente al recuperar foco o volver a la pestaña
+      if (typeof window !== 'undefined') {
+        window.addEventListener('focus', () => {
+          if (syncKey.value) pullFromCloud();
+        });
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible' && syncKey.value) {
+            pullFromCloud();
+          }
+        });
+        // Sondeo cada 45s si la app está visible
+        setInterval(() => {
+          if (document.visibilityState === 'visible' && syncKey.value) {
+            pullFromCloud();
+          }
+        }, 45000);
       }
     });
 
@@ -616,6 +838,21 @@ const app = createApp({
       globalSearchQuery,
       toastMessage,
       showToast,
+      // Sincronización Cloud
+      syncKey,
+      syncStatus,
+      lastSyncTime,
+      showSyncModal,
+      syncCodeInput,
+      syncErrorMsg,
+      syncShareUrl,
+      qrCodeUrl,
+      generateNewSyncKey,
+      pairWithKey,
+      disconnectSync,
+      pullFromCloud,
+      pushToCloud,
+      copySyncLink,
       // Computados
       todayStr,
       challengeInfo,
