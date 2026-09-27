@@ -60,9 +60,29 @@ const app = createApp({
     const activeTab = ref(safeStorage.get('detox_active_tab') || 'dia');
 
     // 3. Estado de Gamificacion, Fecha de Inicio y Seguimiento
+    const isValidDateString = (str) => {
+      if (!str || typeof str !== 'string') return false;
+      const parts = str.split('-');
+      if (parts.length !== 3) return false;
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10);
+      const d = parseInt(parts[2], 10);
+      if (isNaN(y) || isNaN(m) || isNaN(d)) return false;
+      if (y < 2024 || y > 2035) return false;
+      if (m < 1 || m > 12) return false;
+      if (d < 1 || d > 31) return false;
+      return true;
+    };
+
+    const getInitialStartDate = () => {
+      const saved = safeStorage.get('detox_start_date');
+      return isValidDateString(saved) ? saved : null;
+    };
+
     const selectedDay = ref(parseInt(safeStorage.get('detox_selected_day') || '1', 10));
     const startMode = ref(safeStorage.get('detox_start_mode') || 'monodieta3'); // monodieta3, monodieta2, monodieta1, directo
-    const startDate = ref(safeStorage.get('detox_start_date') || null); // YYYY-MM-DD
+    const startDate = ref(getInitialStartDate()); // YYYY-MM-DD
+    const tempStartDate = ref(startDate.value || '');
     const showDateSettings = ref(false);
     const completedMissions = ref(JSON.parse(safeStorage.get('detox_completed_missions') || '{}'));
     const shoppingChecked = ref(JSON.parse(safeStorage.get('detox_shopping_checked') || '{}'));
@@ -158,6 +178,7 @@ const app = createApp({
     const syncErrorMsg = ref('');
     let syncDebounceTimer = null;
     let isPulling = false;
+    let lastLocalMutationTime = 0;
 
     // Funciones auxiliares
     const triggerToast = (msg) => {
@@ -178,14 +199,16 @@ const app = createApp({
       }
     };
 
-    // Motor de Envío a la Nube (Debounced Push)
-    const pushToCloud = () => {
-      if (!syncKey.value || isPulling) return;
+    // Motor de Envío a la Nube (Debounced Push / Inmediato)
+    const pushToCloud = (immediate = false) => {
+      if (!syncKey.value) return;
       syncStatus.value = 'syncing';
-      if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
+      if (syncDebounceTimer) {
+        clearTimeout(syncDebounceTimer);
+        syncDebounceTimer = null;
+      }
 
-      syncDebounceTimer = setTimeout(async () => {
-        if (isPulling) return;
+      const executePush = async () => {
         try {
           const payload = {
             version: 1,
@@ -220,12 +243,23 @@ const app = createApp({
           console.warn('Sync push error:', err);
           syncStatus.value = 'error';
         }
-      }, 700);
+      };
+
+      if (immediate) {
+        return executePush();
+      } else {
+        if (isPulling) return;
+        syncDebounceTimer = setTimeout(executePush, 700);
+      }
     };
 
     // Motor de Descarga de la Nube (Pull)
     const pullFromCloud = async (force = false) => {
       if (!syncKey.value) return;
+      // Escudo protector: si hubo una mutación local en los últimos 4 segundos y no es forzado, no pisar
+      if (!force && (Date.now() - lastLocalMutationTime < 4000)) {
+        return;
+      }
       isPulling = true; // Bloquea pushes inmediatos antes de consultar la nube
       try {
         syncStatus.value = 'syncing';
@@ -236,7 +270,7 @@ const app = createApp({
           isPulling = false;
           // Solo inicializa la nube si se forzó la creación o si hay fecha de inicio local
           if (force || startDate.value) {
-            pushToCloud();
+            pushToCloud(true);
           }
           return;
         }
@@ -252,7 +286,22 @@ const app = createApp({
         }
         const cloudData = JSON.parse(text);
 
-        if (cloudData.startDate !== undefined) startDate.value = cloudData.startDate;
+        // Si los datos de la nube son anteriores a nuestra última mutación local, ignorar pull
+        if (!force && cloudData.updatedAt && cloudData.updatedAt < lastLocalMutationTime) {
+          isPulling = false;
+          syncStatus.value = 'synced';
+          return;
+        }
+
+        if (cloudData.startDate !== undefined) {
+          if (cloudData.startDate === null) {
+            startDate.value = null;
+          } else if (isValidDateString(cloudData.startDate)) {
+            startDate.value = cloudData.startDate;
+          } else {
+            startDate.value = null;
+          }
+        }
         if (cloudData.selectedDay !== undefined && (!startDate.value || force)) selectedDay.value = cloudData.selectedDay;
         if (cloudData.startMode !== undefined) startMode.value = cloudData.startMode;
         if (cloudData.completedMissions !== undefined) completedMissions.value = cloudData.completedMissions;
@@ -265,7 +314,7 @@ const app = createApp({
         if (cloudData.xp !== undefined) xp.value = cloudData.xp;
 
         // Persistir copia local segura
-        if (cloudData.startDate) safeStorage.set('detox_start_date', cloudData.startDate);
+        if (startDate.value) safeStorage.set('detox_start_date', startDate.value);
         else safeStorage.remove('detox_start_date');
         safeStorage.set('detox_completed_missions', JSON.stringify(completedMissions.value));
         safeStorage.set('detox_shopping_checked', JSON.stringify(shoppingChecked.value));
@@ -433,7 +482,7 @@ const app = createApp({
     });
 
     const challengeInfo = computed(() => {
-      if (!startDate.value) {
+      if (!startDate.value || !isValidDateString(startDate.value)) {
         return { started: false, daysDiff: 0, currentDay: null, formattedStartDate: '' };
       }
       const parts = startDate.value.split('-').map(Number);
@@ -480,16 +529,60 @@ const app = createApp({
       }
     });
 
-    const startChallengeToday = () => {
+    const toggleDatePicker = () => {
+      showDateSettings.value = !showDateSettings.value;
+      if (showDateSettings.value) {
+        tempStartDate.value = startDate.value || todayStr.value;
+      }
+    };
+
+    const setQuickDate = (type) => {
+      const d = new Date();
+      if (type === 'today') {
+        // hoy
+      } else if (type === 'tomorrow') {
+        d.setDate(d.getDate() + 1);
+      } else if (type === 'nextMonday') {
+        const dayOfWeek = d.getDay(); // 0 domingo, 1 lunes...
+        const daysUntilMonday = (8 - dayOfWeek) % 7 || 7;
+        d.setDate(d.getDate() + daysUntilMonday);
+      }
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      tempStartDate.value = `${y}-${m}-${day}`;
+    };
+
+    const applySelectedDate = async () => {
+      if (!tempStartDate.value) {
+        triggerToast('⚠️ Por favor seleccioná una fecha.');
+        return;
+      }
+      if (!isValidDateString(tempStartDate.value)) {
+        triggerToast('⚠️ Formato de fecha inválido.');
+        return;
+      }
+      await setStartDate(tempStartDate.value);
+    };
+
+    const startChallengeToday = async () => {
+      lastLocalMutationTime = Date.now();
       startDate.value = todayStr.value;
       selectedDay.value = 1;
+      showDateSettings.value = false;
+      safeStorage.set('detox_start_date', todayStr.value);
+      safeStorage.set('detox_selected_day', '1');
+      await pushToCloud(true);
       triggerToast('🚀 ¡Reto iniciado con éxito! Hoy es tu Día 1.');
       fireConfetti();
     };
 
-    const setStartDate = (dateString) => {
-      if (!dateString) return;
+    const setStartDate = async (dateString) => {
+      if (!isValidDateString(dateString)) return;
+      lastLocalMutationTime = Date.now();
       startDate.value = dateString;
+      safeStorage.set('detox_start_date', dateString);
+      
       const info = challengeInfo.value;
       if (info.isFuture) {
         selectedDay.value = 0;
@@ -502,23 +595,34 @@ const app = createApp({
         triggerToast(`📅 Fecha fijada: reto finalizado el ${info.formattedStartDate}.`);
       }
       showDateSettings.value = false;
+      await pushToCloud(true);
     };
 
-    const resetStartDate = () => {
+    const cancelChallengeStart = async () => {
+      lastLocalMutationTime = Date.now();
       startDate.value = null;
+      selectedDay.value = 1;
       showDateSettings.value = false;
-      triggerToast('Fecha de inicio desvinculada. Podés volver a elegir cuándo arrancar.');
+      safeStorage.remove('detox_start_date');
+      safeStorage.set('detox_selected_day', '1');
+      await pushToCloud(true);
+      triggerToast('↩️ Inicio cancelado. Volviste a foja cero para elegir cuándo arrancar.');
     };
 
-    const resetChallenge = (resetAll = false) => {
+    const resetStartDate = cancelChallengeStart;
+
+    const resetChallenge = async (resetAll = false) => {
       const msg = resetAll 
         ? '¿Reiniciar TODO el reto a foja cero? Se borrará la fecha de inicio, los hábitos/misiones completadas y la lista de compras tachada.'
-        : '¿Reiniciar la fecha del reto? Podrás elegir cuándo empezar de nuevo manteniendo tus hábitos guardados.';
+        : '¿Reiniciar la fecha del reto y volver a foja cero? Podrás elegir cuándo empezar de nuevo manteniendo tus hábitos guardados.';
       
       if (window.confirm(msg)) {
+        lastLocalMutationTime = Date.now();
         startDate.value = null;
         selectedDay.value = 1;
         showDateSettings.value = false;
+        safeStorage.remove('detox_start_date');
+        safeStorage.set('detox_selected_day', '1');
         
         if (resetAll) {
           completedMissions.value = {};
@@ -530,8 +634,10 @@ const app = createApp({
           safeStorage.remove('detox_streak');
           safeStorage.remove('detox_xp');
           safeStorage.remove('detox_unlocked_badges');
+          await pushToCloud(true);
           triggerToast('🔄 Reto reiniciado por completo a foja cero.');
         } else {
+          await pushToCloud(true);
           triggerToast('🔄 Fecha reiniciada. Ya podés elegir una nueva fecha de arranque.');
         }
       }
@@ -1218,8 +1324,9 @@ const app = createApp({
       return results.slice(0, 10);
     });
 
-    const resetAllData = () => {
+    const resetAllData = async () => {
       if (confirm("¿Estás seguro de que querés reiniciar todo tu progreso, racha y listas de compras?")) {
+        lastLocalMutationTime = Date.now();
         completedMissions.value = {};
         shoppingChecked.value = {};
         unlockedBadges.value = [];
@@ -1243,6 +1350,7 @@ const app = createApp({
           'detox_start_date',
           'detox_start_mode'
         ].forEach(k => safeStorage.remove(k));
+        await pushToCloud(true);
         triggerToast("🔄 Progreso reiniciado con éxito.");
       }
     };
@@ -1282,6 +1390,7 @@ const app = createApp({
       selectedDay,
       startMode,
       startDate,
+      tempStartDate,
       showDateSettings,
       completedMissions,
       shoppingChecked,
@@ -1374,6 +1483,10 @@ const app = createApp({
       // Metodos
       startChallengeToday,
       setStartDate,
+      toggleDatePicker,
+      setQuickDate,
+      applySelectedDate,
+      cancelChallengeStart,
       resetStartDate,
       resetChallenge,
       toggleMission,

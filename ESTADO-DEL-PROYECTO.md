@@ -1,7 +1,7 @@
 # 🌿 Detox Primavera — Estado del Proyecto & Guía de Continuidad
 
 > **Última actualización:** 27 de septiembre de 2026  
-> **Versión Actual:** `v1.2.0` *(SemVer: 1 Major, 2 Minor, 0 Patch)*  
+> **Versión Actual:** `v1.2.1` *(SemVer: 1 Major, 2 Minor, 1 Patch)*  
 > **Líder Operativa:** Blair Vance (COO)  
 > **Repositorio GitHub:** [`urrozgustavo-collab/detox-primavera`](https://github.com/urrozgustavo-collab/detox-primavera)  
 > **Enlace de Producción (Webapp PWA):** [https://urrozgustavo-collab.github.io/detox-primavera/](https://urrozgustavo-collab.github.io/detox-primavera/)
@@ -61,12 +61,15 @@ git add . ; git commit -m "feat: actualización" ; git push origin main
 - **Microinteracciones y Ergonomía:** Modales tipo *Bottom Sheet* deslizables desde abajo, carrusel de días con *snap scroll* táctil, soporte de *safe-area-insets* para iPhone/Android, y tema Claro / Oscuro con persistencia.
 
 ### B. Gestión Temporal y Planificación
-- **Control de Fecha de Inicio:**
-  - Botón directo *"Empezar Hoy (Día 1)"* o selector de fecha futura / pasada.
+- **Control Desacoplado de Fecha de Inicio:**
+  - Botón directo *"Empezar Hoy (Día 1)"* o selector desacoplado con atajos rápidos (*Hoy*, *Mañana*, *Próximo Lunes*) y confirmación obligatoria (*"✓ Confirmar fecha"*), evitando que el tipeo parcial dispare cálculos prematuros de reto finalizado.
   - La aplicación calcula automáticamente en qué día del reto te encontrás (`Día X de 21`), destacando el día actual en el carrusel con la etiqueta `HOY`.
-- **Botón de Reinicio Seguro:**
-  - *Reprogramar fecha:* Permite cambiar el día de arranque conservando los hábitos tildados.
+- **Botón Directo "Cancelar inicio (volver a foja cero)":**
+  - Permite ante cualquier error o cambio de planes cancelar inmediatamente la vinculación de fecha, devolviendo la interfaz al estado original sin perder configuraciones.
+- **Botones de Reinicio Seguro & Blindaje Cloud:**
+  - *Reprogramar fecha / Foja cero:* Permite desvincular o cambiar el día de arranque conservando los hábitos tildados.
   - *Borrar todo a cero:* Resetea de foja cero misiones, compras, rachas y puntos.
+  - *Blindaje de concurrencia:* Escudo temporal en el evento de foco para evitar que modales de confirmación del navegador disparen un pull que pise los reseteos locales con datos viejos de la nube.
 
 ### C. Sincronización Universal en la Nube (Multi-Dispositivo)
 - **100% gratuita y sin registros:** No requiere emails, usuarios ni contraseñas.
