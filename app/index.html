@@ -299,11 +299,18 @@
                   <span>Ir a Hoy (Día {{ challengeInfo.currentDay }})</span>
                 </button>
                 <button 
+                  @click="resetChallenge(false)" 
+                  class="p-1.5 sm:px-2.5 sm:py-1.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 rounded-xl border border-rose-200 dark:border-rose-800/60 text-xs transition flex items-center gap-1 active:scale-95"
+                  title="Reiniciar o reprogramar reto">
+                  <span>🔄</span>
+                  <span class="hidden sm:inline">Reiniciar</span>
+                </button>
+                <button 
                   @click="showDateSettings = !showDateSettings" 
                   class="p-1.5 sm:px-2.5 sm:py-1.5 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 rounded-xl border border-stone-200 dark:border-stone-700 text-xs transition flex items-center gap-1"
-                  title="Cambiar fecha de inicio">
+                  title="Ajustar fecha de inicio">
                   <span>⚙️</span>
-                  <span class="hidden sm:inline">Modificar</span>
+                  <span class="hidden sm:inline">Fecha</span>
                 </button>
               </div>
             </div>
@@ -318,11 +325,18 @@
                   @change="setStartDate($event.target.value)" 
                   class="bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-lg px-2.5 py-1 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-sans text-xs">
               </div>
-              <button 
-                @click="resetStartDate()" 
-                class="text-xs text-rose-600 dark:text-rose-400 hover:underline font-medium">
-                Desvincular fecha
-              </button>
+              <div class="flex items-center gap-3">
+                <button 
+                  @click="resetChallenge(false)" 
+                  class="text-xs text-amber-600 dark:text-amber-400 hover:underline font-medium">
+                  🔄 Cambiar inicio
+                </button>
+                <button 
+                  @click="resetChallenge(true)" 
+                  class="text-xs text-rose-600 dark:text-rose-400 hover:underline font-semibold">
+                  ⚠️ Borrar todo y empezar de cero
+                </button>
+              </div>
             </div>
           </div>
 

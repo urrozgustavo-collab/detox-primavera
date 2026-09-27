@@ -177,6 +177,34 @@ const app = createApp({
       triggerToast('Fecha de inicio desvinculada. Podés volver a elegir cuándo arrancar.');
     };
 
+    const resetChallenge = (resetAll = false) => {
+      const msg = resetAll 
+        ? '¿Reiniciar TODO el reto a foja cero? Se borrará la fecha de inicio, los hábitos/misiones completadas y la lista de compras tachada.'
+        : '¿Reiniciar la fecha del reto? Podrás elegir cuándo empezar de nuevo manteniendo tus hábitos guardados.';
+      
+      if (window.confirm(msg)) {
+        startDate.value = null;
+        selectedDay.value = 1;
+        showDateSettings.value = false;
+        
+        if (resetAll) {
+          completedMissions.value = {};
+          shoppingChecked.value = {};
+          streakDays.value = 0;
+          xp.value = 0;
+          unlockedBadges.value = [];
+          localStorage.removeItem('detox_completed_missions');
+          localStorage.removeItem('detox_shopping_checked');
+          localStorage.removeItem('detox_streak');
+          localStorage.removeItem('detox_xp');
+          localStorage.removeItem('detox_unlocked_badges');
+          triggerToast('🔄 Reto reiniciado por completo a foja cero.');
+        } else {
+          triggerToast('🔄 Fecha reiniciada. Ya podés elegir una nueva fecha de arranque.');
+        }
+      }
+    };
+
     onMounted(() => {
       if (startDate.value && challengeInfo.value.started) {
         if (!challengeInfo.value.isFuture && !challengeInfo.value.isFinished) {
@@ -607,6 +635,7 @@ const app = createApp({
       startChallengeToday,
       setStartDate,
       resetStartDate,
+      resetChallenge,
       toggleMission,
       isMissionDone,
       isBadgeUnlocked,
