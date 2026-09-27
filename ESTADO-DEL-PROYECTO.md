@@ -1,6 +1,7 @@
 # 🌿 Detox Primavera — Estado del Proyecto & Guía de Continuidad
 
 > **Última actualización:** 27 de septiembre de 2026  
+> **Versión Actual:** `v1.0.1` *(SemVer: 1 Major, 0 Minor, 1 Patch)*  
 > **Líder Operativa:** Blair Vance (COO)  
 > **Repositorio GitHub:** [`urrozgustavo-collab/detox-primavera`](https://github.com/urrozgustavo-collab/detox-primavera)  
 > **Enlace de Producción (Webapp PWA):** [https://urrozgustavo-collab.github.io/detox-primavera/](https://urrozgustavo-collab.github.io/detox-primavera/)
@@ -89,13 +90,60 @@ git add . ; git commit -m "feat: actualización" ; git push origin main
 
 ---
 
-## 5. Instrucciones para Retomar en un Nuevo Chat
+## 5. Backlog de Mejoras y Roadmap de Escalado
 
-Si abrís una nueva conversación con Blair / Anto / Antigravity, podés arrancar simplemente diciendo:
+A continuación se consolidan los requerimientos estratégicos y funcionales solicitados por el CEO para evolucionar la herramienta hacia un producto robusto y comercializable para profesionales de salud/nutrición (B2B2C):
+
+### A. Inspiración & Mentalidad
+1. **Frase Motivacional Diaria:**
+   - Una píldora de sabiduría y enfoque al comenzar cada jornada ("Mi Día").
+   - Citas célebres y profundas de autores alineados a la medicina natural, depuración y salud digestiva/holística (Hipócrates, Paracelso, Ann Wigmore, Bernard Jensen, Arnold Ehret, etc.).
+   - Tono sobrio, inspirador y sin clichés de autoayuda genérica.
+
+### B. Seguimiento Clínico y Registro Personal
+2. **Diario de a Bordo / Bitácora de Sensaciones & Síntomas:**
+   - Registro cualitativo diario: nivel de energía, digestión, síntomas de crisis depurativa, peso o sensaciones corporales.
+   - **Tres vistas ergonómicas:**
+     - *Vista Diaria:* Foco exclusivo en la jornada en curso (arranca limpia cada día).
+     - *Vista Semanal:* Panorama compacto de los 7 días de la fase para correlacionar avances.
+     - *Vista Global / Historial:* Registro cronológico completo apilado de los 21 días.
+   - **Exportación Universal:** Generador de reportes listo para compartir con el terapeuta/nutricionista en formato PDF imprimible, Google Docs / Word o portapapeles.
+
+3. **Historial de Ingestas & Registro Libre de Comidas:**
+   - Trazabilidad de platos preparados a partir del recetario en cada comida (desayuno, almuerzo, merienda, cena).
+   - Posibilidad de registrar manualmente qué comió la persona si no siguió la receta al pie de la letra o comió fuera de casa.
+
+### C. Inteligencia en la Cocina y Optimización de Compras
+4. **Heladera / Despensa Inteligente ("¿Qué cocino hoy con lo que tengo?"):**
+   - Buscador por selección o tipeo de alimentos disponibles en la cocina del usuario.
+   - **Matching porcentual sensato:** Ponderación diferenciada de ingredientes principales (calabaza, mijo, arroz) vs. condimentos básicos (sal marina, aceite de oliva, orégano) para evitar falsos positivos del 100%.
+   - Indicador claro de qué 1 o 2 ingredientes faltan para completar el plato.
+   - Interfaz visual ultra-rápida, limpia e intuitiva.
+
+5. **Planificador Semanal de Menús & Batch Cooking:**
+   - Selección programada de comidas para los próximos días o la semana completa para eliminar la fatiga de decisión diaria.
+   - **Optimizador de Insumos:** Detección de ingredientes compartidos (ej. si 3 recetas requieren brócoli o zapallo) para coordinar compras por bulto y optimizar cocciones simultáneas.
+
+6. **Gestor de Tiempos Previos, Activación y Remojos:**
+   - Vinculado al planificador semanal: cronómetro de anticipación clínica.
+   - Recordatorios y alertas programadas: cuándo hidratar frutos secos o legumbres la noche anterior, cuándo iniciar la fermentación del kéfir (2 días previos) y control de germinados.
+
+---
+
+## 6. Historial de Versiones (SemVer 2.0.0)
+
+- **`v1.0.1` (27/09/2026):**
+  - Fix crítico: Restauración del scroll estándar en la versión web de escritorio (ajuste de ancho de barra a 10px, estados hover y eliminación de restricciones `100vw`).
+  - Fix crítico: Persistencia de sincronización en caliente ante cierres de navegador móvil (triple capa con LocalStorage, Cookies, prevención de sobreescritura prematura y retención de `?sync=` en URL).
+  - Fix visual: Corrección de solapamiento en la barra de navegación de escritorio (`md:hidden` en botones secundarios de Botiquín/Herbolario).
+  - Fix móvil: Adaptación de la botonera del Semáforo Nutricional a una grilla táctil 2x2 para evitar el desborde del botón rojo.
+- **`v1.0.0` (26/09/2026):**
+  - Lanzamiento inicial de la WebApp PWA interactiva: Tracker 21 días, Menú y recetas con Modo Cocina, Lista de compras clasificada, Semáforo Nutricional, Botiquín SOS y sincronización multi-dispositivo sin contraseñas (Edge KV).
+
+---
+
+## 7. Instrucciones para Retomar en un Nuevo Chat
+
+Si abrís una nueva conversación con Blair / Antigravity, podés arrancar simplemente diciendo:
 
 > *"Leé `ESTADO-DEL-PROYECTO.md` en `04_productividad_herramientas/salud-recetas/detox-primavera` y decime qué tenemos."*
-
-### Aspectos que podrían explorarse a futuro:
-1. **PWA Offline Service Worker:** Agregar `manifest.json` y service worker formal si se busca instalación con ícono dedicado en la pantalla de inicio sin barra de navegador.
-2. **Exportación de Historial:** Descargar en PDF o JSON el resumen de los 21 días al graduarse para análisis nutricional.
-3. **Módulo de Notas Diarias:** Permitir registrar sensaciones corporales, peso o energía en cada jornada.
