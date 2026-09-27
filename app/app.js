@@ -75,12 +75,20 @@ const app = createApp({
     const journalView = ref('dia'); // 'dia', 'semana', 'global'
     const showExportModal = ref(false);
 
-    // 4. Filtros de Recetas
+    // 4. Filtros de Recetas y Subvistas
+    const recipeSubView = ref(safeStorage.get('detox_recipe_subview') || 'catalogo'); // 'catalogo', 'heladera', 'batch', 'remojos'
     const recipeSearch = ref('');
     const recipeFilterCategory = ref('todas');
     const activeRecipe = ref(null);
     const activeCookingRecipe = ref(null);
     const cookingStepIndex = ref(0);
+
+    // 4.1. Heladera Inteligente, Batch Cooking y Planificador Semanal
+    const fridgeSelected = ref(JSON.parse(safeStorage.get('detox_fridge_selected') || '[]'));
+    const fridgeFilterCategory = ref('todas');
+    const fridgeSearch = ref('');
+    const fridgeTierFilter = ref('todas'); // 'todas', 'lista', 'casi_lista'
+    const weeklyPlan = ref(JSON.parse(safeStorage.get('detox_weekly_plan') || '{}'));
 
     // 5. Filtros de Compras
     const shoppingFilterCategory = ref('todas');
@@ -189,6 +197,8 @@ const app = createApp({
             shoppingChecked: shoppingChecked.value,
             dailyJournal: dailyJournal.value,
             dailyMeals: dailyMeals.value,
+            fridgeSelected: fridgeSelected.value,
+            weeklyPlan: weeklyPlan.value,
             streakDays: streakDays.value,
             xp: xp.value,
             unlockedBadges: unlockedBadges.value
@@ -249,6 +259,8 @@ const app = createApp({
         if (cloudData.shoppingChecked !== undefined) shoppingChecked.value = cloudData.shoppingChecked;
         if (cloudData.dailyJournal !== undefined) dailyJournal.value = cloudData.dailyJournal;
         if (cloudData.dailyMeals !== undefined) dailyMeals.value = cloudData.dailyMeals;
+        if (cloudData.fridgeSelected !== undefined) fridgeSelected.value = cloudData.fridgeSelected;
+        if (cloudData.weeklyPlan !== undefined) weeklyPlan.value = cloudData.weeklyPlan;
         if (cloudData.unlockedBadges !== undefined) unlockedBadges.value = cloudData.unlockedBadges;
         if (cloudData.xp !== undefined) xp.value = cloudData.xp;
 
@@ -259,6 +271,8 @@ const app = createApp({
         safeStorage.set('detox_shopping_checked', JSON.stringify(shoppingChecked.value));
         safeStorage.set('detox_daily_journal', JSON.stringify(dailyJournal.value));
         safeStorage.set('detox_daily_meals', JSON.stringify(dailyMeals.value));
+        safeStorage.set('detox_fridge_selected', JSON.stringify(fridgeSelected.value));
+        safeStorage.set('detox_weekly_plan', JSON.stringify(weeklyPlan.value));
         safeStorage.set('detox_unlocked_badges', JSON.stringify(unlockedBadges.value));
         safeStorage.set('detox_xp', String(xp.value));
 
@@ -397,6 +411,15 @@ const app = createApp({
     }, { deep: true });
     watch(dailyMeals, (val) => {
       safeStorage.set('detox_daily_meals', JSON.stringify(val));
+      pushToCloud();
+    }, { deep: true });
+    watch(recipeSubView, (val) => safeStorage.set('detox_recipe_subview', val));
+    watch(fridgeSelected, (val) => {
+      safeStorage.set('detox_fridge_selected', JSON.stringify(val));
+      pushToCloud();
+    }, { deep: true });
+    watch(weeklyPlan, (val) => {
+      safeStorage.set('detox_weekly_plan', JSON.stringify(val));
       pushToCloud();
     }, { deep: true });
 
@@ -922,6 +945,131 @@ const app = createApp({
       cookingStepIndex.value = 0;
     };
 
+    // 4.2. Lógica de Heladera Inteligente, Batch Cooking y Remojos
+    const fridgeData = computed(() => {
+      if (typeof window !== 'undefined' && window.FRIDGE_AND_PREP_DATA) return window.FRIDGE_AND_PREP_DATA;
+      if (typeof FRIDGE_AND_PREP_DATA !== 'undefined') return FRIDGE_AND_PREP_DATA;
+      return null;
+    });
+
+    const fridgeCatalog = computed(() => fridgeData.value?.ingredientsCatalog || []);
+
+    const filteredFridgeIngredients = computed(() => {
+      const q = fridgeSearch.value.trim().toLowerCase();
+      const cat = fridgeFilterCategory.value;
+      return fridgeCatalog.value.filter(ing => {
+        const matchCat = cat === 'todas' || ing.categoria === cat;
+        const matchQ = !q || ing.nombre.toLowerCase().includes(q) || (ing.sinonimos && ing.sinonimos.some(s => s.toLowerCase().includes(q)));
+        return matchCat && matchQ;
+      });
+    });
+
+    // Ingredientes más comunes para selección rápida con 1 tap
+    const fridgeQuickTags = computed(() => {
+      const topIds = [
+        'manzana', 'arroz_yamani', 'porotos_mung', 'calabaza_anco', 'zanahoria',
+        'brocoli', 'repollo_blanco_colorado', 'apio', 'palta', 'almendras',
+        'aceite_oliva', 'sal_marina', 'limon', 'ajo', 'jengibre', 'shoyu_moa'
+      ];
+      return fridgeCatalog.value.filter(ing => topIds.includes(ing.id));
+    });
+
+    // Motor de Matching de Recetas con la Heladera
+    const fridgeMatchResults = computed(() => {
+      if (typeof window !== 'undefined' && window.DetoxFridgeEngine) {
+        return window.DetoxFridgeEngine.matchFridge(fridgeSelected.value);
+      }
+      return { totalRecetas: 0, listasParaCocinar: [], casiListas: [], incompletas: [], todas: [] };
+    });
+
+    const filteredFridgeMatches = computed(() => {
+      const res = fridgeMatchResults.value;
+      if (fridgeTierFilter.value === 'lista') return res.listasParaCocinar;
+      if (fridgeTierFilter.value === 'casi_lista') return res.casiListas;
+      return res.todas;
+    });
+
+    const toggleFridgeIngredient = (id) => {
+      if (fridgeSelected.value.includes(id)) {
+        fridgeSelected.value = fridgeSelected.value.filter(x => x !== id);
+      } else {
+        fridgeSelected.value.push(id);
+      }
+    };
+
+    const isFridgeIngredientSelected = (id) => fridgeSelected.value.includes(id);
+
+    const clearFridge = () => {
+      fridgeSelected.value = [];
+      triggerToast('🧊 Heladera vaciada.');
+    };
+
+    const selectCommonPantry = () => {
+      const basicIds = ['aceite_oliva', 'sal_marina', 'limon', 'agua_filtro'];
+      const set = new Set([...fridgeSelected.value, ...basicIds]);
+      fridgeSelected.value = Array.from(set);
+      triggerToast('🧂 Despensa básica añadida (aceite, sal marina, limón)');
+    };
+
+    const addMissingToShoppingList = (recipeMatch) => {
+      const allMissing = [...(recipeMatch.missingPrincipales || []), ...(recipeMatch.missingCondimentos || [])];
+      if (allMissing.length === 0) {
+        triggerToast('✅ ¡Ya tenés todos los ingredientes de esta receta!');
+        return;
+      }
+      const names = allMissing.map(m => m.nombre).join(', ');
+      triggerToast(`🛒 Faltantes para ${recipeMatch.titulo}: ${names}`);
+    };
+
+    // Planificador Semanal & Batch Cooking
+    const plannedRecipeIds = computed(() => {
+      const ids = new Set();
+      Object.values(weeklyPlan.value).forEach(dayObj => {
+        if (!dayObj) return;
+        ['desayuno', 'almuerzo', 'cena'].forEach(slot => {
+          if (dayObj[slot]) ids.add(dayObj[slot]);
+        });
+      });
+      // Si el planificador está vacío, incluir las recetas favoritas o generales para dar valor inmediato
+      if (ids.size === 0) {
+        ['caldo-detox', 'nituke-manzana', 'hummus-mung', 'bowl-yamani-cruciferas', 'mayonesa-zanahoria'].forEach(id => ids.add(id));
+      }
+      return Array.from(ids);
+    });
+
+    const batchPlanResults = computed(() => {
+      if (typeof window !== 'undefined' && window.DetoxFridgeEngine) {
+        return window.DetoxFridgeEngine.getBatchPlanForRecipes(plannedRecipeIds.value);
+      }
+      return { recetasSeleccionadas: [], basesSugeridas: [], totalTiempoAhorradoMinutos: 0 };
+    });
+
+    const soakingScheduleResults = computed(() => {
+      if (typeof window !== 'undefined' && window.DetoxFridgeEngine) {
+        return window.DetoxFridgeEngine.getSoakingScheduleForRecipes(plannedRecipeIds.value);
+      }
+      return { recetas: [], remojosRequeridos: [] };
+    });
+
+    const isRecipeInBatch = (recipeId) => plannedRecipeIds.value.includes(recipeId);
+
+    const toggleRecipeInBatch = (recipeId) => {
+      const current = weeklyPlan.value[1] || {};
+      const exists = Object.values(current).includes(recipeId);
+      if (exists) {
+        const next = {};
+        for (const [k, v] of Object.entries(current)) {
+          if (v !== recipeId) next[k] = v;
+        }
+        weeklyPlan.value = { ...weeklyPlan.value, 1: next };
+        triggerToast('Plato retirado del plan semanal.');
+      } else {
+        const slot = !current.almuerzo ? 'almuerzo' : (!current.cena ? 'cena' : 'desayuno');
+        weeklyPlan.value = { ...weeklyPlan.value, 1: { ...current, [slot]: recipeId } };
+        triggerToast('Plato añadido al plan semanal.');
+      }
+    };
+
     // Computados de Semáforo
     const filteredFoods = computed(() => {
       return data.foodTrafficLight.filter((f) => {
@@ -1077,6 +1225,8 @@ const app = createApp({
         unlockedBadges.value = [];
         dailyJournal.value = {};
         dailyMeals.value = {};
+        fridgeSelected.value = [];
+        weeklyPlan.value = {};
         xp.value = 0;
         selectedDay.value = 1;
         startDate.value = null;
@@ -1086,6 +1236,8 @@ const app = createApp({
           'detox_unlocked_badges',
           'detox_daily_journal',
           'detox_daily_meals',
+          'detox_fridge_selected',
+          'detox_weekly_plan',
           'detox_xp',
           'detox_selected_day',
           'detox_start_date',
@@ -1197,6 +1349,28 @@ const app = createApp({
       currentDayMeals,
       updateMealSlot,
       getMealSuggestions,
+      // Heladera Inteligente, Batch Cooking y Remojos
+      recipeSubView,
+      fridgeSelected,
+      fridgeFilterCategory,
+      fridgeSearch,
+      fridgeTierFilter,
+      weeklyPlan,
+      fridgeCatalog,
+      filteredFridgeIngredients,
+      fridgeQuickTags,
+      fridgeMatchResults,
+      filteredFridgeMatches,
+      toggleFridgeIngredient,
+      isFridgeIngredientSelected,
+      clearFridge,
+      selectCommonPantry,
+      addMissingToShoppingList,
+      plannedRecipeIds,
+      batchPlanResults,
+      soakingScheduleResults,
+      isRecipeInBatch,
+      toggleRecipeInBatch,
       // Metodos
       startChallengeToday,
       setStartDate,

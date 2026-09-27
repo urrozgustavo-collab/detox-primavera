@@ -1080,6 +1080,2078 @@ if (typeof module !== 'undefined') {
 }
 
 </script>
+  <script>
+// Motor de Heladera Inteligente, Batch Cooking y Tiempos Previos
+// Detox de Primavera - Isabel Caparra (Septiembre 2026)
+// Compilado por Blair Vance (COO)
+
+const FRIDGE_AND_PREP_DATA = {
+  "meta": {
+    "nombre": "Motor Clínico de Heladera Inteligente, Batch Cooking y Gestor de Remojos",
+    "proyecto": "Detox de Primavera - Isabel Caparra",
+    "version": "1.2.0",
+    "actualizado": "2026-09-27",
+    "autor": "Blair Vance (COO)"
+  },
+  "scoringConfig": {
+    "principalesWeight": 80,
+    "condimentosWeight": 20,
+    "basicosWeight": 0,
+    "zeroPrincipalesMaxScore": 20,
+    "underHalfPrincipalesMaxScore": 40,
+    "formula": "Score = (principales_presentes / total_principales) * 80 + (condimentos_presentes / total_condimentos) * 20",
+    "businessRules": [
+      "Los ingredientes 'principales' representan el 80% del valor total del plato.",
+      "Los ingredientes 'condimento' representan el 20% del valor restante.",
+      "Los ingredientes 'básicos' (agua, líquidos de cocción de la casa) no penalizan el score si no están explícitamente marcados.",
+      "Si el usuario tiene 0 ingredientes principales, el score máximo posible es de 20%, aun si cuenta con el 100% de los condimentos.",
+      "Si el usuario cuenta con menos del 50% de los ingredientes principales, el score nunca puede superar el 40%.",
+      "Los condimentos marcados como opcionales no penalizan la completitud pero suman ponderación si están presentes.",
+      "Clasificación visual de recetas: 100% (Lista para cocinar), 70-99% (Casi lista: falta 1 condimento o toque menor), <70% (Incompleta: faltan alimentos base)."
+    ]
+  },
+  "ingredientsCatalog": [
+    {
+      "id": "arroz_yamani",
+      "nombre": "Arroz Yamaní integral",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "granos",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "arroz yamani",
+        "arroz yamaní",
+        "yamani",
+        "arroz integral",
+        "arroz integral largo fino"
+      ],
+      "requiereActivacion": true,
+      "activacionId": "arroz_yamani"
+    },
+    {
+      "id": "quinoa",
+      "nombre": "Quinoa real",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "granos",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "quinoa",
+        "quinua",
+        "quinoa real"
+      ],
+      "requiereActivacion": true,
+      "activacionId": "quinoa"
+    },
+    {
+      "id": "mijo",
+      "nombre": "Mijo pelado",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "granos",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "mijo",
+        "mijo pelado"
+      ],
+      "requiereActivacion": true,
+      "activacionId": "mijo"
+    },
+    {
+      "id": "porotos_mung",
+      "nombre": "Porotos Mung",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "legumbres",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "mung",
+        "poroto mung",
+        "porotos mung",
+        "mungo",
+        "poroto verde"
+      ],
+      "requiereActivacion": true,
+      "activacionId": "porotos_mung"
+    },
+    {
+      "id": "porotos_aduki",
+      "nombre": "Porotos Aduki o negros",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "legumbres",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "aduki",
+        "azuki",
+        "poroto aduki",
+        "porotos negros"
+      ],
+      "requiereActivacion": true,
+      "activacionId": "porotos_aduki"
+    },
+    {
+      "id": "manzana",
+      "nombre": "Manzana verde o roja (agroecológica)",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "frutas",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "manzana",
+        "manzanas",
+        "manzana verde",
+        "manzana roja",
+        "manzana deliciosa",
+        "manzana gala"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "apio",
+      "nombre": "Apio fresco (pencas y hojas)",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "apio",
+        "pencas de apio",
+        "varas de apio",
+        "planta de apio"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "puerro",
+      "nombre": "Puerro",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "puerro",
+        "puerros"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "repollo",
+      "nombre": "Repollo blanco o morado",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "repollo",
+        "repollo blanco",
+        "repollo morado",
+        "repollo colorado",
+        "col"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "zanahoria",
+      "nombre": "Zanahoria",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "zanahoria",
+        "zanahorias"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "calabaza_anco",
+      "nombre": "Zapallo anco o cabutiá",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "zapallo anco",
+        "calabaza",
+        "zapallo",
+        "cabutia",
+        "cabutiá",
+        "butternut"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "berenjena",
+      "nombre": "Berenjena",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "berenjena",
+        "berenjenas"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "brocoli",
+      "nombre": "Brócoli",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "brocoli",
+        "brócoli",
+        "ramilletes de brocoli"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "coliflor",
+      "nombre": "Coliflor",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "coliflor",
+        "ramilletes de coliflor"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "palta",
+      "nombre": "Palta madura",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "grasas_frutas",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "palta",
+        "paltas",
+        "aguacate"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "remolacha",
+      "nombre": "Remolacha con hojas",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "remolacha",
+        "remolachas",
+        "betarraga"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "zucchini",
+      "nombre": "Zucchini",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "zucchini",
+        "zucchinis",
+        "zapallito verde",
+        "calabacín"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "espinaca",
+      "nombre": "Espinaca o Kale",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "espinaca",
+        "espinacas",
+        "kale",
+        "col rizada"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "alcaucil",
+      "nombre": "Alcaucil (estacional)",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "alcaucil",
+        "alcauciles",
+        "alcachofa",
+        "alcachofas"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "repollitos_bruselas",
+      "nombre": "Repollitos de Bruselas",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "repollitos de bruselas",
+        "bruselas",
+        "col de bruselas"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "esparragos",
+      "nombre": "Espárragos frescos",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "verduras",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "esparragos",
+        "espárragos"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "almendras",
+      "nombre": "Almendras crudas sin tostar",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "frutos_secos",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "almendras",
+        "almendra",
+        "almendras crudas"
+      ],
+      "requiereActivacion": true,
+      "activacionId": "almendras"
+    },
+    {
+      "id": "castanas_caju",
+      "nombre": "Castañas de Cajú crudas (sin sal)",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "frutos_secos",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "caju",
+        "castañas de cajú",
+        "castañas caju",
+        "anacardos"
+      ],
+      "requiereActivacion": true,
+      "activacionId": "castanas_caju"
+    },
+    {
+      "id": "harina_arroz_integral",
+      "nombre": "Harina de arroz integral",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "harinas",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "harina de arroz",
+        "harina arroz integral",
+        "harina integral de arroz"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "harina_centeno_integral",
+      "nombre": "Harina de centeno integral pura",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "harinas",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "harina de centeno",
+        "centeno integral",
+        "harina centeno"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "masa_madre",
+      "nombre": "Fermento de masa madre activo",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "fermentos",
+      "rubroCompra": "Panadería",
+      "sinonimos": [
+        "masa madre",
+        "fermento natural",
+        "masa madre de centeno"
+      ],
+      "requiereActivacion": true,
+      "activacionId": "masa_madre"
+    },
+    {
+      "id": "tofu",
+      "nombre": "Tofu orgánico firme (Soyana)",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "proteinas",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "tofu",
+        "tofu organico",
+        "tofu soyana"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "pescado",
+      "nombre": "Pescado blanco fresco (merluza/abadejo)",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "proteinas",
+      "rubroCompra": "Pescadería",
+      "sinonimos": [
+        "pescado",
+        "pescado blanco",
+        "merluza",
+        "abadejo"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "huevos",
+      "nombre": "Huevos de campo pastoriles",
+      "clasificacion": "principal",
+      "pesoScore": 80,
+      "categoria": "proteinas",
+      "rubroCompra": "Granja",
+      "sinonimos": [
+        "huevos",
+        "huevo",
+        "huevos pastoriles"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "aceite_oliva",
+      "nombre": "Aceite de Oliva Extra Virgen (1ra prensión fría)",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "grasas",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "oliva",
+        "aceite de oliva",
+        "aceite de oliva virgen extra",
+        "aceite oliva crudo"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "sal_marina",
+      "nombre": "Sal marina fina o del Himalaya",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "condimentos",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "sal marina",
+        "sal de mar",
+        "sal del himalaya",
+        "sal rosada"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "limon",
+      "nombre": "Limón fresco",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "citricos",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "limon",
+        "limones",
+        "jugo de limon",
+        "jugo de limón"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "ajo",
+      "nombre": "Diente de ajo",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "aromaticos",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "ajo",
+        "dientes de ajo",
+        "ajo picado",
+        "cabeza de ajo"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "cebolla",
+      "nombre": "Cebolla o verdeo",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "aromaticos",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "cebolla",
+        "cebolla de verdeo",
+        "verdeo",
+        "cebolla morada"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "shoyu",
+      "nombre": "Salsa de soja Shoyu MOA (fermento natural)",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "fermentos",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "shoyu",
+        "salsa de soja",
+        "shoyu moa",
+        "soja fermentada"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "chucrut",
+      "nombre": "Chucrut vivo artesanal",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "fermentos",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "chucrut",
+        "sauerkraut",
+        "chucrut vivo"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "semillas_lino",
+      "nombre": "Semillas de Lino (dorado o marrón)",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "semillas",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "lino",
+        "semillas de lino",
+        "linaza"
+      ],
+      "requiereActivacion": true,
+      "activacionId": "semillas_lino"
+    },
+    {
+      "id": "semillas_chia",
+      "nombre": "Semillas de Chía",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "semillas",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "chia",
+        "semillas de chia",
+        "semillas de chía"
+      ],
+      "requiereActivacion": true,
+      "activacionId": "semillas_chia"
+    },
+    {
+      "id": "semillas_sesamo",
+      "nombre": "Semillas de Sésamo integral",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "semillas",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "sesamo",
+        "sésamo",
+        "semillas de sésamo",
+        "ajonjolí"
+      ],
+      "requiereActivacion": true,
+      "activacionId": "semillas_sesamo"
+    },
+    {
+      "id": "semillas_girasol",
+      "nombre": "Semillas de Girasol crudas",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "semillas",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "girasol",
+        "semillas de girasol",
+        "pipas"
+      ],
+      "requiereActivacion": true,
+      "activacionId": "semillas_girasol"
+    },
+    {
+      "id": "albahaca",
+      "nombre": "Albahaca fresca",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "hierbas",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "albahaca",
+        "albahaca fresca",
+        "hojas de albahaca"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "perejil",
+      "nombre": "Perejil fresco",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "hierbas",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "perejil",
+        "perejil fresco"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "comino",
+      "nombre": "Comino en polvo",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "especias",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "comino",
+        "comino molido"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "curcuma",
+      "nombre": "Cúrcuma molida o en raíz",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "especias",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "curcuma",
+        "cúrcuma",
+        "turmeric"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "canela",
+      "nombre": "Canela en polvo o rama",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "especias",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "canela",
+        "canela molida"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "jengibre",
+      "nombre": "Jengibre fresco",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "especias",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "jengibre",
+        "raíz de jengibre"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "laurel",
+      "nombre": "Hojas de laurel seco",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "hierbas",
+      "rubroCompra": "Herboristería",
+      "sinonimos": [
+        "laurel",
+        "hojas de laurel"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "oregano",
+      "nombre": "Orégano o tomillo seco",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "hierbas",
+      "rubroCompra": "Herboristería",
+      "sinonimos": [
+        "oregano",
+        "orégano",
+        "tomillo",
+        "hierbas secas"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "kombu",
+      "nombre": "Alga Kombu",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "algas",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "kombu",
+        "alga kombu"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "vinagre_manzana",
+      "nombre": "Vinagre de sidra de manzana vivo",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "fermentos",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "vinagre de manzana",
+        "vinagre vivo",
+        "vinagre de sidra"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "levadura_nutricional",
+      "nombre": "Levadura nutricional virgen",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "suplementos",
+      "rubroCompra": "Dietética",
+      "sinonimos": [
+        "levadura nutricional",
+        "levadura virgen"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "aceitunas_negras",
+      "nombre": "Aceitunas negras descarozadas",
+      "clasificacion": "condimento",
+      "pesoScore": 20,
+      "categoria": "encurtidos",
+      "rubroCompra": "Verdulería",
+      "sinonimos": [
+        "aceitunas negras",
+        "aceituna negra",
+        "olivas negras"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "agua",
+      "nombre": "Agua de filtro limpia o tibia",
+      "clasificacion": "basico",
+      "pesoScore": 0,
+      "categoria": "basicos",
+      "rubroCompra": "Hogar",
+      "sinonimos": [
+        "agua",
+        "agua tibia",
+        "agua de filtro",
+        "agua filtrada"
+      ],
+      "requiereActivacion": false
+    },
+    {
+      "id": "liquido_coccion",
+      "nombre": "Líquido de cocción reservado",
+      "clasificacion": "basico",
+      "pesoScore": 0,
+      "categoria": "basicos",
+      "rubroCompra": "Hogar",
+      "sinonimos": [
+        "liquido de coccion",
+        "agua de coccion",
+        "caldo de coccion"
+      ],
+      "requiereActivacion": false
+    }
+  ],
+  "recipesMapping": [
+    {
+      "id": "caldo-detox",
+      "titulo": "Caldo Détox Alcalinizante",
+      "categoria": "caldos",
+      "tiempoEstimado": "35 min",
+      "metodo": "Hervido suave tapado",
+      "principales": [
+        {
+          "id": "apio",
+          "nombre": "Apio",
+          "cantidad": "4 pencas cortadas",
+          "esencial": true
+        },
+        {
+          "id": "puerro",
+          "nombre": "Puerro",
+          "cantidad": "1 a 2 puerros cortados",
+          "esencial": true
+        },
+        {
+          "id": "repollo",
+          "nombre": "Repollo",
+          "cantidad": "1 taza en tiras",
+          "esencial": true
+        },
+        {
+          "id": "zanahoria",
+          "nombre": "Zanahoria",
+          "cantidad": "1 o 2 en rodajas",
+          "esencial": true
+        },
+        {
+          "id": "manzana",
+          "nombre": "Manzana",
+          "cantidad": "1 entera con corazón y semillas",
+          "esencial": true
+        },
+        {
+          "id": "alcaucil",
+          "nombre": "Alcaucil",
+          "cantidad": "1/2 unidad",
+          "esencial": false,
+          "nota": "Opcional según estación"
+        }
+      ],
+      "condimentos": [
+        {
+          "id": "ajo",
+          "nombre": "Ajo",
+          "cantidad": "2 dientes enteros aplastados",
+          "esencial": true
+        },
+        {
+          "id": "perejil",
+          "nombre": "Perejil fresco",
+          "cantidad": "1 puñado",
+          "esencial": true
+        },
+        {
+          "id": "sal_marina",
+          "nombre": "Sal marina",
+          "cantidad": "A gusto",
+          "esencial": true
+        }
+      ],
+      "basicos": [
+        {
+          "id": "agua",
+          "nombre": "Agua limpia",
+          "cantidad": "Agua fría que duplique volumen"
+        }
+      ],
+      "basesRequeridas": [
+        "base-caldo-detox"
+      ],
+      "rolBatch": "Base productora de caldo para múltiples días y recetas"
+    },
+    {
+      "id": "nituke-manzana",
+      "titulo": "Nituke de Manzana (Desayuno / Merienda)",
+      "categoria": "desayunos",
+      "tiempoEstimado": "40 min",
+      "metodo": "Nituke",
+      "principales": [
+        {
+          "id": "manzana",
+          "nombre": "Manzanas rojas o verdes",
+          "cantidad": "3 o 4 en cubos",
+          "esencial": true
+        }
+      ],
+      "condimentos": [
+        {
+          "id": "sal_marina",
+          "nombre": "Sal marina",
+          "cantidad": "1 pizca",
+          "esencial": true
+        },
+        {
+          "id": "almendras",
+          "nombre": "Almendras tostadas",
+          "cantidad": "1 puñadito picado",
+          "esencial": false,
+          "nota": "Opcional topping"
+        },
+        {
+          "id": "semillas_lino",
+          "nombre": "Semillas de lino molidas",
+          "cantidad": "1 cucharadita",
+          "esencial": false,
+          "nota": "Opcional topping"
+        }
+      ],
+      "basicos": [
+        {
+          "id": "agua",
+          "nombre": "Agua",
+          "cantidad": "2 cucharadas soperas"
+        }
+      ],
+      "basesRequeridas": [
+        "base-verduras-vapor-nituke"
+      ],
+      "rolBatch": "Se puede cocinar por triplicado para tener desayunos listos 3 días"
+    },
+    {
+      "id": "hummus-mung",
+      "titulo": "Hummus de Porotos Mung",
+      "categoria": "dips",
+      "tiempoEstimado": "15 min (con porotos ya cocidos)",
+      "metodo": "Procesado en frío",
+      "principales": [
+        {
+          "id": "porotos_mung",
+          "nombre": "Porotos mung cocidos y tiernos",
+          "cantidad": "2 tazas",
+          "esencial": true
+        }
+      ],
+      "condimentos": [
+        {
+          "id": "ajo",
+          "nombre": "Ajo",
+          "cantidad": "1 diente pequeño",
+          "esencial": true
+        },
+        {
+          "id": "albahaca",
+          "nombre": "Albahaca fresca",
+          "cantidad": "1 puñado de hojas",
+          "esencial": true
+        },
+        {
+          "id": "aceite_oliva",
+          "nombre": "Aceite de oliva extra virgen",
+          "cantidad": "1 cucharada",
+          "esencial": true
+        },
+        {
+          "id": "limon",
+          "nombre": "Limón",
+          "cantidad": "Gotitas de jugo fresco",
+          "esencial": true
+        },
+        {
+          "id": "sal_marina",
+          "nombre": "Sal marina",
+          "cantidad": "A gusto",
+          "esencial": true
+        }
+      ],
+      "basicos": [
+        {
+          "id": "liquido_coccion",
+          "nombre": "Líquido de cocción del mung",
+          "cantidad": "1/4 a 1/2 taza"
+        }
+      ],
+      "basesRequeridas": [
+        "base-porotos-mung"
+      ],
+      "rolBatch": "Consume 2 tazas de la base de porotos mung cocidos en batch"
+    },
+    {
+      "id": "mayonesa-zanahoria",
+      "titulo": "Mayonesa Suave de Zanahoria",
+      "categoria": "dips",
+      "tiempoEstimado": "20 min",
+      "metodo": "Hervido + Procesado",
+      "principales": [
+        {
+          "id": "zanahoria",
+          "nombre": "Zanahorias peladas",
+          "cantidad": "4 unidades",
+          "esencial": true
+        },
+        {
+          "id": "calabaza_anco",
+          "nombre": "Zapallo anco",
+          "cantidad": "1 trozo pequeño para cremosidad",
+          "esencial": true
+        }
+      ],
+      "condimentos": [
+        {
+          "id": "puerro",
+          "nombre": "Puerro o cebolla",
+          "cantidad": "1/2 puerro o trozo cebolla",
+          "esencial": true
+        },
+        {
+          "id": "ajo",
+          "nombre": "Ajo",
+          "cantidad": "1 diente",
+          "esencial": true
+        },
+        {
+          "id": "aceite_oliva",
+          "nombre": "Aceite de oliva crudo",
+          "cantidad": "1 cucharada",
+          "esencial": true
+        },
+        {
+          "id": "limon",
+          "nombre": "Limón",
+          "cantidad": "Abundante jugo fresco",
+          "esencial": true
+        },
+        {
+          "id": "sal_marina",
+          "nombre": "Sal marina",
+          "cantidad": "A gusto",
+          "esencial": true
+        },
+        {
+          "id": "aceitunas_negras",
+          "nombre": "Aceitunas negras",
+          "cantidad": "3 o 4 descarozadas",
+          "esencial": false,
+          "nota": "Opcional"
+        }
+      ],
+      "basicos": [
+        {
+          "id": "liquido_coccion",
+          "nombre": "Líquido de cocción de las verduras",
+          "cantidad": "Cantidad necesaria para emulsionar"
+        }
+      ],
+      "basesRequeridas": [
+        "base-verduras-vapor-nituke"
+      ],
+      "rolBatch": "Rinde 1 frasco de emulsión fresca para aderezar platos por 4 días"
+    },
+    {
+      "id": "babaganoush",
+      "titulo": "Babaganoush Ahumado sin Aceite Cocido",
+      "categoria": "dips",
+      "tiempoEstimado": "25 min",
+      "metodo": "Asado a la hornalla",
+      "principales": [
+        {
+          "id": "berenjena",
+          "nombre": "Berenjenas medianas",
+          "cantidad": "2 unidades enteras",
+          "esencial": true
+        }
+      ],
+      "condimentos": [
+        {
+          "id": "ajo",
+          "nombre": "Ajo",
+          "cantidad": "1/2 diente rallado",
+          "esencial": true
+        },
+        {
+          "id": "limon",
+          "nombre": "Limón",
+          "cantidad": "Jugo de 1/2 limón",
+          "esencial": true
+        },
+        {
+          "id": "aceite_oliva",
+          "nombre": "Aceite de oliva virgen extra en crudo",
+          "cantidad": "1 cucharada",
+          "esencial": true
+        },
+        {
+          "id": "sal_marina",
+          "nombre": "Sal marina",
+          "cantidad": "A gusto",
+          "esencial": true
+        },
+        {
+          "id": "comino",
+          "nombre": "Comino",
+          "cantidad": "Pizca",
+          "esencial": true
+        }
+      ],
+      "basicos": [],
+      "basesRequeridas": [],
+      "rolBatch": "Se pueden asar 4 a 6 berenjenas juntas a la llama y guardarlas peladas"
+    },
+    {
+      "id": "queso-caju",
+      "titulo": "Queso Untable de Castañas de Cajú",
+      "categoria": "dips",
+      "tiempoEstimado": "10 min + 8h remojo",
+      "metodo": "Remojo + Licuado de alta potencia",
+      "principales": [
+        {
+          "id": "castanas_caju",
+          "nombre": "Castañas de cajú crudas",
+          "cantidad": "1 taza (remojada 8 hs)",
+          "esencial": true
+        }
+      ],
+      "condimentos": [
+        {
+          "id": "sal_marina",
+          "nombre": "Sal marina",
+          "cantidad": "1 pizca",
+          "esencial": true
+        },
+        {
+          "id": "limon",
+          "nombre": "Limón",
+          "cantidad": "Gotitas de limón",
+          "esencial": true
+        },
+        {
+          "id": "levadura_nutricional",
+          "nombre": "Levadura nutricional o hierbas",
+          "cantidad": "1 cucharadita",
+          "esencial": false,
+          "nota": "Opcional sabor queso"
+        }
+      ],
+      "basicos": [
+        {
+          "id": "agua",
+          "nombre": "Agua limpia de filtro",
+          "cantidad": "1/4 a 1/2 taza"
+        }
+      ],
+      "basesRequeridas": [
+        "base-frutos-secos-activados"
+      ],
+      "rolBatch": "Se elabora en 10 min tras activar y dura 5 días en frasco hermético"
+    },
+    {
+      "id": "galletas-yamani",
+      "titulo": "Maravillosas Galletas de Arroz Yamaní",
+      "categoria": "panificados",
+      "tiempoEstimado": "30 min",
+      "metodo": "Horno 180°C",
+      "principales": [
+        {
+          "id": "arroz_yamani",
+          "nombre": "Arroz yamaní cocido pasado",
+          "cantidad": "1 taza (1 taza arroz x 3 de agua)",
+          "esencial": true
+        },
+        {
+          "id": "harina_arroz_integral",
+          "nombre": "Harina de arroz integral",
+          "cantidad": "1 taza",
+          "esencial": true
+        }
+      ],
+      "condimentos": [
+        {
+          "id": "semillas_lino",
+          "nombre": "Semillas de lino",
+          "cantidad": "4 cucharadas (ligue)",
+          "esencial": true
+        },
+        {
+          "id": "aceite_oliva",
+          "nombre": "Aceite de oliva",
+          "cantidad": "2 cucharadas",
+          "esencial": true
+        },
+        {
+          "id": "sal_marina",
+          "nombre": "Sal marina",
+          "cantidad": "1 cdita",
+          "esencial": true
+        },
+        {
+          "id": "oregano",
+          "nombre": "Hierbas secas / orégano / cúrcuma",
+          "cantidad": "A gusto",
+          "esencial": true
+        }
+      ],
+      "basicos": [
+        {
+          "id": "agua",
+          "nombre": "Agua tibia",
+          "cantidad": "Chorrito apenas para unir"
+        }
+      ],
+      "basesRequeridas": [
+        "base-arroz-yamani"
+      ],
+      "rolBatch": "Aprovecha la porción sobrecocinada de la base semanal de arroz yamaní"
+    },
+    {
+      "id": "pan-centeno-masamadre",
+      "titulo": "Pan de Centeno 100% de Masa Madre",
+      "categoria": "panificados",
+      "tiempoEstimado": "Leudado 8-12h + 50 min horno",
+      "metodo": "Fermentación natural y horneado",
+      "principales": [
+        {
+          "id": "harina_centeno_integral",
+          "nombre": "Harina de centeno integral pura",
+          "cantidad": "1 kg",
+          "esencial": true
+        },
+        {
+          "id": "masa_madre",
+          "nombre": "Fermento de masa madre activo",
+          "cantidad": "2 tazas",
+          "esencial": true
+        }
+      ],
+      "condimentos": [
+        {
+          "id": "sal_marina",
+          "nombre": "Sal marina",
+          "cantidad": "1 cucharada colmada",
+          "esencial": true
+        }
+      ],
+      "basicos": [
+        {
+          "id": "agua",
+          "nombre": "Agua tibia",
+          "cantidad": "800 ml"
+        }
+      ],
+      "basesRequeridas": [
+        "base-fermentos-activos"
+      ],
+      "rolBatch": "Rinde 2 panes de molde. Se corta en rodajas y se freeza para 21 días"
+    },
+    {
+      "id": "chucrut-casero",
+      "titulo": "Chucrut Probiótico Vivo",
+      "categoria": "fermentos",
+      "tiempoEstimado": "20 min prep + 21 días fermento",
+      "metodo": "Fermentación láctica anaeróbica",
+      "principales": [
+        {
+          "id": "repollo",
+          "nombre": "Repollo agroecológico (blanco o morado)",
+          "cantidad": "1 unidad grande",
+          "esencial": true
+        }
+      ],
+      "condimentos": [
+        {
+          "id": "sal_marina",
+          "nombre": "Sal marina",
+          "cantidad": "20 a 25 g por kilo de repollo (2% a 2.5%)",
+          "esencial": true
+        }
+      ],
+      "basicos": [],
+      "basesRequeridas": [
+        "base-fermentos-activos"
+      ],
+      "rolBatch": "Un solo frasco inicial provee lactobacilos vivos diarios para todo el detox"
+    },
+    {
+      "id": "leche-almendras",
+      "titulo": "Leche Fresca de Almendras",
+      "categoria": "leches",
+      "tiempoEstimado": "10 min + 8-12h remojo",
+      "metodo": "Licuado + Filtrado en tela",
+      "principales": [
+        {
+          "id": "almendras",
+          "nombre": "Almendras crudas",
+          "cantidad": "100 g (remojadas 8 a 12 hs)",
+          "esencial": true
+        }
+      ],
+      "condimentos": [
+        {
+          "id": "sal_marina",
+          "nombre": "Sal marina",
+          "cantidad": "Pizca",
+          "esencial": false,
+          "nota": "Opcional"
+        },
+        {
+          "id": "canela",
+          "nombre": "Canela en polvo",
+          "cantidad": "Pizca",
+          "esencial": false,
+          "nota": "Opcional"
+        }
+      ],
+      "basicos": [
+        {
+          "id": "agua",
+          "nombre": "Agua de filtro limpia",
+          "cantidad": "1 litro"
+        }
+      ],
+      "basesRequeridas": [
+        "base-frutos-secos-activados"
+      ],
+      "rolBatch": "Genera 1 litro de leche para la semana y bagazo para sumar a las galletas"
+    },
+    {
+      "id": "bowl-yamani-cruciferas",
+      "titulo": "Bowl Alcalino de Yamaní y Crucíferas",
+      "categoria": "almuerzos",
+      "tiempoEstimado": "25 min (o 5 min con batch pre-cocido)",
+      "metodo": "Vapor + Ensamble clínico",
+      "principales": [
+        {
+          "id": "arroz_yamani",
+          "nombre": "Arroz yamaní cocido caliente",
+          "cantidad": "1 taza",
+          "esencial": true
+        },
+        {
+          "id": "brocoli",
+          "nombre": "Ramilletes de brócoli al vapor",
+          "cantidad": "1 taza",
+          "esencial": true
+        },
+        {
+          "id": "coliflor",
+          "nombre": "Ramilletes de coliflor al vapor",
+          "cantidad": "1 taza",
+          "esencial": true
+        },
+        {
+          "id": "porotos_mung",
+          "nombre": "Porotos mung cocidos",
+          "cantidad": "1/2 taza",
+          "esencial": true
+        },
+        {
+          "id": "palta",
+          "nombre": "Palta en láminas",
+          "cantidad": "1/4 de unidad",
+          "esencial": true
+        }
+      ],
+      "condimentos": [
+        {
+          "id": "chucrut",
+          "nombre": "Chucrut vivo",
+          "cantidad": "1 cucharadita",
+          "esencial": true
+        },
+        {
+          "id": "aceite_oliva",
+          "nombre": "Aceite de oliva crudo",
+          "cantidad": "1 cucharada",
+          "esencial": true
+        },
+        {
+          "id": "shoyu",
+          "nombre": "Salsa Shoyu MOA",
+          "cantidad": "Gotas",
+          "esencial": true
+        },
+        {
+          "id": "limon",
+          "nombre": "Jugo de limón",
+          "cantidad": "A gusto",
+          "esencial": true
+        }
+      ],
+      "basicos": [],
+      "basesRequeridas": [
+        "base-arroz-yamani",
+        "base-porotos-mung",
+        "base-verduras-vapor-nituke",
+        "base-fermentos-activos"
+      ],
+      "rolBatch": "El plato cumbre del detox: ensambla 4 bases cocinadas previamente en solo 3 minutos"
+    }
+  ],
+  "batchCookingBases": [
+    {
+      "id": "base-arroz-yamani",
+      "nombre": "Base Arroz Yamaní Cocido & Pasado",
+      "icono": "🍚",
+      "descripcion": "Cereal madre del detox. Cocido al dente para bowls o pasado para galletas de masa ligada.",
+      "metodoCoccion": "Cocción lenta con difusor a fuego pelusa",
+      "proporcionAgua": "1 taza de arroz por 2.5 tazas de agua (para grano entero) o 1:3 (para galletas)",
+      "rendimiento": "Rinde 4 a 6 porciones (800g a 1 kg cocido)",
+      "vidaUtilHeladeraDias": 5,
+      "aptoFreezer": true,
+      "freezerDias": 60,
+      "instruccionesBatch": [
+        "Poner en remojo 500g de arroz yamaní la noche previa (8-12 hs).",
+        "Enjuagar bien y colocar en olla pesada con el doble y medio de agua fría y pizca de sal marina.",
+        "Hervir tapado a fuego mínimo con difusor durante 35-40 minutos hasta absorber todo el líquido.",
+        "Separar 2 tazas y pasarlas unos minutos más con agua tibia si se planea hacer galletas de arroz.",
+        "Distribuir en recipientes herméticos de vidrio y enfriar antes de tapar."
+      ],
+      "recetasQueLaUsan": [
+        {
+          "recipeId": "bowl-yamani-cruciferas",
+          "porcionRequerida": "1 taza caliente",
+          "rol": "Base carbohidrato de asimilación lenta"
+        },
+        {
+          "recipeId": "galletas-yamani",
+          "porcionRequerida": "1 taza pisada pegajosa",
+          "rol": "Masa ligada sin gluten"
+        }
+      ],
+      "insumosCompartidos": [
+        "arroz_yamani",
+        "sal_marina",
+        "agua"
+      ],
+      "ahorroTiempoMinutosSemanal": 80
+    },
+    {
+      "id": "base-porotos-mung",
+      "nombre": "Base Porotos Mung Tiernos con Kombu",
+      "icono": "🫘",
+      "descripcion": "Legumbre reina depurativa. Muy digerible, libre de purinas densas y rica en aminoácidos.",
+      "metodoCoccion": "Hervido digestivo con descarte de saponinas",
+      "proporcionAgua": "1 taza de porotos por 3 tazas de agua fresca",
+      "rendimiento": "Rinde 4 porciones (aprox. 600g cocidos)",
+      "vidaUtilHeladeraDias": 4,
+      "aptoFreezer": true,
+      "freezerDias": 90,
+      "instruccionesBatch": [
+        "Remojo prolongado obligatorio de 12 a 24 horas con cambio de agua a mitad del proceso.",
+        "Descartar completamente el agua de remojo espumosa.",
+        "Cocinar en olla con agua fresca y un trozo de alga kombu o 2 hojas de laurel.",
+        "Espumar intensamente durante los primeros 10 minutos para remover antinutrientes.",
+        "Bajar a fuego suave 30-35 minutos hasta que el grano ceda fácil a la presión.",
+        "Agregar sal marina únicamente al final. Reservar parte del líquido de cocción para hummus."
+      ],
+      "recetasQueLaUsan": [
+        {
+          "recipeId": "hummus-mung",
+          "porcionRequerida": "2 tazas + 1/3 taza líquido",
+          "rol": "Base untable proteica"
+        },
+        {
+          "recipeId": "bowl-yamani-cruciferas",
+          "porcionRequerida": "1/2 taza",
+          "rol": "Aporte proteico vegetal del bowl"
+        }
+      ],
+      "insumosCompartidos": [
+        "porotos_mung",
+        "kombu",
+        "laurel",
+        "sal_marina"
+      ],
+      "ahorroTiempoMinutosSemanal": 60
+    },
+    {
+      "id": "base-caldo-detox",
+      "nombre": "Base Caldo Détox Alcalinizante Concentrado",
+      "icono": "🥣",
+      "descripcion": "Solvente maestro de toxinas. Aporta potasio y minerales orgánicos sin digestión.",
+      "metodoCoccion": "Extracción lenta a baja temperatura en olla tapada",
+      "proporcionAgua": "Agua fría que cubra holgadamente 5 cm por sobre los vegetales",
+      "rendimiento": "Rinde 3.5 a 4.5 litros de caldo colado puro",
+      "vidaUtilHeladeraDias": 5,
+      "aptoFreezer": true,
+      "freezerDias": 60,
+      "instruccionesBatch": [
+        "Picar apio, puerro, repollo, zanahoria, ajo y perejil en trozos medianos.",
+        "Lavar 1 manzana entera con cáscara e incorporarla partida al medio.",
+        "Llenar con agua de filtro y cocinar a fuego mínimo tapado durante 40 minutos.",
+        "Colar inmediatamente en caliente para separar el líquido límpido de los vegetales.",
+        "Embotellar en frascos o botellas de vidrio templadas y dejar enfriar antes de heladera.",
+        "Separar 1 cubetera para congelar caldos concentrados en cubos."
+      ],
+      "recetasQueLaUsan": [
+        {
+          "recipeId": "caldo-detox",
+          "porcionRequerida": "Toma directa libre",
+          "rol": "Termo de hidratación y pre-comidas"
+        },
+        {
+          "recipeId": "mayonesa-zanahoria",
+          "porcionRequerida": "1/4 taza",
+          "rol": "Líquido de emulsión aromático"
+        },
+        {
+          "recipeId": "hummus-mung",
+          "porcionRequerida": "1/4 taza",
+          "rol": "Sustituto de agua para textura suave"
+        }
+      ],
+      "insumosCompartidos": [
+        "apio",
+        "puerro",
+        "repollo",
+        "zanahoria",
+        "manzana",
+        "ajo",
+        "perejil",
+        "sal_marina"
+      ],
+      "ahorroTiempoMinutosSemanal": 70
+    },
+    {
+      "id": "base-verduras-vapor-nituke",
+      "nombre": "Base Verduras al Vapor & Nituke Concentrado",
+      "icono": "🥦",
+      "descripcion": "Verduras cocidas al dente que conservan sulforafano, pectinas y clorofila activa.",
+      "metodoCoccion": "Vaporera 5-7 min para crucíferas / Nituke 35 min para tubérculos y manzana",
+      "rendimiento": "Rinde guarniciones listas para 4 comidas",
+      "vidaUtilHeladeraDias": 4,
+      "aptoFreezer": false,
+      "freezerDias": 0,
+      "instruccionesBatch": [
+        "Cocinar al vapor brócoli y coliflor por tandas separadas (5 min brócoli, 6 min coliflor) para dejarlos crocantes y verde brillante.",
+        "Enfriar sobre bandeja limpia para cortar la cocción por calor residual.",
+        "Hacer un nituke simultáneo de zanahorias y zapallo anco con 2 cucharadas de agua en olla pesada.",
+        "Almacenar en tuppers de vidrio con servilleta absorbente en la base para evitar condensación."
+      ],
+      "recetasQueLaUsan": [
+        {
+          "recipeId": "bowl-yamani-cruciferas",
+          "porcionRequerida": "1 taza brócoli + 1 taza coliflor",
+          "rol": "Crucíferas depurativas de fase 2"
+        },
+        {
+          "recipeId": "mayonesa-zanahoria",
+          "porcionRequerida": "Zanahoria cocida + zapallo anco",
+          "rol": "Cuerpo emulsionable del dip"
+        },
+        {
+          "recipeId": "nituke-manzana",
+          "porcionRequerida": "Manzanas en cubos cocidas",
+          "rol": "Compota natural sin azúcar"
+        }
+      ],
+      "insumosCompartidos": [
+        "brocoli",
+        "coliflor",
+        "zanahoria",
+        "calabaza_anco",
+        "manzana",
+        "sal_marina"
+      ],
+      "ahorroTiempoMinutosSemanal": 50
+    },
+    {
+      "id": "base-frutos-secos-activados",
+      "nombre": "Base Frutos Secos Activados, Leches & Untables",
+      "icono": "🥛",
+      "descripcion": "Grasas nobles y leches vegetales sin conservantes ni aditivos industriales.",
+      "metodoCoccion": "Remojo desinhibidor + Licuado y prensado en tela",
+      "rendimiento": "1 litro de leche + 1 taza de bagazo + 1 pote de queso untable",
+      "vidaUtilHeladeraDias": 5,
+      "aptoFreezer": true,
+      "freezerDias": 30,
+      "instruccionesBatch": [
+        "Poner en remojo paralelo: 100g de almendras y 150g de castañas de cajú en recipientes con agua filtrada y pizca de sal.",
+        "A la mañana siguiente, descartar ambas aguas de remojo y enjuagar bien.",
+        "Licuar las almendras con 1 litro de agua y filtrar con bolsa para leche vegetal. Embotellar la leche.",
+        "Reservar la pulpa sólida húmeda (bagazo) para hornear con las galletas de arroz yamaní.",
+        "Licuar las castañas de cajú con gotas de limón, sal marina y 1/3 taza de agua para lograr el queso crema."
+      ],
+      "recetasQueLaUsan": [
+        {
+          "recipeId": "leche-almendras",
+          "porcionRequerida": "Almendras activadas",
+          "rol": "Bebida vegetal alcalina"
+        },
+        {
+          "recipeId": "queso-caju",
+          "porcionRequerida": "Cajú activado",
+          "rol": "Queso untable probiótico"
+        },
+        {
+          "recipeId": "nituke-manzana",
+          "porcionRequerida": "Almendras picadas",
+          "rol": "Topping crocante"
+        }
+      ],
+      "insumosCompartidos": [
+        "almendras",
+        "castanas_caju",
+        "limon",
+        "sal_marina",
+        "agua"
+      ],
+      "ahorroTiempoMinutosSemanal": 45
+    },
+    {
+      "id": "base-fermentos-activos",
+      "nombre": "Base Fermentos Vivos Probióticos (Chucrut & Masa Madre)",
+      "icono": "🫙",
+      "descripcion": "Bacterias lácticas vivas y levaduras simbióticas para regenerar la barrera intestinal.",
+      "metodoCoccion": "Fermentación láctica y anaeróbica natural a temperatura ambiente",
+      "rendimiento": "1 frasco de chucrut (dura 21 días) + 1 pan de molde centeno",
+      "vidaUtilHeladeraDias": 30,
+      "aptoFreezer": true,
+      "freezerDias": 90,
+      "instruccionesBatch": [
+        "Preparar el chucrut durante la fase previa al detox: masajear 1 kg de repollo con 22g de sal marina hasta soltar abundante salmuera.",
+        "Envasar prensando hermético y dejar fermentar 21 a 28 días en oscuridad.",
+        "Para el pan: alimentar la masa madre de centeno 8-12 hs antes, amasar con 1 kg de harina de centeno y sal, leudar 8-12 hs y hornear 50 min.",
+        "Rebanar el pan frío y freezarlo en bolsitas de 2 rodajas para tostar a diario en el desayuno."
+      ],
+      "recetasQueLaUsan": [
+        {
+          "recipeId": "chucrut-casero",
+          "porcionRequerida": "Frasco completo",
+          "rol": "Bacterias lácticas puras"
+        },
+        {
+          "recipeId": "bowl-yamani-cruciferas",
+          "porcionRequerida": "1 cucharadita",
+          "rol": "Inóculo probiótico del almuerzo"
+        },
+        {
+          "recipeId": "pan-centeno-masamadre",
+          "porcionRequerida": "2 hogazas horneadas",
+          "rol": "Tostadas aptas de la mañana"
+        }
+      ],
+      "insumosCompartidos": [
+        "repollo",
+        "harina_centeno_integral",
+        "masa_madre",
+        "sal_marina"
+      ],
+      "ahorroTiempoMinutosSemanal": 60
+    }
+  ],
+  "soakingAndPreTimes": [
+    {
+      "ingredienteId": "almendras",
+      "nombre": "Almendras crudas",
+      "categoria": "frutos_secos",
+      "tiempoMinimoHoras": 8,
+      "tiempoOptimoHoras": 12,
+      "tiempoMaximoHoras": 24,
+      "tiempoLabel": "8 a 12 horas (Noche previa)",
+      "anticipacionRecomendada": "Al ir a dormir la noche anterior",
+      "medio": "Agua de filtro a temperatura ambiente con una pizca de sal marina",
+      "descartarAgua": true,
+      "razonDescarte": "El agua contiene taninos amargos, antinutrientes e inhibidores de tripsina que sobrecargan la vesícula y el páncreas.",
+      "propositoClinico": "Despierta la semilla viva, multiplica su biodisponibilidad vitamínica y emulsiona con extrema facilidad para leches y quesos.",
+      "recetasAsociadas": [
+        "leche-almendras",
+        "nituke-manzana"
+      ],
+      "alertas": "Si se dejan más de 24 horas a temperatura ambiente pueden fermentar o volverse agrias; en ese caso guardar en heladera tapadas."
+    },
+    {
+      "ingredienteId": "castanas_caju",
+      "nombre": "Castañas de Cajú crudas (sin tostar)",
+      "categoria": "frutos_secos",
+      "tiempoMinimoHoras": 6,
+      "tiempoOptimoHoras": 8,
+      "tiempoMaximoHoras": 12,
+      "tiempoLabel": "6 a 8 horas",
+      "anticipacionRecomendada": "Noche previa o a primera hora de la mañana",
+      "medio": "Agua pura limpia",
+      "descartarAgua": true,
+      "razonDescarte": "Elimina residuos de procesamiento y polvo de cáscara exterior.",
+      "propositoClinico": "Hidrata los ácidos grasos internos logrando una pasta ultra cremosa que simula queso mascarpone o queso crema sin grumos.",
+      "recetasAsociadas": [
+        "queso-caju"
+      ],
+      "alertas": "No sobrepasar las 12 horas porque la pulpa se deshace en exceso y pierde firmeza."
+    },
+    {
+      "ingredienteId": "porotos_mung",
+      "nombre": "Porotos Mung",
+      "categoria": "legumbres",
+      "tiempoMinimoHoras": 12,
+      "tiempoOptimoHoras": 16,
+      "tiempoMaximoHoras": 24,
+      "tiempoLabel": "12 a 24 horas",
+      "anticipacionRecomendada": "Noche previa (al menos 16 hs antes de cocinar)",
+      "medio": "Abundante agua tibia o templada (triplican su tamaño)",
+      "descartarAgua": true,
+      "razonDescarte": "CRÍTICO: En el agua de remojo se liberan las saponinas y oligosacáridos no digeribles causantes de fermentación colónica y gases.",
+      "propositoClinico": "Inicia el proceso de germinación desactivando el ácido fítico, garantizando una digestión liviana y absorción óptima de hierro y zinc.",
+      "recetasAsociadas": [
+        "hummus-mung",
+        "bowl-yamani-cruciferas"
+      ],
+      "alertas": "Cambiar el agua al menos una vez si la temperatura ambiente supera los 22°C para evitar fermentaciones anaeróbicas."
+    },
+    {
+      "ingredienteId": "arroz_yamani",
+      "nombre": "Arroz Yamaní integral",
+      "categoria": "granos",
+      "tiempoMinimoHoras": 8,
+      "tiempoOptimoHoras": 12,
+      "tiempoMaximoHoras": 18,
+      "tiempoLabel": "8 a 12 horas (Noche previa)",
+      "anticipacionRecomendada": "Noche previa",
+      "medio": "Agua tibia de filtro con unas gotitas de limón o vinagre vivo",
+      "descartarAgua": true,
+      "razonDescarte": "Remueve impurezas de la cáscara y ácido fítico quelante de minerales.",
+      "propositoClinico": "Pre-hidrata el salvado exterior reduciendo el tiempo de cocción en un 30% y facilitando la gelatinización pareja del almidón.",
+      "recetasAsociadas": [
+        "bowl-yamani-cruciferas",
+        "galletas-yamani"
+      ],
+      "alertas": "Enjuagar sobre colador fino antes de mandar a la olla hasta que el agua salga translúcida."
+    },
+    {
+      "ingredienteId": "quinoa",
+      "nombre": "Quinoa real",
+      "categoria": "granos",
+      "tiempoMinimoHoras": 2,
+      "tiempoOptimoHoras": 4,
+      "tiempoMaximoHoras": 8,
+      "tiempoLabel": "2 a 4 horas + Lavado intenso",
+      "anticipacionRecomendada": "2 horas previas a la cocción",
+      "medio": "Agua fría con frotado manual enérgico",
+      "descartarAgua": true,
+      "razonDescarte": "La cáscara de quinoa está impregnada de saponina, un jabón natural de sabor fuertemente amargo y agresivo para la pared estomacal.",
+      "propositoClinico": "Remoción total de saponinas e hidratación rápida del embrión espiralado para una cocción esponjosa en solo 15 minutos.",
+      "recetasAsociadas": [
+        "bowl-yamani-cruciferas"
+      ],
+      "alertas": "Frotar entre las manos bajo el chorro de la canilla al menos 5 veces hasta que el agua no genere espuma alguna."
+    },
+    {
+      "ingredienteId": "semillas_lino",
+      "nombre": "Semillas de Lino (Linaza)",
+      "categoria": "semillas",
+      "tiempoMinimoHoras": 0.33,
+      "tiempoOptimoHoras": 0.5,
+      "tiempoMaximoHoras": 12,
+      "tiempoLabel": "20 a 30 minutos (o noche previa)",
+      "anticipacionRecomendada": "30 minutos antes de armar masas o noche previa para constipación",
+      "medio": "Agua tibia (relación 1 cda de semillas por 3 cdas de agua)",
+      "descartarAgua": false,
+      "razonDescarte": "PROHIBIDO DESCARTAR: El líquido resultante es mucílago curativo rico en fibra soluble y omega 3 protector de la mucosa intestinal.",
+      "propositoClinico": "Forma un gel viscoelástico ('huevo de lino') que reemplaza al huevo para ligar las galletas de arroz yamaní, o hidrata el colon ante constipación.",
+      "recetasAsociadas": [
+        "galletas-yamani",
+        "nituke-manzana"
+      ],
+      "alertas": "Evitar el consumo de lino entero o agua de lino si se cursa un episodio de flojera intestinal o diarrea."
+    },
+    {
+      "ingredienteId": "semillas_chia",
+      "nombre": "Semillas de Chía",
+      "categoria": "semillas",
+      "tiempoMinimoHoras": 0.33,
+      "tiempoOptimoHoras": 0.5,
+      "tiempoMaximoHoras": 8,
+      "tiempoLabel": "20 a 30 minutos",
+      "anticipacionRecomendada": "30 minutos antes de consumir",
+      "medio": "Agua, leche vegetal o infusión fría",
+      "descartarAgua": false,
+      "razonDescarte": "PROHIBIDO DESCARTAR: Todo el beneficio biológico reside en la matriz coloidal gelatinosa que retiene 12 veces su peso en agua.",
+      "propositoClinico": "Genera saciedad mecánica suave, retrasa la absorción glucémica y lubrica el tránsito del bolo fecal.",
+      "recetasAsociadas": [
+        "desayunos-chia"
+      ],
+      "alertas": "Revolver bien a los 5 minutos de sumergidas para evitar que se apelmacen en el fondo del vaso."
+    },
+    {
+      "ingredienteId": "semillas_sesamo",
+      "nombre": "Semillas de Sésamo integral",
+      "categoria": "semillas",
+      "tiempoMinimoHoras": 4,
+      "tiempoOptimoHoras": 6,
+      "tiempoMaximoHoras": 8,
+      "tiempoLabel": "4 a 6 horas (o tostado suave en sartén)",
+      "anticipacionRecomendada": "Media jornada antes o tostar 2 minutos al momento",
+      "medio": "Agua con pizca de sal marina",
+      "descartarAgua": true,
+      "razonDescarte": "Desprende oxalatos y compuestos que restringen la absorción de calcio bioactivo.",
+      "propositoClinico": "Potencia la asimilación del calcio vegetal y abre la cutícula del grano para permitir su molienda (Gomasio).",
+      "recetasAsociadas": [
+        "bowl-yamani-cruciferas"
+      ],
+      "alertas": "Si se opta por tostar, hacerlo a fuego mínimo en sartén de hierro sin aceite, removiendo sin pausa para que no se quemen."
+    },
+    {
+      "ingredienteId": "kefir_agua",
+      "nombre": "Nódulos de Kéfir de Agua",
+      "categoria": "fermentos",
+      "tiempoMinimoHoras": 24,
+      "tiempoOptimoHoras": 48,
+      "tiempoMaximoHoras": 72,
+      "tiempoLabel": "48 horas de fermentación",
+      "anticipacionRecomendada": "2 días de anticipación",
+      "medio": "Agua de filtro + azúcar mascabo (alimento de los nódulos) + higo seco/pasa + limón",
+      "descartarAgua": false,
+      "razonDescarte": "El agua fermentada es el producto final probiótico; el azúcar fue predigerida por las levaduras y bacterias lácticas.",
+      "propositoClinico": "Genera una bebida tónica enzimática con miles de millones de UFC que colonizan la microbiota y desplazan cándidas.",
+      "recetasAsociadas": [
+        "hidratacion-probiotica"
+      ],
+      "alertas": "Nunca manipular con cucharas, filtros o recipientes metálicos; usar exclusivamente madera, vidrio y plástico para no alterar la carga bacteriana."
+    },
+    {
+      "ingredienteId": "chucrut_vivo",
+      "nombre": "Chucrut casero de repollo",
+      "categoria": "fermentos",
+      "tiempoMinimoHoras": 504,
+      "tiempoOptimoHoras": 672,
+      "tiempoMaximoHoras": 840,
+      "tiempoLabel": "21 a 28 días a temperatura ambiente",
+      "anticipacionRecomendada": "3 a 4 semanas previas al inicio del detox",
+      "medio": "Su propia salmuera (2% a 2.5% de sal marina sobre peso de repollo)",
+      "descartarAgua": false,
+      "razonDescarte": "La salmuera ácida contiene la máxima concentración de ácido láctico, bacteriocinas y bacterias vivas Leuconostoc y Lactobacillus.",
+      "propositoClinico": "Restablece el pH ácido saludable del colon, estimula la secreción de ácido clorhídrico estomacal y regenera la flora autóctona.",
+      "recetasAsociadas": [
+        "chucrut-casero",
+        "bowl-yamani-cruciferas"
+      ],
+      "alertas": "Las primeras 48 horas son decisivas: todo el repollo debe permanecer absolutamente sumergido para prevenir el desarrollo de mohos aerobios."
+    },
+    {
+      "ingredienteId": "masa_madre",
+      "nombre": "Refresco de Masa Madre de Centeno",
+      "categoria": "fermentos",
+      "tiempoMinimoHoras": 6,
+      "tiempoOptimoHoras": 8,
+      "tiempoMaximoHoras": 12,
+      "tiempoLabel": "8 a 12 horas previas al amasado",
+      "anticipacionRecomendada": "Noche anterior a la jornada de horneado",
+      "medio": "Harina de centeno pura + agua tibia (relación 1:1)",
+      "descartarAgua": false,
+      "razonDescarte": "Es la levadura viva silvestre que elevará el pan de centeno.",
+      "propositoClinico": "Predigiere el gluten del cereal y descompone el ácido fítico, haciendo que el pan de centeno resulte altamente digerible y de índice glucémico bajo.",
+      "recetasAsociadas": [
+        "pan-centeno-masamadre"
+      ],
+      "alertas": "Usar en el momento exacto en que duplica su volumen y tiene domo redondeado con aroma afrutado antes de que comience a colapsar."
+    },
+    {
+      "ingredienteId": "mijo",
+      "nombre": "Mijo pelado",
+      "categoria": "granos",
+      "tiempoMinimoHoras": 6,
+      "tiempoOptimoHoras": 8,
+      "tiempoMaximoHoras": 12,
+      "tiempoLabel": "6 a 8 horas (o escaldado con agua hirviendo)",
+      "anticipacionRecomendada": "Noche previa",
+      "medio": "Agua tibia de filtro",
+      "descartarAgua": true,
+      "razonDescarte": "Desactiva inhibidores enzimáticos y remueve polvo amargo superficial.",
+      "propositoClinico": "Cereal alcalinizante por excelencia; el remojo ablanda el grano permitiendo una cocción untuosa para cremas y sopas sin pesadez.",
+      "recetasAsociadas": [
+        "sopas-cremas-mijo"
+      ],
+      "alertas": "Escurrir bien antes de cocinar; si se busca sabor más almendrado, secar en sartén un minuto antes de agregar el agua de cocción."
+    },
+    {
+      "ingredienteId": "porotos_aduki",
+      "nombre": "Porotos Aduki o negros",
+      "categoria": "legumbres",
+      "tiempoMinimoHoras": 12,
+      "tiempoOptimoHoras": 18,
+      "tiempoMaximoHoras": 24,
+      "tiempoLabel": "12 a 18 horas",
+      "anticipacionRecomendada": "Noche previa",
+      "medio": "Abundante agua fresca",
+      "descartarAgua": true,
+      "razonDescarte": "Concentra oligosacáridos fermentables que deben eliminarse por completo.",
+      "propositoClinico": "Tónico por excelencia del elemento agua y riñones según la Medicina Tradicional China. Cocinar siempre con alga kombu.",
+      "recetasAsociadas": [
+        "pasta-remolacha-aduki"
+      ],
+      "alertas": "Requiere cocción más larga que el mung (45 a 60 minutos)."
+    },
+    {
+      "ingredienteId": "semillas_girasol",
+      "nombre": "Semillas de Girasol crudas",
+      "categoria": "semillas",
+      "tiempoMinimoHoras": 4,
+      "tiempoOptimoHoras": 6,
+      "tiempoMaximoHoras": 8,
+      "tiempoLabel": "4 a 6 horas",
+      "anticipacionRecomendada": "Media jornada previa",
+      "medio": "Agua de filtro con pizca de sal marina",
+      "descartarAgua": true,
+      "razonDescarte": "Elimina antinutrientes de la semilla oleaginosa.",
+      "propositoClinico": "Activa la vitamina E y zinc vegetal, dejándolas suaves para patés o cremas untables.",
+      "recetasAsociadas": [
+        "pates-vegetales"
+      ],
+      "alertas": "Secar sobre repasador limpio si se van a consumir enteras o tostadas."
+    }
+  ]
+};
+
+
+/**
+ * Motor de Cálculo para Heladera Inteligente, Batch Cooking y Remojos
+ * Taller Detox de Primavera - Isabel Caparra
+ */
+
+function matchFridge(availableIngredientIds, options = {}) {
+  const catalog = FRIDGE_AND_PREP_DATA.ingredientsCatalog;
+  const recipes = FRIDGE_AND_PREP_DATA.recipesMapping;
+  const config = FRIDGE_AND_PREP_DATA.scoringConfig;
+
+  const normalizedAvailable = (availableIngredientIds || []).map(id => id.toLowerCase().trim());
+
+  const results = recipes.map(recipe => {
+    // Filtrar principales esenciales vs opcionales
+    const requiredPrincipales = recipe.principales.filter(p => p.esencial !== false);
+    const requiredCondimentos = recipe.condimentos.filter(c => c.esencial !== false);
+
+    const totalP = requiredPrincipales.length;
+    const totalC = requiredCondimentos.length;
+
+    const presentPrincipales = requiredPrincipales.filter(p => normalizedAvailable.includes(p.id.toLowerCase()));
+    const presentCondimentos = requiredCondimentos.filter(c => normalizedAvailable.includes(c.id.toLowerCase()));
+
+    const countP = presentPrincipales.length;
+    const countC = presentCondimentos.length;
+
+    const ratioP = totalP > 0 ? (countP / totalP) : 1;
+    const ratioC = totalC > 0 ? (countC / totalC) : 1;
+
+    // Fórmula base 80/20
+    let rawScore = (ratioP * config.principalesWeight) + (ratioC * config.condimentosWeight);
+
+    // Regla clínica estricta:
+    // Si no tiene los principales, NUNCA supera el 40%
+    let score = rawScore;
+    if (countP === 0) {
+      score = Math.min(score, config.zeroPrincipalesMaxScore); // Max 20%
+    } else if (ratioP < 0.5) {
+      score = Math.min(score, config.underHalfPrincipalesMaxScore); // Max 40%
+    }
+
+    const missingPrincipales = requiredPrincipales.filter(p => !normalizedAvailable.includes(p.id.toLowerCase()));
+    const missingCondimentos = requiredCondimentos.filter(c => !normalizedAvailable.includes(c.id.toLowerCase()));
+
+    const canCook = missingPrincipales.length === 0 && missingCondimentos.length === 0;
+    const canCookBase = missingPrincipales.length === 0;
+
+    let tier = 'incompleta';
+    if (score === 100) tier = 'lista';
+    else if (score >= 70) tier = 'casi_lista';
+
+    return {
+      recipeId: recipe.id,
+      titulo: recipe.titulo,
+      categoria: recipe.categoria,
+      score: Math.round(score),
+      rawScore: Math.round(rawScore),
+      ratioPrincipalesPct: Math.round(ratioP * 100),
+      ratioCondimentosPct: Math.round(ratioC * 100),
+      countPrincipales: countP,
+      totalPrincipales: totalP,
+      countCondimentos: countC,
+      totalCondimentos: totalC,
+      missingPrincipales: missingPrincipales.map(m => ({ id: m.id, nombre: m.nombre, cantidad: m.cantidad })),
+      missingCondimentos: missingCondimentos.map(m => ({ id: m.id, nombre: m.nombre, cantidad: m.cantidad })),
+      canCook,
+      canCookBase,
+      tier,
+      basesRequeridas: recipe.basesRequeridas
+    };
+  });
+
+  // Ordenar de mayor a menor score de completitud
+  results.sort((a, b) => b.score - a.score);
+
+  return {
+    totalRecetas: recipes.length,
+    listasParaCocinar: results.filter(r => r.tier === 'lista'),
+    casiListas: results.filter(r => r.tier === 'casi_lista'),
+    incompletas: results.filter(r => r.tier === 'incompleta'),
+    todas: results
+  };
+}
+
+function getBatchPlanForRecipes(recipeIds) {
+  const bases = FRIDGE_AND_PREP_DATA.batchCookingBases;
+  const targetIds = (recipeIds || []).map(id => id.toLowerCase().trim());
+
+  const matchedBases = bases.filter(base => {
+    return base.recetasQueLaUsan.some(r => targetIds.includes(r.recipeId.toLowerCase()));
+  });
+
+  let totalTiempoAhorrado = 0;
+  matchedBases.forEach(b => totalTiempoAhorrado += b.ahorroTiempoMinutosSemanal);
+
+  return {
+    recetasSeleccionadas: recipeIds,
+    basesSugeridas: matchedBases,
+    totalTiempoAhorradoMinutos: totalTiempoAhorrado
+  };
+}
+
+function getSoakingScheduleForRecipes(recipeIds) {
+  const recipes = FRIDGE_AND_PREP_DATA.recipesMapping;
+  const soakingRules = FRIDGE_AND_PREP_DATA.soakingAndPreTimes;
+  const targetIds = (recipeIds || []).map(id => id.toLowerCase().trim());
+
+  const selectedRecipes = recipes.filter(r => targetIds.includes(r.id.toLowerCase()));
+  
+  // Reunir todos los IDs de ingredientes principales y condimentos
+  const allIngredientIds = new Set();
+  selectedRecipes.forEach(r => {
+    r.principales.forEach(p => allIngredientIds.add(p.id));
+    r.condimentos.forEach(c => allIngredientIds.add(c.id));
+  });
+
+  const activeRules = soakingRules.filter(rule => allIngredientIds.has(rule.ingredienteId));
+
+  // Ordenar por tiempo de anticipación necesario (de mayor a menor)
+  activeRules.sort((a, b) => b.tiempoOptimoHoras - a.tiempoOptimoHoras);
+
+  return {
+    recetas: selectedRecipes.map(r => ({ id: r.id, titulo: r.titulo })),
+    remojosRequeridos: activeRules
+  };
+}
+
+
+if (typeof window !== 'undefined') {
+  window.FRIDGE_AND_PREP_DATA = FRIDGE_AND_PREP_DATA;
+  window.DetoxFridgeEngine = {
+    data: FRIDGE_AND_PREP_DATA,
+    matchFridge,
+    getBatchPlanForRecipes,
+    getSoakingScheduleForRecipes
+  };
+}
+
+if (typeof module !== 'undefined') {
+  module.exports = {
+    data: FRIDGE_AND_PREP_DATA,
+    matchFridge,
+    getBatchPlanForRecipes,
+    getSoakingScheduleForRecipes
+  };
+}
+
+</script>
 </head>
 <body class="bg-warmcream text-stone-800 dark:bg-stone-950 dark:text-stone-100 min-h-screen transition-colors duration-200 overflow-x-hidden w-full">
   <div id="app" v-cloak class="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
@@ -1939,111 +4011,558 @@ if (typeof module !== 'undefined') {
       </section>
 
       <!-- ========================================== -->
-      <!-- PESTANA 2: RECETARIO & MENUS               -->
+      <!-- ========================================== -->
+      <!-- PESTANA 2: RECETARIO & COCINA INTELIGENTE   -->
       <!-- ========================================== -->
       <section v-show="activeTab === 'recetas'" class="space-y-6">
         
-        <!-- Header con Buscador y Filtros de Recetas -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
-          <div class="flex items-center justify-between flex-wrap gap-3">
-            <div>
-              <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
-                <span>Catálogo de Recetas & Cocina Limpia</span>
-                <span class="text-xs px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-900/60 text-sage-800 dark:text-sage-300 font-medium">
-                  {{ filteredRecipes.length }} disponibles
-                </span>
-              </h2>
-              <p class="text-xs text-stone-500 dark:text-stone-400">Recetas oficiales del PDF con ingredientes exactos, métodos de cocción y modo de cocina paso a paso.</p>
-            </div>
-
-            <!-- Buscador en tiempo real -->
-            <div class="w-full sm:w-72 relative">
-              <input 
-                type="text" 
-                v-model="recipeSearch" 
-                placeholder="Buscar por plato o ingrediente..."
-                class="w-full pl-9 pr-4 py-2 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs sm:text-sm text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-sage-500">
-              <span class="absolute left-3 top-2.5 text-stone-400">🔍</span>
-              <button v-if="recipeSearch" @click="recipeSearch = ''" class="absolute right-3 top-2.5 text-xs text-stone-400 hover:text-stone-600">✕</button>
-            </div>
-          </div>
-
-          <!-- Filtros de Categoría -->
-          <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
-            <button 
-              v-for="cat in ['todas', 'desayunos', 'almuerzos', 'caldos', 'dips', 'panificados', 'fermentos', 'leches']"
-              :key="cat"
-              @click="recipeFilterCategory = cat"
-              :class="recipeFilterCategory === cat ? 'bg-sage-600 text-white font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
-              class="px-3 py-1.5 rounded-lg capitalize whitespace-nowrap transition">
-              {{ cat === 'todas' ? 'Todas las recetas' : cat }}
-            </button>
-          </div>
+        <!-- Segmented Switcher de Cocina Inteligente -->
+        <div class="flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-2xl mx-auto overflow-x-auto no-scrollbar">
+          <button 
+            @click="recipeSubView = 'catalogo'"
+            class="flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            :class="recipeSubView === 'catalogo' ? 'bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+            <span>📖</span> <span>Recetario</span>
+          </button>
+          <button 
+            @click="recipeSubView = 'heladera'"
+            class="flex-1 min-w-[130px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            :class="recipeSubView === 'heladera' ? 'bg-white dark:bg-stone-900 shadow-xs text-sage-700 dark:text-sage-300 font-extrabold' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+            <span>🧊</span> <span>Mi Heladera</span>
+            <span v-if="fridgeSelected.length > 0" class="text-[10px] px-1.5 py-0.2 rounded-full bg-sage-600 text-white font-mono">
+              {{ fridgeSelected.length }}
+            </span>
+          </button>
+          <button 
+            @click="recipeSubView = 'batch'"
+            class="flex-1 min-w-[130px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            :class="recipeSubView === 'batch' ? 'bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+            <span>🍱</span> <span>Batch Cooking</span>
+          </button>
+          <button 
+            @click="recipeSubView = 'remojos'"
+            class="flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            :class="recipeSubView === 'remojos' ? 'bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+            <span>⏳</span> <span>Remojos</span>
+          </button>
         </div>
 
-        <!-- Métodos de Cocción Destacados -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <div v-for="m in data.cookingMethods" :key="m.id" 
-               class="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 shadow-2xs space-y-1.5">
-            <h4 class="text-xs font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
-              <span>♨️</span> {{ m.nombre }}
-            </h4>
-            <p class="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">{{ m.desc }}</p>
-          </div>
-        </div>
-
-        <!-- Grilla de Tarjetas de Recetas -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div 
-            v-for="r in filteredRecipes" 
-            :key="r.id"
-            class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200/80 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-md transition-card flex flex-col justify-between">
-            
-            <div class="p-5 space-y-3">
-              <div class="flex items-start justify-between gap-2">
-                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
-                  {{ r.categoria }}
-                </span>
-                <span class="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1">
-                  ⏱️ {{ r.tiempo }}
-                </span>
-              </div>
-
+        <!-- ========================================== -->
+        <!-- SUBVISTA 1: CATÁLOGO CLÁSICO DE RECETAS    -->
+        <!-- ========================================== -->
+        <div v-show="recipeSubView === 'catalogo'" class="space-y-6">
+          
+          <!-- Header con Buscador y Filtros de Recetas -->
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 leading-snug">{{ r.titulo }}</h3>
-                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">Método: <span class="font-medium text-stone-700 dark:text-stone-300">{{ r.metodo }}</span></p>
+                <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                  <span>Catálogo de Recetas & Cocina Limpia</span>
+                  <span class="text-xs px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-900/60 text-sage-800 dark:text-sage-300 font-medium">
+                    {{ filteredRecipes.length }} disponibles
+                  </span>
+                </h2>
+                <p class="text-xs text-stone-500 dark:text-stone-400">Recetas oficiales del PDF con ingredientes exactos, métodos de cocción y modo de cocina paso a paso.</p>
               </div>
 
-              <!-- Ingredientes resumidos -->
-              <div class="pt-2 border-t border-stone-100 dark:border-stone-800">
-                <p class="text-[11px] font-semibold text-stone-700 dark:text-stone-300 mb-1">Ingredientes clave:</p>
-                <ul class="text-xs text-stone-600 dark:text-stone-400 space-y-0.5">
-                  <li v-for="(ing, idx) in r.ingredientes.slice(0, 3)" :key="idx" class="truncate">
-                    • {{ ing }}
-                  </li>
-                  <li v-if="r.ingredientes.length > 3" class="text-[10px] text-stone-400 italic">
-                    + {{ r.ingredientes.length - 3 }} ingredientes más...
-                  </li>
-                </ul>
+              <!-- Buscador en tiempo real -->
+              <div class="w-full sm:w-72 relative">
+                <input 
+                  type="text" 
+                  v-model="recipeSearch" 
+                  placeholder="Buscar por plato o ingrediente..."
+                  class="w-full pl-9 pr-4 py-2 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs sm:text-sm text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-sage-500">
+                <span class="absolute left-3 top-2.5 text-stone-400">🔍</span>
+                <button v-if="recipeSearch" @click="recipeSearch = ''" class="absolute right-3 top-2.5 text-xs text-stone-400 hover:text-stone-600">✕</button>
               </div>
             </div>
 
-            <!-- Footer con Botones de Acción -->
-            <div class="p-4 bg-stone-50/60 dark:bg-stone-800/40 border-t border-stone-100 dark:border-stone-800 flex items-center gap-2">
+            <!-- Filtros de Categoría -->
+            <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
               <button 
-                @click="openRecipe(r)" 
-                class="flex-1 py-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs font-semibold text-stone-800 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition">
-                Ver Detalles
+                v-for="cat in ['todas', 'desayunos', 'almuerzos', 'caldos', 'dips', 'panificados', 'fermentos', 'leches']"
+                :key="cat"
+                @click="recipeFilterCategory = cat"
+                :class="recipeFilterCategory === cat ? 'bg-sage-600 text-white font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
+                class="px-3 py-1.5 rounded-lg capitalize whitespace-nowrap transition">
+                {{ cat === 'todas' ? 'Todas las recetas' : cat }}
               </button>
-              <button 
-                @click="startCooking(r)" 
-                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 transition"
-                title="Modo Pantalla Completa para cocinar paso a paso">
-                <span>👨‍🍳</span> Cocinar
-              </button>
+            </div>
+          </div>
+
+          <!-- Métodos de Cocción Destacados -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div v-for="m in data.cookingMethods" :key="m.id" 
+                 class="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 shadow-2xs space-y-1.5">
+              <h4 class="text-xs font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+                <span>♨️</span> {{ m.nombre }}
+              </h4>
+              <p class="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">{{ m.desc }}</p>
+            </div>
+          </div>
+
+          <!-- Grilla de Tarjetas de Recetas -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div 
+              v-for="r in filteredRecipes" 
+              :key="r.id"
+              class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200/80 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-md transition-card flex flex-col justify-between">
+              
+              <div class="p-5 space-y-3">
+                <div class="flex items-start justify-between gap-2">
+                  <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
+                    {{ r.categoria }}
+                  </span>
+                  <span class="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1">
+                    ⏱️ {{ r.tiempo }}
+                  </span>
+                </div>
+
+                <div>
+                  <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 leading-snug">{{ r.titulo }}</h3>
+                  <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">Método: <span class="font-medium text-stone-700 dark:text-stone-300">{{ r.metodo }}</span></p>
+                </div>
+
+                <!-- Ingredientes resumidos -->
+                <div class="pt-2 border-t border-stone-100 dark:border-stone-800">
+                  <p class="text-[11px] font-semibold text-stone-700 dark:text-stone-300 mb-1">Ingredientes clave:</p>
+                  <ul class="text-xs text-stone-600 dark:text-stone-400 space-y-0.5">
+                    <li v-for="(ing, idx) in r.ingredientes.slice(0, 3)" :key="idx" class="truncate">
+                      • {{ ing }}
+                    </li>
+                    <li v-if="r.ingredientes.length > 3" class="text-[10px] text-stone-400 italic">
+                      + {{ r.ingredientes.length - 3 }} ingredientes más...
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Footer con Botones de Acción -->
+              <div class="p-4 bg-stone-50/60 dark:bg-stone-800/40 border-t border-stone-100 dark:border-stone-800 flex items-center gap-2">
+                <button 
+                  @click="openRecipe(r)" 
+                  class="flex-1 py-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs font-semibold text-stone-800 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition">
+                  Ver Detalles
+                </button>
+                <button 
+                  @click="startCooking(r)" 
+                  class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 transition"
+                  title="Modo Pantalla Completa para cocinar paso a paso">
+                  <span>👨‍🍳</span> Cocinar
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SUBVISTA 2: HELADERA INTELIGENTE           -->
+        <!-- ========================================== -->
+        <div v-show="recipeSubView === 'heladera'" class="space-y-6">
+          
+          <!-- Banner Explicativo & Acciones Rápidas -->
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+            <div class="flex items-start justify-between flex-wrap gap-3">
+              <div>
+                <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                  <span>🧊 Heladera & Despensa Inteligente</span>
+                  <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
+                    {{ fridgeSelected.length }} seleccionados
+                  </span>
+                </h3>
+                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1 max-w-2xl leading-relaxed">
+                  Marcá los alimentos que tenés hoy en tu cocina. El algoritmo clínico prioriza los ingredientes base (80% del score) por sobre condimentos básicos para mostrarte qué podés cocinar ya o qué 1-2 insumos te faltan para arrancar.
+                </p>
+              </div>
+
+              <!-- Botones de Acción Rápida -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <button 
+                  @click="selectCommonPantry()"
+                  class="px-3 py-1.5 rounded-xl bg-sage-50 dark:bg-sage-950/50 border border-sage-200 dark:border-sage-800 text-xs font-semibold text-sage-800 dark:text-sage-300 hover:bg-sage-100 transition shadow-2xs flex items-center gap-1.5">
+                  <span>🧂</span> Despensa básica (aceite, sal, limón)
+                </button>
+                <button 
+                  v-if="fridgeSelected.length > 0"
+                  @click="clearFridge()"
+                  class="px-3 py-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 text-xs font-semibold text-stone-600 dark:text-stone-300 transition shadow-2xs flex items-center gap-1.5">
+                  <span>🧹</span> Vaciar
+                </button>
+              </div>
+            </div>
+
+            <!-- Taps Rápidos de Alimentos Más Comunes -->
+            <div class="space-y-1.5 pt-2 border-t border-stone-100 dark:border-stone-800">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500">
+                ⚡ Taps rápidos (Ingredientes frecuentes del detox):
+              </p>
+              <div class="flex flex-wrap gap-1.5">
+                <button 
+                  v-for="ing in fridgeQuickTags" 
+                  :key="ing.id"
+                  @click="toggleFridgeIngredient(ing.id)"
+                  class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all active:scale-95 flex items-center gap-1"
+                  :class="isFridgeIngredientSelected(ing.id) 
+                          ? 'bg-sage-600 text-white border-sage-600 shadow-2xs font-semibold' 
+                          : 'bg-stone-50 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300 border-stone-200/80 dark:border-stone-700 hover:border-stone-400'">
+                  <span>{{ isFridgeIngredientSelected(ing.id) ? '✓' : '+' }}</span>
+                  <span>{{ ing.nombre }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Buscador y Selector Detallado por Categoría -->
+            <div class="space-y-2 pt-2 border-t border-stone-100 dark:border-stone-800">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex-1 min-w-[200px] relative">
+                  <input 
+                    type="text" 
+                    v-model="fridgeSearch" 
+                    placeholder="Buscar ingrediente (ej: zanahoria, mijo, kombu, cajú)..."
+                    class="w-full pl-8 pr-3 py-1.5 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-sage-500">
+                  <span class="absolute left-2.5 top-2 text-stone-400 text-xs">🔍</span>
+                </div>
+                
+                <div class="flex gap-1 overflow-x-auto no-scrollbar text-xs">
+                  <button 
+                    v-for="c in ['todas', 'granos', 'legumbres', 'verduras', 'frutas', 'semillas_frutos', 'condimentos']" 
+                    :key="c"
+                    @click="fridgeFilterCategory = c"
+                    class="px-2.5 py-1 rounded-lg capitalize whitespace-nowrap text-[11px] font-medium transition"
+                    :class="fridgeFilterCategory === c ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'">
+                    {{ c === 'todas' ? 'Todos' : c.replace('_', ' ') }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Grilla de Ingredientes del Catálogo (Pills compactas) -->
+              <div class="max-h-48 overflow-y-auto p-2 bg-stone-50/50 dark:bg-stone-950/40 rounded-xl border border-stone-200/60 dark:border-stone-800/80 flex flex-wrap gap-1.5">
+                <button 
+                  v-for="ing in filteredFridgeIngredients" 
+                  :key="ing.id"
+                  @click="toggleFridgeIngredient(ing.id)"
+                  class="px-2.5 py-1 rounded-lg text-xs border transition-all text-left flex items-center gap-1.5"
+                  :class="isFridgeIngredientSelected(ing.id) 
+                          ? 'bg-emerald-600 text-white border-emerald-600 font-semibold shadow-2xs' 
+                          : 'bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-stone-300'">
+                  <span class="text-[10px]">{{ isFridgeIngredientSelected(ing.id) ? '✓' : '○' }}</span>
+                  <span>{{ ing.nombre }}</span>
+                  <span v-if="ing.clasificacion === 'principal'" class="text-[9px] px-1 rounded bg-black/10 dark:bg-white/10 uppercase">Base</span>
+                </button>
+                <div v-if="filteredFridgeIngredients.length === 0" class="text-xs text-stone-400 p-2 italic">
+                  No se encontraron ingredientes para "{{ fridgeSearch }}".
+                </div>
+              </div>
             </div>
 
           </div>
+
+          <!-- RESUMEN DE COMPATIBILIDAD CON RECETAS -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>🍳 Recetas Compatibles</span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+                  {{ fridgeMatchResults.listasParaCocinar.length }} listas ya
+                </span>
+                <span v-if="fridgeMatchResults.casiListas.length > 0" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                  {{ fridgeMatchResults.casiListas.length }} casi listas
+                </span>
+              </h3>
+
+              <!-- Filtro de Tiers -->
+              <div class="inline-flex p-1 bg-stone-100 dark:bg-stone-800 rounded-xl text-xs">
+                <button 
+                  @click="fridgeTierFilter = 'todas'"
+                  class="px-2.5 py-1 rounded-lg font-semibold transition"
+                  :class="fridgeTierFilter === 'todas' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+                  Todas ({{ fridgeMatchResults.todas.length }})
+                </button>
+                <button 
+                  @click="fridgeTierFilter = 'lista'"
+                  class="px-2.5 py-1 rounded-lg font-semibold transition"
+                  :class="fridgeTierFilter === 'lista' ? 'bg-white dark:bg-stone-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+                  Listas ({{ fridgeMatchResults.listasParaCocinar.length }})
+                </button>
+                <button 
+                  @click="fridgeTierFilter = 'casi_lista'"
+                  class="px-2.5 py-1 rounded-lg font-semibold transition"
+                  :class="fridgeTierFilter === 'casi_lista' ? 'bg-white dark:bg-stone-900 text-amber-700 dark:text-amber-400 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+                  Casi listas ({{ fridgeMatchResults.casiListas.length }})
+                </button>
+              </div>
+            </div>
+
+            <!-- Grilla de Tarjetas de Matching -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div 
+                v-for="match in filteredFridgeMatches" 
+                :key="match.recipeId"
+                class="bg-white dark:bg-stone-900 rounded-2xl border transition-all shadow-xs flex flex-col justify-between overflow-hidden"
+                :class="match.tier === 'lista' 
+                        ? 'border-emerald-300 dark:border-emerald-800/80 ring-1 ring-emerald-400/30' 
+                        : (match.tier === 'casi_lista' 
+                           ? 'border-amber-300 dark:border-amber-800/80' 
+                           : 'border-stone-200/80 dark:border-stone-800 opacity-80')">
+                
+                <div class="p-5 space-y-3">
+                  <!-- Cabecera de la Tarjeta con Porcentaje -->
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md"
+                          :class="match.tier === 'lista' 
+                                  ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300' 
+                                  : (match.tier === 'casi_lista' 
+                                     ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300' 
+                                     : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400')">
+                      {{ match.tier === 'lista' ? '🟢 100% Cocinable Ya' : (match.tier === 'casi_lista' ? '🟡 Falta 1 o 2 ingredientes' : '⚪ Incompleta') }}
+                    </span>
+                    <span class="text-sm font-extrabold font-mono"
+                          :class="match.tier === 'lista' ? 'text-emerald-600 dark:text-emerald-400' : (match.tier === 'casi_lista' ? 'text-amber-600 dark:text-amber-400' : 'text-stone-400')">
+                      {{ match.score }}%
+                    </span>
+                  </div>
+
+                  <!-- Barra de Progreso de Coincidencia -->
+                  <div class="w-full bg-stone-100 dark:bg-stone-800 h-2 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-500"
+                         :class="match.tier === 'lista' ? 'bg-emerald-500' : (match.tier === 'casi_lista' ? 'bg-amber-500' : 'bg-stone-400')"
+                         :style="{ width: `${match.score}%` }">
+                    </div>
+                  </div>
+
+                  <!-- Título de Receta -->
+                  <div>
+                    <h4 class="text-base font-bold text-stone-900 dark:text-stone-100 leading-snug">
+                      {{ match.titulo }}
+                    </h4>
+                    <p class="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5">
+                      {{ match.countPrincipales }} de {{ match.totalPrincipales }} alimentos base • {{ match.countCondimentos }} de {{ match.totalCondimentos }} condimentos
+                    </p>
+                  </div>
+
+                  <!-- Faltantes Claros y Destacados -->
+                  <div class="pt-2 border-t border-stone-100 dark:border-stone-800 text-xs space-y-1.5">
+                    <div v-if="match.missingPrincipales.length > 0">
+                      <p class="text-[10px] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400">
+                        Te faltan de base:
+                      </p>
+                      <ul class="text-stone-700 dark:text-stone-300 text-[11px] space-y-0.5 pl-1">
+                        <li v-for="m in match.missingPrincipales" :key="m.id" class="flex items-center gap-1.5">
+                          <span class="text-rose-500 font-bold">✕</span>
+                          <span><strong>{{ m.nombre }}</strong> ({{ m.cantidad }})</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div v-if="match.missingCondimentos.length > 0">
+                      <p class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                        Faltan de condimento / aliño:
+                      </p>
+                      <ul class="text-stone-600 dark:text-stone-400 text-[11px] space-y-0.5 pl-1">
+                        <li v-for="m in match.missingCondimentos" :key="m.id" class="flex items-center gap-1.5">
+                          <span class="text-amber-500 font-bold">○</span>
+                          <span>{{ m.nombre }}</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div v-if="match.canCook" class="p-2.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-medium text-center text-xs">
+                      ✨ ¡Tenés todo en tu cocina! No necesitás salir a comprar nada.
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- Footer de Acción -->
+                <div class="p-3.5 bg-stone-50/60 dark:bg-stone-800/40 border-t border-stone-100 dark:border-stone-800 flex items-center gap-2">
+                  <button 
+                    v-if="match.canCook"
+                    @click="activeRecipe = data.recipes.find(r => r.id === match.recipeId); startCooking(activeRecipe)"
+                    class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-1.5">
+                    <span>👨‍🍳</span> Cocinar Ya
+                  </button>
+                  <button 
+                    v-else
+                    @click="activeRecipe = data.recipes.find(r => r.id === match.recipeId)"
+                    class="flex-1 py-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 text-xs font-semibold rounded-xl hover:bg-stone-50 transition">
+                    Ver Receta
+                  </button>
+
+                  <button 
+                    v-if="!match.canCook"
+                    @click="addMissingToShoppingList(match)"
+                    class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1"
+                    title="Anotar faltantes en la lista">
+                    <span>🛒</span> Faltantes
+                  </button>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SUBVISTA 3: BATCH COOKING & PLANIFICADOR   -->
+        <!-- ========================================== -->
+        <div v-show="recipeSubView === 'batch'" class="space-y-6">
+          
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-3">
+            <div class="flex items-start justify-between flex-wrap gap-3">
+              <div>
+                <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                  <span>🍱 Planificador Semanal & Batch Cooking</span>
+                  <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+                    Ahorro estimado: ~{{ batchPlanResults.totalTiempoAhorradoMinutos }} min
+                  </span>
+                </h3>
+                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1 max-w-2xl leading-relaxed">
+                  Cocinando estas 6 bases en bloque durante el fin de semana, el armado de tus almuerzos y cenas cotidianas pasa de demandar 45 minutos a solo 3 minutos de ensamblado.
+                </p>
+              </div>
+
+              <div class="p-3 bg-emerald-50/80 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800/60 text-right">
+                <span class="text-[10px] uppercase font-bold text-emerald-800 dark:text-emerald-300">Tiempo Ahorrado</span>
+                <p class="text-xl font-mono font-extrabold text-emerald-700 dark:text-emerald-300 leading-tight">
+                  ~{{ Math.round(batchPlanResults.totalTiempoAhorradoMinutos / 60) }}h {{ batchPlanResults.totalTiempoAhorradoMinutos % 60 }}m
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grilla de las 6 Bases de Batch Cooking -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div 
+              v-for="base in (fridgeEngineData?.batchCookingBases || [])" 
+              :key="base.id"
+              class="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200/80 dark:border-stone-800 shadow-xs space-y-3 flex flex-col justify-between">
+              
+              <div class="space-y-2">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300">
+                    {{ base.rendimiento }}
+                  </span>
+                  <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                    ⚡ Ahorra {{ base.ahorroTiempoMinutosSemanal }} min
+                  </span>
+                </div>
+
+                <h4 class="text-base font-bold text-stone-900 dark:text-stone-100">{{ base.nombre }}</h4>
+                <p class="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">{{ base.descripcion }}</p>
+
+                <!-- Consejos de Almacenamiento -->
+                <div class="p-2.5 bg-stone-50 dark:bg-stone-800/40 rounded-xl border border-stone-200/60 dark:border-stone-700/60 text-[11px] space-y-1">
+                  <p class="text-stone-600 dark:text-stone-300">
+                    🧊 <strong>Heladera:</strong> {{ base.almacenamiento.heladera }}
+                  </p>
+                  <p class="text-stone-600 dark:text-stone-300">
+                    ❄️ <strong>Freezer:</strong> {{ base.almacenamiento.freezer }}
+                  </p>
+                </div>
+
+                <!-- Recetas que la aprovechan -->
+                <div class="space-y-1 pt-1">
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-stone-400">Aprovechamiento cruzado:</p>
+                  <ul class="text-xs text-stone-600 dark:text-stone-300 space-y-0.5">
+                    <li v-for="(rec, idx) in base.recetasQueLaUsan" :key="idx" class="flex items-center justify-between text-[11px]">
+                      <span>• <strong>{{ rec.titulo }}</strong></span>
+                      <span class="text-[10px] text-stone-400">{{ rec.porcentajeAprovechamiento }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Tip de Conservación Clínica -->
+              <div class="pt-2 border-t border-stone-100 dark:border-stone-800 text-[10px] text-stone-500 italic">
+                💡 {{ base.almacenamiento.consejo }}
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SUBVISTA 4: GESTOR DE REMOJOS Y TIEMPOS    -->
+        <!-- ========================================== -->
+        <div v-show="recipeSubView === 'remojos'" class="space-y-6">
+          
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-2">
+            <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <span>⏳ Gestor de Remojos, Activación & Tiempos Previos</span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                11 reglas bioquímicas
+              </span>
+            </h3>
+            <p class="text-xs text-stone-500 dark:text-stone-400 max-w-2xl leading-relaxed">
+              La activación adecuada neutraliza el ácido fítico y los inhibidores enzimáticos de las semillas, granos y legumbres. Esta tabla te indica exactamente cuánto tiempo requiere cada insumo y si tenés que descartar o conservar el agua.
+            </p>
+          </div>
+
+          <!-- Grilla de Insumos y Reglas de Remojo -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div 
+              v-for="rule in (fridgeEngineData?.soakingAndPreTimes || [])" 
+              :key="rule.id"
+              class="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200/80 dark:border-stone-800 shadow-xs space-y-3 flex flex-col justify-between">
+              
+              <div class="space-y-2.5">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
+                        :class="rule.tiempoOptimoHoras >= 48 
+                                ? 'bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300' 
+                                : (rule.tiempoOptimoHoras >= 8 
+                                   ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300' 
+                                   : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300')">
+                    ⏱️ {{ rule.tiempoRemojoTexto }}
+                  </span>
+                  <span class="text-[10px] font-mono text-stone-400">
+                    {{ rule.temperatura }}
+                  </span>
+                </div>
+
+                <div>
+                  <h4 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+                    <span>{{ rule.icono }}</span> <span>{{ rule.alimento }}</span>
+                  </h4>
+                  <p class="text-xs text-stone-600 dark:text-stone-300 mt-1 leading-relaxed">
+                    {{ rule.metodo }}
+                  </p>
+                </div>
+
+                <!-- Alerta de Agua: ¿Descartar o Conservar? -->
+                <div class="p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2"
+                     :class="rule.descartarAgua 
+                             ? 'bg-rose-50/70 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-300' 
+                             : 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-300'">
+                  <span class="text-base">{{ rule.descartarAgua ? '🚰' : '🥣' }}</span>
+                  <div class="text-[11px] leading-tight">
+                    <p class="font-bold">{{ rule.descartarAgua ? 'DESCARTAR EL AGUA' : 'NO DESCARTAR EL AGUA' }}</p>
+                    <p class="text-[10px] opacity-80 mt-0.5">{{ rule.descartarAgua ? 'Enjuagar enérgicamente antes de cocinar' : 'El gel / mucílago contiene los nutrientes activos' }}</p>
+                  </div>
+                </div>
+
+                <!-- Motivo Bioquímico -->
+                <div class="space-y-1 text-xs">
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-stone-400">Fundamento Clínico:</p>
+                  <p class="text-stone-600 dark:text-stone-300 text-[11px] leading-relaxed">
+                    {{ rule.motivoBioquimico }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Recetas Asociadas -->
+              <div class="pt-2 border-t border-stone-100 dark:border-stone-800 text-[10px] text-stone-400">
+                Aplica a: <span class="text-stone-600 dark:text-stone-300 font-medium">{{ rule.recetasAsociadas.join(', ') }}</span>
+              </div>
+
+            </div>
+          </div>
+
         </div>
 
       </section>
@@ -2414,7 +4933,7 @@ if (typeof module !== 'undefined') {
     <!-- Footer -->
     <footer class="mt-auto border-t border-stone-200 dark:border-stone-800 py-6 text-center text-xs text-stone-500 dark:text-stone-400 bg-white/50 dark:bg-stone-900/50">
       <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p>Detox de Primavera • <span class="font-mono font-semibold text-sage-600 dark:text-sage-400">v1.1.0</span> • Material de referencia Septiembre 2026</p>
+        <p>Detox de Primavera • <span class="font-mono font-semibold text-sage-600 dark:text-sage-400">v1.2.0</span> • Material de referencia Septiembre 2026</p>
         <button @click="resetAllData" class="text-rose-500 hover:text-rose-700 text-xs font-medium underline">
           Reiniciar Progreso de la App
         </button>
@@ -2946,12 +5465,20 @@ const app = createApp({
     const journalView = ref('dia'); // 'dia', 'semana', 'global'
     const showExportModal = ref(false);
 
-    // 4. Filtros de Recetas
+    // 4. Filtros de Recetas y Subvistas
+    const recipeSubView = ref(safeStorage.get('detox_recipe_subview') || 'catalogo'); // 'catalogo', 'heladera', 'batch', 'remojos'
     const recipeSearch = ref('');
     const recipeFilterCategory = ref('todas');
     const activeRecipe = ref(null);
     const activeCookingRecipe = ref(null);
     const cookingStepIndex = ref(0);
+
+    // 4.1. Heladera Inteligente, Batch Cooking y Planificador Semanal
+    const fridgeSelected = ref(JSON.parse(safeStorage.get('detox_fridge_selected') || '[]'));
+    const fridgeFilterCategory = ref('todas');
+    const fridgeSearch = ref('');
+    const fridgeTierFilter = ref('todas'); // 'todas', 'lista', 'casi_lista'
+    const weeklyPlan = ref(JSON.parse(safeStorage.get('detox_weekly_plan') || '{}'));
 
     // 5. Filtros de Compras
     const shoppingFilterCategory = ref('todas');
@@ -3060,6 +5587,8 @@ const app = createApp({
             shoppingChecked: shoppingChecked.value,
             dailyJournal: dailyJournal.value,
             dailyMeals: dailyMeals.value,
+            fridgeSelected: fridgeSelected.value,
+            weeklyPlan: weeklyPlan.value,
             streakDays: streakDays.value,
             xp: xp.value,
             unlockedBadges: unlockedBadges.value
@@ -3120,6 +5649,8 @@ const app = createApp({
         if (cloudData.shoppingChecked !== undefined) shoppingChecked.value = cloudData.shoppingChecked;
         if (cloudData.dailyJournal !== undefined) dailyJournal.value = cloudData.dailyJournal;
         if (cloudData.dailyMeals !== undefined) dailyMeals.value = cloudData.dailyMeals;
+        if (cloudData.fridgeSelected !== undefined) fridgeSelected.value = cloudData.fridgeSelected;
+        if (cloudData.weeklyPlan !== undefined) weeklyPlan.value = cloudData.weeklyPlan;
         if (cloudData.unlockedBadges !== undefined) unlockedBadges.value = cloudData.unlockedBadges;
         if (cloudData.xp !== undefined) xp.value = cloudData.xp;
 
@@ -3130,6 +5661,8 @@ const app = createApp({
         safeStorage.set('detox_shopping_checked', JSON.stringify(shoppingChecked.value));
         safeStorage.set('detox_daily_journal', JSON.stringify(dailyJournal.value));
         safeStorage.set('detox_daily_meals', JSON.stringify(dailyMeals.value));
+        safeStorage.set('detox_fridge_selected', JSON.stringify(fridgeSelected.value));
+        safeStorage.set('detox_weekly_plan', JSON.stringify(weeklyPlan.value));
         safeStorage.set('detox_unlocked_badges', JSON.stringify(unlockedBadges.value));
         safeStorage.set('detox_xp', String(xp.value));
 
@@ -3268,6 +5801,15 @@ const app = createApp({
     }, { deep: true });
     watch(dailyMeals, (val) => {
       safeStorage.set('detox_daily_meals', JSON.stringify(val));
+      pushToCloud();
+    }, { deep: true });
+    watch(recipeSubView, (val) => safeStorage.set('detox_recipe_subview', val));
+    watch(fridgeSelected, (val) => {
+      safeStorage.set('detox_fridge_selected', JSON.stringify(val));
+      pushToCloud();
+    }, { deep: true });
+    watch(weeklyPlan, (val) => {
+      safeStorage.set('detox_weekly_plan', JSON.stringify(val));
       pushToCloud();
     }, { deep: true });
 
@@ -3793,6 +6335,131 @@ const app = createApp({
       cookingStepIndex.value = 0;
     };
 
+    // 4.2. Lógica de Heladera Inteligente, Batch Cooking y Remojos
+    const fridgeData = computed(() => {
+      if (typeof window !== 'undefined' && window.FRIDGE_AND_PREP_DATA) return window.FRIDGE_AND_PREP_DATA;
+      if (typeof FRIDGE_AND_PREP_DATA !== 'undefined') return FRIDGE_AND_PREP_DATA;
+      return null;
+    });
+
+    const fridgeCatalog = computed(() => fridgeData.value?.ingredientsCatalog || []);
+
+    const filteredFridgeIngredients = computed(() => {
+      const q = fridgeSearch.value.trim().toLowerCase();
+      const cat = fridgeFilterCategory.value;
+      return fridgeCatalog.value.filter(ing => {
+        const matchCat = cat === 'todas' || ing.categoria === cat;
+        const matchQ = !q || ing.nombre.toLowerCase().includes(q) || (ing.sinonimos && ing.sinonimos.some(s => s.toLowerCase().includes(q)));
+        return matchCat && matchQ;
+      });
+    });
+
+    // Ingredientes más comunes para selección rápida con 1 tap
+    const fridgeQuickTags = computed(() => {
+      const topIds = [
+        'manzana', 'arroz_yamani', 'porotos_mung', 'calabaza_anco', 'zanahoria',
+        'brocoli', 'repollo_blanco_colorado', 'apio', 'palta', 'almendras',
+        'aceite_oliva', 'sal_marina', 'limon', 'ajo', 'jengibre', 'shoyu_moa'
+      ];
+      return fridgeCatalog.value.filter(ing => topIds.includes(ing.id));
+    });
+
+    // Motor de Matching de Recetas con la Heladera
+    const fridgeMatchResults = computed(() => {
+      if (typeof window !== 'undefined' && window.DetoxFridgeEngine) {
+        return window.DetoxFridgeEngine.matchFridge(fridgeSelected.value);
+      }
+      return { totalRecetas: 0, listasParaCocinar: [], casiListas: [], incompletas: [], todas: [] };
+    });
+
+    const filteredFridgeMatches = computed(() => {
+      const res = fridgeMatchResults.value;
+      if (fridgeTierFilter.value === 'lista') return res.listasParaCocinar;
+      if (fridgeTierFilter.value === 'casi_lista') return res.casiListas;
+      return res.todas;
+    });
+
+    const toggleFridgeIngredient = (id) => {
+      if (fridgeSelected.value.includes(id)) {
+        fridgeSelected.value = fridgeSelected.value.filter(x => x !== id);
+      } else {
+        fridgeSelected.value.push(id);
+      }
+    };
+
+    const isFridgeIngredientSelected = (id) => fridgeSelected.value.includes(id);
+
+    const clearFridge = () => {
+      fridgeSelected.value = [];
+      triggerToast('🧊 Heladera vaciada.');
+    };
+
+    const selectCommonPantry = () => {
+      const basicIds = ['aceite_oliva', 'sal_marina', 'limon', 'agua_filtro'];
+      const set = new Set([...fridgeSelected.value, ...basicIds]);
+      fridgeSelected.value = Array.from(set);
+      triggerToast('🧂 Despensa básica añadida (aceite, sal marina, limón)');
+    };
+
+    const addMissingToShoppingList = (recipeMatch) => {
+      const allMissing = [...(recipeMatch.missingPrincipales || []), ...(recipeMatch.missingCondimentos || [])];
+      if (allMissing.length === 0) {
+        triggerToast('✅ ¡Ya tenés todos los ingredientes de esta receta!');
+        return;
+      }
+      const names = allMissing.map(m => m.nombre).join(', ');
+      triggerToast(`🛒 Faltantes para ${recipeMatch.titulo}: ${names}`);
+    };
+
+    // Planificador Semanal & Batch Cooking
+    const plannedRecipeIds = computed(() => {
+      const ids = new Set();
+      Object.values(weeklyPlan.value).forEach(dayObj => {
+        if (!dayObj) return;
+        ['desayuno', 'almuerzo', 'cena'].forEach(slot => {
+          if (dayObj[slot]) ids.add(dayObj[slot]);
+        });
+      });
+      // Si el planificador está vacío, incluir las recetas favoritas o generales para dar valor inmediato
+      if (ids.size === 0) {
+        ['caldo-detox', 'nituke-manzana', 'hummus-mung', 'bowl-yamani-cruciferas', 'mayonesa-zanahoria'].forEach(id => ids.add(id));
+      }
+      return Array.from(ids);
+    });
+
+    const batchPlanResults = computed(() => {
+      if (typeof window !== 'undefined' && window.DetoxFridgeEngine) {
+        return window.DetoxFridgeEngine.getBatchPlanForRecipes(plannedRecipeIds.value);
+      }
+      return { recetasSeleccionadas: [], basesSugeridas: [], totalTiempoAhorradoMinutos: 0 };
+    });
+
+    const soakingScheduleResults = computed(() => {
+      if (typeof window !== 'undefined' && window.DetoxFridgeEngine) {
+        return window.DetoxFridgeEngine.getSoakingScheduleForRecipes(plannedRecipeIds.value);
+      }
+      return { recetas: [], remojosRequeridos: [] };
+    });
+
+    const isRecipeInBatch = (recipeId) => plannedRecipeIds.value.includes(recipeId);
+
+    const toggleRecipeInBatch = (recipeId) => {
+      const current = weeklyPlan.value[1] || {};
+      const exists = Object.values(current).includes(recipeId);
+      if (exists) {
+        const next = {};
+        for (const [k, v] of Object.entries(current)) {
+          if (v !== recipeId) next[k] = v;
+        }
+        weeklyPlan.value = { ...weeklyPlan.value, 1: next };
+        triggerToast('Plato retirado del plan semanal.');
+      } else {
+        const slot = !current.almuerzo ? 'almuerzo' : (!current.cena ? 'cena' : 'desayuno');
+        weeklyPlan.value = { ...weeklyPlan.value, 1: { ...current, [slot]: recipeId } };
+        triggerToast('Plato añadido al plan semanal.');
+      }
+    };
+
     // Computados de Semáforo
     const filteredFoods = computed(() => {
       return data.foodTrafficLight.filter((f) => {
@@ -3948,6 +6615,8 @@ const app = createApp({
         unlockedBadges.value = [];
         dailyJournal.value = {};
         dailyMeals.value = {};
+        fridgeSelected.value = [];
+        weeklyPlan.value = {};
         xp.value = 0;
         selectedDay.value = 1;
         startDate.value = null;
@@ -3957,6 +6626,8 @@ const app = createApp({
           'detox_unlocked_badges',
           'detox_daily_journal',
           'detox_daily_meals',
+          'detox_fridge_selected',
+          'detox_weekly_plan',
           'detox_xp',
           'detox_selected_day',
           'detox_start_date',
@@ -4068,6 +6739,28 @@ const app = createApp({
       currentDayMeals,
       updateMealSlot,
       getMealSuggestions,
+      // Heladera Inteligente, Batch Cooking y Remojos
+      recipeSubView,
+      fridgeSelected,
+      fridgeFilterCategory,
+      fridgeSearch,
+      fridgeTierFilter,
+      weeklyPlan,
+      fridgeCatalog,
+      filteredFridgeIngredients,
+      fridgeQuickTags,
+      fridgeMatchResults,
+      filteredFridgeMatches,
+      toggleFridgeIngredient,
+      isFridgeIngredientSelected,
+      clearFridge,
+      selectCommonPantry,
+      addMissingToShoppingList,
+      plannedRecipeIds,
+      batchPlanResults,
+      soakingScheduleResults,
+      isRecipeInBatch,
+      toggleRecipeInBatch,
       // Metodos
       startChallengeToday,
       setStartDate,

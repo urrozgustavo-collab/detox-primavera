@@ -12,6 +12,8 @@ with open(os.path.join(app_dir, 'styles.css'), encoding='utf-8') as f:
     css = f.read()
 with open(os.path.join(app_dir, 'detox-data.js'), encoding='utf-8') as f:
     data_js = f.read()
+with open(os.path.join(app_dir, 'fridge-engine.js'), encoding='utf-8') as f:
+    fridge_js = f.read()
 with open(os.path.join(app_dir, 'app.js'), encoding='utf-8') as f:
     app_js = f.read()
 
@@ -20,6 +22,9 @@ html = html.replace('<link rel="stylesheet" href="styles.css">', f'<style>\n{css
 
 # Replace detox-data.js script with inline script
 html = html.replace('<script src="detox-data.js"></script>', f'<script>\n{data_js}\n</script>')
+
+# Replace fridge-engine.js script with inline script
+html = html.replace('<script src="fridge-engine.js"></script>', f'<script>\n{fridge_js}\n</script>')
 
 # Replace app.js script with inline script
 html = html.replace('<script src="app.js"></script>', f'<script>\n{app_js}\n</script>')

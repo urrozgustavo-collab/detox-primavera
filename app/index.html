@@ -82,6 +82,7 @@
   <!-- Estilos y Base de Datos Local -->
   <link rel="stylesheet" href="styles.css">
   <script src="detox-data.js"></script>
+  <script src="fridge-engine.js"></script>
 </head>
 <body class="bg-warmcream text-stone-800 dark:bg-stone-950 dark:text-stone-100 min-h-screen transition-colors duration-200 overflow-x-hidden w-full">
   <div id="app" v-cloak class="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
@@ -941,111 +942,558 @@
       </section>
 
       <!-- ========================================== -->
-      <!-- PESTANA 2: RECETARIO & MENUS               -->
+      <!-- ========================================== -->
+      <!-- PESTANA 2: RECETARIO & COCINA INTELIGENTE   -->
       <!-- ========================================== -->
       <section v-show="activeTab === 'recetas'" class="space-y-6">
         
-        <!-- Header con Buscador y Filtros de Recetas -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
-          <div class="flex items-center justify-between flex-wrap gap-3">
-            <div>
-              <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
-                <span>Catálogo de Recetas & Cocina Limpia</span>
-                <span class="text-xs px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-900/60 text-sage-800 dark:text-sage-300 font-medium">
-                  {{ filteredRecipes.length }} disponibles
-                </span>
-              </h2>
-              <p class="text-xs text-stone-500 dark:text-stone-400">Recetas oficiales del PDF con ingredientes exactos, métodos de cocción y modo de cocina paso a paso.</p>
-            </div>
-
-            <!-- Buscador en tiempo real -->
-            <div class="w-full sm:w-72 relative">
-              <input 
-                type="text" 
-                v-model="recipeSearch" 
-                placeholder="Buscar por plato o ingrediente..."
-                class="w-full pl-9 pr-4 py-2 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs sm:text-sm text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-sage-500">
-              <span class="absolute left-3 top-2.5 text-stone-400">🔍</span>
-              <button v-if="recipeSearch" @click="recipeSearch = ''" class="absolute right-3 top-2.5 text-xs text-stone-400 hover:text-stone-600">✕</button>
-            </div>
-          </div>
-
-          <!-- Filtros de Categoría -->
-          <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
-            <button 
-              v-for="cat in ['todas', 'desayunos', 'almuerzos', 'caldos', 'dips', 'panificados', 'fermentos', 'leches']"
-              :key="cat"
-              @click="recipeFilterCategory = cat"
-              :class="recipeFilterCategory === cat ? 'bg-sage-600 text-white font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
-              class="px-3 py-1.5 rounded-lg capitalize whitespace-nowrap transition">
-              {{ cat === 'todas' ? 'Todas las recetas' : cat }}
-            </button>
-          </div>
+        <!-- Segmented Switcher de Cocina Inteligente -->
+        <div class="flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-2xl mx-auto overflow-x-auto no-scrollbar">
+          <button 
+            @click="recipeSubView = 'catalogo'"
+            class="flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            :class="recipeSubView === 'catalogo' ? 'bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+            <span>📖</span> <span>Recetario</span>
+          </button>
+          <button 
+            @click="recipeSubView = 'heladera'"
+            class="flex-1 min-w-[130px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            :class="recipeSubView === 'heladera' ? 'bg-white dark:bg-stone-900 shadow-xs text-sage-700 dark:text-sage-300 font-extrabold' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+            <span>🧊</span> <span>Mi Heladera</span>
+            <span v-if="fridgeSelected.length > 0" class="text-[10px] px-1.5 py-0.2 rounded-full bg-sage-600 text-white font-mono">
+              {{ fridgeSelected.length }}
+            </span>
+          </button>
+          <button 
+            @click="recipeSubView = 'batch'"
+            class="flex-1 min-w-[130px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            :class="recipeSubView === 'batch' ? 'bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+            <span>🍱</span> <span>Batch Cooking</span>
+          </button>
+          <button 
+            @click="recipeSubView = 'remojos'"
+            class="flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            :class="recipeSubView === 'remojos' ? 'bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+            <span>⏳</span> <span>Remojos</span>
+          </button>
         </div>
 
-        <!-- Métodos de Cocción Destacados -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <div v-for="m in data.cookingMethods" :key="m.id" 
-               class="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 shadow-2xs space-y-1.5">
-            <h4 class="text-xs font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
-              <span>♨️</span> {{ m.nombre }}
-            </h4>
-            <p class="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">{{ m.desc }}</p>
-          </div>
-        </div>
-
-        <!-- Grilla de Tarjetas de Recetas -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div 
-            v-for="r in filteredRecipes" 
-            :key="r.id"
-            class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200/80 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-md transition-card flex flex-col justify-between">
-            
-            <div class="p-5 space-y-3">
-              <div class="flex items-start justify-between gap-2">
-                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
-                  {{ r.categoria }}
-                </span>
-                <span class="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1">
-                  ⏱️ {{ r.tiempo }}
-                </span>
-              </div>
-
+        <!-- ========================================== -->
+        <!-- SUBVISTA 1: CATÁLOGO CLÁSICO DE RECETAS    -->
+        <!-- ========================================== -->
+        <div v-show="recipeSubView === 'catalogo'" class="space-y-6">
+          
+          <!-- Header con Buscador y Filtros de Recetas -->
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 leading-snug">{{ r.titulo }}</h3>
-                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">Método: <span class="font-medium text-stone-700 dark:text-stone-300">{{ r.metodo }}</span></p>
+                <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                  <span>Catálogo de Recetas & Cocina Limpia</span>
+                  <span class="text-xs px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-900/60 text-sage-800 dark:text-sage-300 font-medium">
+                    {{ filteredRecipes.length }} disponibles
+                  </span>
+                </h2>
+                <p class="text-xs text-stone-500 dark:text-stone-400">Recetas oficiales del PDF con ingredientes exactos, métodos de cocción y modo de cocina paso a paso.</p>
               </div>
 
-              <!-- Ingredientes resumidos -->
-              <div class="pt-2 border-t border-stone-100 dark:border-stone-800">
-                <p class="text-[11px] font-semibold text-stone-700 dark:text-stone-300 mb-1">Ingredientes clave:</p>
-                <ul class="text-xs text-stone-600 dark:text-stone-400 space-y-0.5">
-                  <li v-for="(ing, idx) in r.ingredientes.slice(0, 3)" :key="idx" class="truncate">
-                    • {{ ing }}
-                  </li>
-                  <li v-if="r.ingredientes.length > 3" class="text-[10px] text-stone-400 italic">
-                    + {{ r.ingredientes.length - 3 }} ingredientes más...
-                  </li>
-                </ul>
+              <!-- Buscador en tiempo real -->
+              <div class="w-full sm:w-72 relative">
+                <input 
+                  type="text" 
+                  v-model="recipeSearch" 
+                  placeholder="Buscar por plato o ingrediente..."
+                  class="w-full pl-9 pr-4 py-2 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs sm:text-sm text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-sage-500">
+                <span class="absolute left-3 top-2.5 text-stone-400">🔍</span>
+                <button v-if="recipeSearch" @click="recipeSearch = ''" class="absolute right-3 top-2.5 text-xs text-stone-400 hover:text-stone-600">✕</button>
               </div>
             </div>
 
-            <!-- Footer con Botones de Acción -->
-            <div class="p-4 bg-stone-50/60 dark:bg-stone-800/40 border-t border-stone-100 dark:border-stone-800 flex items-center gap-2">
+            <!-- Filtros de Categoría -->
+            <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
               <button 
-                @click="openRecipe(r)" 
-                class="flex-1 py-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs font-semibold text-stone-800 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition">
-                Ver Detalles
+                v-for="cat in ['todas', 'desayunos', 'almuerzos', 'caldos', 'dips', 'panificados', 'fermentos', 'leches']"
+                :key="cat"
+                @click="recipeFilterCategory = cat"
+                :class="recipeFilterCategory === cat ? 'bg-sage-600 text-white font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
+                class="px-3 py-1.5 rounded-lg capitalize whitespace-nowrap transition">
+                {{ cat === 'todas' ? 'Todas las recetas' : cat }}
               </button>
-              <button 
-                @click="startCooking(r)" 
-                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 transition"
-                title="Modo Pantalla Completa para cocinar paso a paso">
-                <span>👨‍🍳</span> Cocinar
-              </button>
+            </div>
+          </div>
+
+          <!-- Métodos de Cocción Destacados -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div v-for="m in data.cookingMethods" :key="m.id" 
+                 class="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 shadow-2xs space-y-1.5">
+              <h4 class="text-xs font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+                <span>♨️</span> {{ m.nombre }}
+              </h4>
+              <p class="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">{{ m.desc }}</p>
+            </div>
+          </div>
+
+          <!-- Grilla de Tarjetas de Recetas -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div 
+              v-for="r in filteredRecipes" 
+              :key="r.id"
+              class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200/80 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-md transition-card flex flex-col justify-between">
+              
+              <div class="p-5 space-y-3">
+                <div class="flex items-start justify-between gap-2">
+                  <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
+                    {{ r.categoria }}
+                  </span>
+                  <span class="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1">
+                    ⏱️ {{ r.tiempo }}
+                  </span>
+                </div>
+
+                <div>
+                  <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 leading-snug">{{ r.titulo }}</h3>
+                  <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">Método: <span class="font-medium text-stone-700 dark:text-stone-300">{{ r.metodo }}</span></p>
+                </div>
+
+                <!-- Ingredientes resumidos -->
+                <div class="pt-2 border-t border-stone-100 dark:border-stone-800">
+                  <p class="text-[11px] font-semibold text-stone-700 dark:text-stone-300 mb-1">Ingredientes clave:</p>
+                  <ul class="text-xs text-stone-600 dark:text-stone-400 space-y-0.5">
+                    <li v-for="(ing, idx) in r.ingredientes.slice(0, 3)" :key="idx" class="truncate">
+                      • {{ ing }}
+                    </li>
+                    <li v-if="r.ingredientes.length > 3" class="text-[10px] text-stone-400 italic">
+                      + {{ r.ingredientes.length - 3 }} ingredientes más...
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Footer con Botones de Acción -->
+              <div class="p-4 bg-stone-50/60 dark:bg-stone-800/40 border-t border-stone-100 dark:border-stone-800 flex items-center gap-2">
+                <button 
+                  @click="openRecipe(r)" 
+                  class="flex-1 py-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs font-semibold text-stone-800 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition">
+                  Ver Detalles
+                </button>
+                <button 
+                  @click="startCooking(r)" 
+                  class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 transition"
+                  title="Modo Pantalla Completa para cocinar paso a paso">
+                  <span>👨‍🍳</span> Cocinar
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SUBVISTA 2: HELADERA INTELIGENTE           -->
+        <!-- ========================================== -->
+        <div v-show="recipeSubView === 'heladera'" class="space-y-6">
+          
+          <!-- Banner Explicativo & Acciones Rápidas -->
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+            <div class="flex items-start justify-between flex-wrap gap-3">
+              <div>
+                <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                  <span>🧊 Heladera & Despensa Inteligente</span>
+                  <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
+                    {{ fridgeSelected.length }} seleccionados
+                  </span>
+                </h3>
+                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1 max-w-2xl leading-relaxed">
+                  Marcá los alimentos que tenés hoy en tu cocina. El algoritmo clínico prioriza los ingredientes base (80% del score) por sobre condimentos básicos para mostrarte qué podés cocinar ya o qué 1-2 insumos te faltan para arrancar.
+                </p>
+              </div>
+
+              <!-- Botones de Acción Rápida -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <button 
+                  @click="selectCommonPantry()"
+                  class="px-3 py-1.5 rounded-xl bg-sage-50 dark:bg-sage-950/50 border border-sage-200 dark:border-sage-800 text-xs font-semibold text-sage-800 dark:text-sage-300 hover:bg-sage-100 transition shadow-2xs flex items-center gap-1.5">
+                  <span>🧂</span> Despensa básica (aceite, sal, limón)
+                </button>
+                <button 
+                  v-if="fridgeSelected.length > 0"
+                  @click="clearFridge()"
+                  class="px-3 py-1.5 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 text-xs font-semibold text-stone-600 dark:text-stone-300 transition shadow-2xs flex items-center gap-1.5">
+                  <span>🧹</span> Vaciar
+                </button>
+              </div>
+            </div>
+
+            <!-- Taps Rápidos de Alimentos Más Comunes -->
+            <div class="space-y-1.5 pt-2 border-t border-stone-100 dark:border-stone-800">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500">
+                ⚡ Taps rápidos (Ingredientes frecuentes del detox):
+              </p>
+              <div class="flex flex-wrap gap-1.5">
+                <button 
+                  v-for="ing in fridgeQuickTags" 
+                  :key="ing.id"
+                  @click="toggleFridgeIngredient(ing.id)"
+                  class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all active:scale-95 flex items-center gap-1"
+                  :class="isFridgeIngredientSelected(ing.id) 
+                          ? 'bg-sage-600 text-white border-sage-600 shadow-2xs font-semibold' 
+                          : 'bg-stone-50 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300 border-stone-200/80 dark:border-stone-700 hover:border-stone-400'">
+                  <span>{{ isFridgeIngredientSelected(ing.id) ? '✓' : '+' }}</span>
+                  <span>{{ ing.nombre }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Buscador y Selector Detallado por Categoría -->
+            <div class="space-y-2 pt-2 border-t border-stone-100 dark:border-stone-800">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex-1 min-w-[200px] relative">
+                  <input 
+                    type="text" 
+                    v-model="fridgeSearch" 
+                    placeholder="Buscar ingrediente (ej: zanahoria, mijo, kombu, cajú)..."
+                    class="w-full pl-8 pr-3 py-1.5 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-sage-500">
+                  <span class="absolute left-2.5 top-2 text-stone-400 text-xs">🔍</span>
+                </div>
+                
+                <div class="flex gap-1 overflow-x-auto no-scrollbar text-xs">
+                  <button 
+                    v-for="c in ['todas', 'granos', 'legumbres', 'verduras', 'frutas', 'semillas_frutos', 'condimentos']" 
+                    :key="c"
+                    @click="fridgeFilterCategory = c"
+                    class="px-2.5 py-1 rounded-lg capitalize whitespace-nowrap text-[11px] font-medium transition"
+                    :class="fridgeFilterCategory === c ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'">
+                    {{ c === 'todas' ? 'Todos' : c.replace('_', ' ') }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Grilla de Ingredientes del Catálogo (Pills compactas) -->
+              <div class="max-h-48 overflow-y-auto p-2 bg-stone-50/50 dark:bg-stone-950/40 rounded-xl border border-stone-200/60 dark:border-stone-800/80 flex flex-wrap gap-1.5">
+                <button 
+                  v-for="ing in filteredFridgeIngredients" 
+                  :key="ing.id"
+                  @click="toggleFridgeIngredient(ing.id)"
+                  class="px-2.5 py-1 rounded-lg text-xs border transition-all text-left flex items-center gap-1.5"
+                  :class="isFridgeIngredientSelected(ing.id) 
+                          ? 'bg-emerald-600 text-white border-emerald-600 font-semibold shadow-2xs' 
+                          : 'bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-stone-300'">
+                  <span class="text-[10px]">{{ isFridgeIngredientSelected(ing.id) ? '✓' : '○' }}</span>
+                  <span>{{ ing.nombre }}</span>
+                  <span v-if="ing.clasificacion === 'principal'" class="text-[9px] px-1 rounded bg-black/10 dark:bg-white/10 uppercase">Base</span>
+                </button>
+                <div v-if="filteredFridgeIngredients.length === 0" class="text-xs text-stone-400 p-2 italic">
+                  No se encontraron ingredientes para "{{ fridgeSearch }}".
+                </div>
+              </div>
             </div>
 
           </div>
+
+          <!-- RESUMEN DE COMPATIBILIDAD CON RECETAS -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>🍳 Recetas Compatibles</span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+                  {{ fridgeMatchResults.listasParaCocinar.length }} listas ya
+                </span>
+                <span v-if="fridgeMatchResults.casiListas.length > 0" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                  {{ fridgeMatchResults.casiListas.length }} casi listas
+                </span>
+              </h3>
+
+              <!-- Filtro de Tiers -->
+              <div class="inline-flex p-1 bg-stone-100 dark:bg-stone-800 rounded-xl text-xs">
+                <button 
+                  @click="fridgeTierFilter = 'todas'"
+                  class="px-2.5 py-1 rounded-lg font-semibold transition"
+                  :class="fridgeTierFilter === 'todas' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+                  Todas ({{ fridgeMatchResults.todas.length }})
+                </button>
+                <button 
+                  @click="fridgeTierFilter = 'lista'"
+                  class="px-2.5 py-1 rounded-lg font-semibold transition"
+                  :class="fridgeTierFilter === 'lista' ? 'bg-white dark:bg-stone-900 text-emerald-700 dark:text-emerald-400 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+                  Listas ({{ fridgeMatchResults.listasParaCocinar.length }})
+                </button>
+                <button 
+                  @click="fridgeTierFilter = 'casi_lista'"
+                  class="px-2.5 py-1 rounded-lg font-semibold transition"
+                  :class="fridgeTierFilter === 'casi_lista' ? 'bg-white dark:bg-stone-900 text-amber-700 dark:text-amber-400 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+                  Casi listas ({{ fridgeMatchResults.casiListas.length }})
+                </button>
+              </div>
+            </div>
+
+            <!-- Grilla de Tarjetas de Matching -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div 
+                v-for="match in filteredFridgeMatches" 
+                :key="match.recipeId"
+                class="bg-white dark:bg-stone-900 rounded-2xl border transition-all shadow-xs flex flex-col justify-between overflow-hidden"
+                :class="match.tier === 'lista' 
+                        ? 'border-emerald-300 dark:border-emerald-800/80 ring-1 ring-emerald-400/30' 
+                        : (match.tier === 'casi_lista' 
+                           ? 'border-amber-300 dark:border-amber-800/80' 
+                           : 'border-stone-200/80 dark:border-stone-800 opacity-80')">
+                
+                <div class="p-5 space-y-3">
+                  <!-- Cabecera de la Tarjeta con Porcentaje -->
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md"
+                          :class="match.tier === 'lista' 
+                                  ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300' 
+                                  : (match.tier === 'casi_lista' 
+                                     ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300' 
+                                     : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400')">
+                      {{ match.tier === 'lista' ? '🟢 100% Cocinable Ya' : (match.tier === 'casi_lista' ? '🟡 Falta 1 o 2 ingredientes' : '⚪ Incompleta') }}
+                    </span>
+                    <span class="text-sm font-extrabold font-mono"
+                          :class="match.tier === 'lista' ? 'text-emerald-600 dark:text-emerald-400' : (match.tier === 'casi_lista' ? 'text-amber-600 dark:text-amber-400' : 'text-stone-400')">
+                      {{ match.score }}%
+                    </span>
+                  </div>
+
+                  <!-- Barra de Progreso de Coincidencia -->
+                  <div class="w-full bg-stone-100 dark:bg-stone-800 h-2 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-500"
+                         :class="match.tier === 'lista' ? 'bg-emerald-500' : (match.tier === 'casi_lista' ? 'bg-amber-500' : 'bg-stone-400')"
+                         :style="{ width: `${match.score}%` }">
+                    </div>
+                  </div>
+
+                  <!-- Título de Receta -->
+                  <div>
+                    <h4 class="text-base font-bold text-stone-900 dark:text-stone-100 leading-snug">
+                      {{ match.titulo }}
+                    </h4>
+                    <p class="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5">
+                      {{ match.countPrincipales }} de {{ match.totalPrincipales }} alimentos base • {{ match.countCondimentos }} de {{ match.totalCondimentos }} condimentos
+                    </p>
+                  </div>
+
+                  <!-- Faltantes Claros y Destacados -->
+                  <div class="pt-2 border-t border-stone-100 dark:border-stone-800 text-xs space-y-1.5">
+                    <div v-if="match.missingPrincipales.length > 0">
+                      <p class="text-[10px] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400">
+                        Te faltan de base:
+                      </p>
+                      <ul class="text-stone-700 dark:text-stone-300 text-[11px] space-y-0.5 pl-1">
+                        <li v-for="m in match.missingPrincipales" :key="m.id" class="flex items-center gap-1.5">
+                          <span class="text-rose-500 font-bold">✕</span>
+                          <span><strong>{{ m.nombre }}</strong> ({{ m.cantidad }})</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div v-if="match.missingCondimentos.length > 0">
+                      <p class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                        Faltan de condimento / aliño:
+                      </p>
+                      <ul class="text-stone-600 dark:text-stone-400 text-[11px] space-y-0.5 pl-1">
+                        <li v-for="m in match.missingCondimentos" :key="m.id" class="flex items-center gap-1.5">
+                          <span class="text-amber-500 font-bold">○</span>
+                          <span>{{ m.nombre }}</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div v-if="match.canCook" class="p-2.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-medium text-center text-xs">
+                      ✨ ¡Tenés todo en tu cocina! No necesitás salir a comprar nada.
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- Footer de Acción -->
+                <div class="p-3.5 bg-stone-50/60 dark:bg-stone-800/40 border-t border-stone-100 dark:border-stone-800 flex items-center gap-2">
+                  <button 
+                    v-if="match.canCook"
+                    @click="activeRecipe = data.recipes.find(r => r.id === match.recipeId); startCooking(activeRecipe)"
+                    class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-1.5">
+                    <span>👨‍🍳</span> Cocinar Ya
+                  </button>
+                  <button 
+                    v-else
+                    @click="activeRecipe = data.recipes.find(r => r.id === match.recipeId)"
+                    class="flex-1 py-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 text-xs font-semibold rounded-xl hover:bg-stone-50 transition">
+                    Ver Receta
+                  </button>
+
+                  <button 
+                    v-if="!match.canCook"
+                    @click="addMissingToShoppingList(match)"
+                    class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1"
+                    title="Anotar faltantes en la lista">
+                    <span>🛒</span> Faltantes
+                  </button>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SUBVISTA 3: BATCH COOKING & PLANIFICADOR   -->
+        <!-- ========================================== -->
+        <div v-show="recipeSubView === 'batch'" class="space-y-6">
+          
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-3">
+            <div class="flex items-start justify-between flex-wrap gap-3">
+              <div>
+                <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                  <span>🍱 Planificador Semanal & Batch Cooking</span>
+                  <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+                    Ahorro estimado: ~{{ batchPlanResults.totalTiempoAhorradoMinutos }} min
+                  </span>
+                </h3>
+                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1 max-w-2xl leading-relaxed">
+                  Cocinando estas 6 bases en bloque durante el fin de semana, el armado de tus almuerzos y cenas cotidianas pasa de demandar 45 minutos a solo 3 minutos de ensamblado.
+                </p>
+              </div>
+
+              <div class="p-3 bg-emerald-50/80 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800/60 text-right">
+                <span class="text-[10px] uppercase font-bold text-emerald-800 dark:text-emerald-300">Tiempo Ahorrado</span>
+                <p class="text-xl font-mono font-extrabold text-emerald-700 dark:text-emerald-300 leading-tight">
+                  ~{{ Math.round(batchPlanResults.totalTiempoAhorradoMinutos / 60) }}h {{ batchPlanResults.totalTiempoAhorradoMinutos % 60 }}m
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grilla de las 6 Bases de Batch Cooking -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div 
+              v-for="base in (fridgeEngineData?.batchCookingBases || [])" 
+              :key="base.id"
+              class="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200/80 dark:border-stone-800 shadow-xs space-y-3 flex flex-col justify-between">
+              
+              <div class="space-y-2">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300">
+                    {{ base.rendimiento }}
+                  </span>
+                  <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                    ⚡ Ahorra {{ base.ahorroTiempoMinutosSemanal }} min
+                  </span>
+                </div>
+
+                <h4 class="text-base font-bold text-stone-900 dark:text-stone-100">{{ base.nombre }}</h4>
+                <p class="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">{{ base.descripcion }}</p>
+
+                <!-- Consejos de Almacenamiento -->
+                <div class="p-2.5 bg-stone-50 dark:bg-stone-800/40 rounded-xl border border-stone-200/60 dark:border-stone-700/60 text-[11px] space-y-1">
+                  <p class="text-stone-600 dark:text-stone-300">
+                    🧊 <strong>Heladera:</strong> {{ base.almacenamiento.heladera }}
+                  </p>
+                  <p class="text-stone-600 dark:text-stone-300">
+                    ❄️ <strong>Freezer:</strong> {{ base.almacenamiento.freezer }}
+                  </p>
+                </div>
+
+                <!-- Recetas que la aprovechan -->
+                <div class="space-y-1 pt-1">
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-stone-400">Aprovechamiento cruzado:</p>
+                  <ul class="text-xs text-stone-600 dark:text-stone-300 space-y-0.5">
+                    <li v-for="(rec, idx) in base.recetasQueLaUsan" :key="idx" class="flex items-center justify-between text-[11px]">
+                      <span>• <strong>{{ rec.titulo }}</strong></span>
+                      <span class="text-[10px] text-stone-400">{{ rec.porcentajeAprovechamiento }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Tip de Conservación Clínica -->
+              <div class="pt-2 border-t border-stone-100 dark:border-stone-800 text-[10px] text-stone-500 italic">
+                💡 {{ base.almacenamiento.consejo }}
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SUBVISTA 4: GESTOR DE REMOJOS Y TIEMPOS    -->
+        <!-- ========================================== -->
+        <div v-show="recipeSubView === 'remojos'" class="space-y-6">
+          
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-2">
+            <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <span>⏳ Gestor de Remojos, Activación & Tiempos Previos</span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                11 reglas bioquímicas
+              </span>
+            </h3>
+            <p class="text-xs text-stone-500 dark:text-stone-400 max-w-2xl leading-relaxed">
+              La activación adecuada neutraliza el ácido fítico y los inhibidores enzimáticos de las semillas, granos y legumbres. Esta tabla te indica exactamente cuánto tiempo requiere cada insumo y si tenés que descartar o conservar el agua.
+            </p>
+          </div>
+
+          <!-- Grilla de Insumos y Reglas de Remojo -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div 
+              v-for="rule in (fridgeEngineData?.soakingAndPreTimes || [])" 
+              :key="rule.id"
+              class="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200/80 dark:border-stone-800 shadow-xs space-y-3 flex flex-col justify-between">
+              
+              <div class="space-y-2.5">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
+                        :class="rule.tiempoOptimoHoras >= 48 
+                                ? 'bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300' 
+                                : (rule.tiempoOptimoHoras >= 8 
+                                   ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300' 
+                                   : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300')">
+                    ⏱️ {{ rule.tiempoRemojoTexto }}
+                  </span>
+                  <span class="text-[10px] font-mono text-stone-400">
+                    {{ rule.temperatura }}
+                  </span>
+                </div>
+
+                <div>
+                  <h4 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+                    <span>{{ rule.icono }}</span> <span>{{ rule.alimento }}</span>
+                  </h4>
+                  <p class="text-xs text-stone-600 dark:text-stone-300 mt-1 leading-relaxed">
+                    {{ rule.metodo }}
+                  </p>
+                </div>
+
+                <!-- Alerta de Agua: ¿Descartar o Conservar? -->
+                <div class="p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2"
+                     :class="rule.descartarAgua 
+                             ? 'bg-rose-50/70 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-300' 
+                             : 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-300'">
+                  <span class="text-base">{{ rule.descartarAgua ? '🚰' : '🥣' }}</span>
+                  <div class="text-[11px] leading-tight">
+                    <p class="font-bold">{{ rule.descartarAgua ? 'DESCARTAR EL AGUA' : 'NO DESCARTAR EL AGUA' }}</p>
+                    <p class="text-[10px] opacity-80 mt-0.5">{{ rule.descartarAgua ? 'Enjuagar enérgicamente antes de cocinar' : 'El gel / mucílago contiene los nutrientes activos' }}</p>
+                  </div>
+                </div>
+
+                <!-- Motivo Bioquímico -->
+                <div class="space-y-1 text-xs">
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-stone-400">Fundamento Clínico:</p>
+                  <p class="text-stone-600 dark:text-stone-300 text-[11px] leading-relaxed">
+                    {{ rule.motivoBioquimico }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Recetas Asociadas -->
+              <div class="pt-2 border-t border-stone-100 dark:border-stone-800 text-[10px] text-stone-400">
+                Aplica a: <span class="text-stone-600 dark:text-stone-300 font-medium">{{ rule.recetasAsociadas.join(', ') }}</span>
+              </div>
+
+            </div>
+          </div>
+
         </div>
 
       </section>
@@ -1416,7 +1864,7 @@
     <!-- Footer -->
     <footer class="mt-auto border-t border-stone-200 dark:border-stone-800 py-6 text-center text-xs text-stone-500 dark:text-stone-400 bg-white/50 dark:bg-stone-900/50">
       <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p>Detox de Primavera • <span class="font-mono font-semibold text-sage-600 dark:text-sage-400">v1.1.0</span> • Material de referencia Septiembre 2026</p>
+        <p>Detox de Primavera • <span class="font-mono font-semibold text-sage-600 dark:text-sage-400">v1.2.0</span> • Material de referencia Septiembre 2026</p>
         <button @click="resetAllData" class="text-rose-500 hover:text-rose-700 text-xs font-medium underline">
           Reiniciar Progreso de la App
         </button>
