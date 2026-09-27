@@ -1,5 +1,47 @@
 // Logica Reactiva de la WebApp - Detox de Primavera
-// Powered by Vue 3 (CDN), LocalStorage y Canvas-Confetti
+// Powered by Vue 3 (CDN), LocalStorage, Cookies y Canvas-Confetti
+
+// Almacenamiento seguro persistente con triple capa (LocalStorage + Cookie + In-Memory)
+// Previene pérdidas de sesión en navegadores móviles (iOS Safari, in-app browsers de WhatsApp)
+const safeStorage = {
+  get(key) {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const val = localStorage.getItem(key);
+        if (val !== null) return val;
+      }
+    } catch (e) {}
+    if (typeof document !== 'undefined') {
+      const match = document.cookie.match(new RegExp('(^|;\\s*)' + key + '=([^;]*)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    }
+    return null;
+  },
+  set(key, val) {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(key, val);
+      }
+    } catch (e) {}
+    if (typeof document !== 'undefined') {
+      try {
+        document.cookie = `${key}=${encodeURIComponent(val)};max-age=31536000;path=/;SameSite=Lax`;
+      } catch (e) {}
+    }
+  },
+  remove(key) {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(key);
+      }
+    } catch (e) {}
+    if (typeof document !== 'undefined') {
+      try {
+        document.cookie = `${key}=;max-age=0;path=/;SameSite=Lax`;
+      } catch (e) {}
+    }
+  }
+};
 
 const { createApp, ref, computed, watch, onMounted } = Vue;
 
@@ -10,22 +52,22 @@ const app = createApp({
 
     // 2. Estado de Navegacion y Tema
     const getInitialDarkMode = () => {
-      const saved = localStorage.getItem('detox_dark_mode');
+      const saved = safeStorage.get('detox_dark_mode');
       if (saved !== null) return saved === 'true';
       return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     };
     const isDarkMode = ref(getInitialDarkMode());
-    const activeTab = ref(localStorage.getItem('detox_active_tab') || 'dia');
+    const activeTab = ref(safeStorage.get('detox_active_tab') || 'dia');
 
     // 3. Estado de Gamificacion, Fecha de Inicio y Seguimiento
-    const selectedDay = ref(parseInt(localStorage.getItem('detox_selected_day') || '1', 10));
-    const startMode = ref(localStorage.getItem('detox_start_mode') || 'monodieta3'); // monodieta3, monodieta2, monodieta1, directo
-    const startDate = ref(localStorage.getItem('detox_start_date') || null); // YYYY-MM-DD
+    const selectedDay = ref(parseInt(safeStorage.get('detox_selected_day') || '1', 10));
+    const startMode = ref(safeStorage.get('detox_start_mode') || 'monodieta3'); // monodieta3, monodieta2, monodieta1, directo
+    const startDate = ref(safeStorage.get('detox_start_date') || null); // YYYY-MM-DD
     const showDateSettings = ref(false);
-    const completedMissions = ref(JSON.parse(localStorage.getItem('detox_completed_missions') || '{}'));
-    const shoppingChecked = ref(JSON.parse(localStorage.getItem('detox_shopping_checked') || '{}'));
-    const unlockedBadges = ref(JSON.parse(localStorage.getItem('detox_unlocked_badges') || '[]'));
-    const xp = ref(parseInt(localStorage.getItem('detox_xp') || '0', 10));
+    const completedMissions = ref(JSON.parse(safeStorage.get('detox_completed_missions') || '{}'));
+    const shoppingChecked = ref(JSON.parse(safeStorage.get('detox_shopping_checked') || '{}'));
+    const unlockedBadges = ref(JSON.parse(safeStorage.get('detox_unlocked_badges') || '[]'));
+    const xp = ref(parseInt(safeStorage.get('detox_xp') || '0', 10));
 
     // 4. Filtros de Recetas
     const recipeSearch = ref('');
@@ -54,21 +96,44 @@ const app = createApp({
     const KV_BUCKET = 'EE7impjfrWvHaAhuDDuBvU';
     const KV_BASE_URL = `https://kvdb.io/${KV_BUCKET}/`;
 
-    // Detectar clave de sincronización por URL (?sync=...) o por LocalStorage
+    // Detectar clave de sincronización por URL (?sync=...), Hash (#sync=...) o Storage
     const getInitialSyncKey = () => {
+      let key = null;
       if (typeof window !== 'undefined') {
+        // 1. Prioridad: parámetro en query string
         const urlParams = new URLSearchParams(window.location.search);
         const urlKey = urlParams.get('sync');
         if (urlKey && urlKey.trim()) {
-          const cleanKey = urlKey.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
-          localStorage.setItem('detox_sync_key', cleanKey);
-          // Limpiar la URL sin recargar
-          const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-          window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
-          return cleanKey;
+          key = urlKey.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+        }
+
+        // 2. Hash fallback (#sync=...)
+        if (!key && window.location.hash) {
+          const hashMatch = window.location.hash.match(/sync=([A-Z0-9_-]+)/i);
+          if (hashMatch && hashMatch[1]) {
+            key = hashMatch[1].trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+          }
+        }
+
+        // 3. Fallback a almacenamiento seguro (LocalStorage + Cookies)
+        if (!key) {
+          key = safeStorage.get('detox_sync_key');
+        }
+
+        // Si tenemos clave, asegurar persistencia en Storage y en la URL para evitar des-sincronizaciones al cerrar pestañas
+        if (key) {
+          safeStorage.set('detox_sync_key', key);
+          try {
+            const currentUrl = new URL(window.location.href);
+            if (currentUrl.searchParams.get('sync') !== key) {
+              currentUrl.searchParams.set('sync', key);
+              window.history.replaceState({ path: currentUrl.href }, '', currentUrl.href);
+            }
+          } catch (e) {}
+          return key;
         }
       }
-      return localStorage.getItem('detox_sync_key') || null;
+      return safeStorage.get('detox_sync_key') || null;
     };
 
     const syncKey = ref(getInitialSyncKey());
@@ -106,6 +171,7 @@ const app = createApp({
       if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
 
       syncDebounceTimer = setTimeout(async () => {
+        if (isPulling) return;
         try {
           const payload = {
             version: 1,
@@ -142,46 +208,55 @@ const app = createApp({
     // Motor de Descarga de la Nube (Pull)
     const pullFromCloud = async (force = false) => {
       if (!syncKey.value) return;
+      isPulling = true; // Bloquea pushes inmediatos antes de consultar la nube
       try {
         syncStatus.value = 'syncing';
-        const res = await fetch(`${KV_BASE_URL}${syncKey.value}`);
+        // Cache buster para evitar respuestas cacheadas en iOS Safari
+        const res = await fetch(`${KV_BASE_URL}${syncKey.value}?_t=${Date.now()}`);
         if (res.status === 404) {
           syncStatus.value = 'synced';
-          pushToCloud();
+          isPulling = false;
+          // Solo inicializa la nube si se forzó la creación o si hay fecha de inicio local
+          if (force || startDate.value) {
+            pushToCloud();
+          }
           return;
         }
         if (!res.ok) {
           syncStatus.value = 'error';
+          isPulling = false;
           return;
         }
         const text = await res.text();
-        if (!text || text.trim() === '') return;
-        const data = JSON.parse(text);
+        if (!text || text.trim() === '') {
+          isPulling = false;
+          return;
+        }
+        const cloudData = JSON.parse(text);
 
-        isPulling = true;
-        if (data.startDate !== undefined) startDate.value = data.startDate;
-        if (data.selectedDay !== undefined && (!startDate.value || force)) selectedDay.value = data.selectedDay;
-        if (data.startMode !== undefined) startMode.value = data.startMode;
-        if (data.completedMissions !== undefined) completedMissions.value = data.completedMissions;
-        if (data.shoppingChecked !== undefined) shoppingChecked.value = data.shoppingChecked;
-        if (data.unlockedBadges !== undefined) unlockedBadges.value = data.unlockedBadges;
-        if (data.xp !== undefined) xp.value = data.xp;
+        if (cloudData.startDate !== undefined) startDate.value = cloudData.startDate;
+        if (cloudData.selectedDay !== undefined && (!startDate.value || force)) selectedDay.value = cloudData.selectedDay;
+        if (cloudData.startMode !== undefined) startMode.value = cloudData.startMode;
+        if (cloudData.completedMissions !== undefined) completedMissions.value = cloudData.completedMissions;
+        if (cloudData.shoppingChecked !== undefined) shoppingChecked.value = cloudData.shoppingChecked;
+        if (cloudData.unlockedBadges !== undefined) unlockedBadges.value = cloudData.unlockedBadges;
+        if (cloudData.xp !== undefined) xp.value = cloudData.xp;
 
-        // Persistir copia local
-        if (data.startDate) localStorage.setItem('detox_start_date', data.startDate);
-        else localStorage.removeItem('detox_start_date');
-        localStorage.setItem('detox_completed_missions', JSON.stringify(completedMissions.value));
-        localStorage.setItem('detox_shopping_checked', JSON.stringify(shoppingChecked.value));
-        localStorage.setItem('detox_unlocked_badges', JSON.stringify(unlockedBadges.value));
-        localStorage.setItem('detox_xp', xp.value);
+        // Persistir copia local segura
+        if (cloudData.startDate) safeStorage.set('detox_start_date', cloudData.startDate);
+        else safeStorage.remove('detox_start_date');
+        safeStorage.set('detox_completed_missions', JSON.stringify(completedMissions.value));
+        safeStorage.set('detox_shopping_checked', JSON.stringify(shoppingChecked.value));
+        safeStorage.set('detox_unlocked_badges', JSON.stringify(unlockedBadges.value));
+        safeStorage.set('detox_xp', String(xp.value));
 
         syncStatus.value = 'synced';
         lastSyncTime.value = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        setTimeout(() => { isPulling = false; }, 300);
       } catch (err) {
         console.warn('Sync pull error:', err);
         syncStatus.value = 'error';
-        isPulling = false;
+      } finally {
+        setTimeout(() => { isPulling = false; }, 400);
       }
     };
 
@@ -201,9 +276,18 @@ const app = createApp({
       if (!key || !key.trim()) return;
       const cleanKey = key.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
       syncKey.value = cleanKey;
-      localStorage.setItem('detox_sync_key', cleanKey);
+      safeStorage.set('detox_sync_key', cleanKey);
       syncCodeInput.value = '';
       syncErrorMsg.value = '';
+
+      // Asegurar parámetro sync en la URL para persistencia ante cierres de navegador
+      if (typeof window !== 'undefined') {
+        try {
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.set('sync', cleanKey);
+          window.history.replaceState({ path: currentUrl.href }, '', currentUrl.href);
+        } catch (e) {}
+      }
 
       if (isNew) {
         pushToCloud();
@@ -220,9 +304,16 @@ const app = createApp({
     const disconnectSync = () => {
       if (window.confirm('¿Desvincular la sincronización en la nube? Este dispositivo volverá a funcionar en modo local independiente.')) {
         syncKey.value = null;
-        localStorage.removeItem('detox_sync_key');
+        safeStorage.remove('detox_sync_key');
         syncStatus.value = 'local';
         showSyncModal.value = false;
+        if (typeof window !== 'undefined') {
+          try {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.delete('sync');
+            window.history.replaceState({ path: currentUrl.href }, '', currentUrl.href);
+          } catch (e) {}
+        }
         triggerToast('Dispositivo desvinculado de la nube.');
       }
     };
@@ -250,9 +341,9 @@ const app = createApp({
     };
 
     // Persistencia reactiva a LocalStorage y Nube
-    watch(activeTab, (val) => localStorage.setItem('detox_active_tab', val));
+    watch(activeTab, (val) => safeStorage.set('detox_active_tab', val));
     watch(isDarkMode, (val) => {
-      localStorage.setItem('detox_dark_mode', val);
+      safeStorage.set('detox_dark_mode', String(val));
       if (val) {
         document.documentElement.classList.add('dark');
       } else {
@@ -260,32 +351,32 @@ const app = createApp({
       }
     });
     watch(selectedDay, (val) => {
-      localStorage.setItem('detox_selected_day', val);
+      safeStorage.set('detox_selected_day', String(val));
       pushToCloud();
     });
     watch(startMode, (val) => {
-      localStorage.setItem('detox_start_mode', val);
+      safeStorage.set('detox_start_mode', val);
       pushToCloud();
     });
     watch(startDate, (val) => {
-      if (val) localStorage.setItem('detox_start_date', val);
-      else localStorage.removeItem('detox_start_date');
+      if (val) safeStorage.set('detox_start_date', val);
+      else safeStorage.remove('detox_start_date');
       pushToCloud();
     });
     watch(completedMissions, (val) => {
-      localStorage.setItem('detox_completed_missions', JSON.stringify(val));
+      safeStorage.set('detox_completed_missions', JSON.stringify(val));
       pushToCloud();
     }, { deep: true });
     watch(shoppingChecked, (val) => {
-      localStorage.setItem('detox_shopping_checked', JSON.stringify(val));
+      safeStorage.set('detox_shopping_checked', JSON.stringify(val));
       pushToCloud();
     }, { deep: true });
     watch(unlockedBadges, (val) => {
-      localStorage.setItem('detox_unlocked_badges', JSON.stringify(val));
+      safeStorage.set('detox_unlocked_badges', JSON.stringify(val));
       pushToCloud();
     }, { deep: true });
     watch(xp, (val) => {
-      localStorage.setItem('detox_xp', val);
+      safeStorage.set('detox_xp', String(val));
       pushToCloud();
     });
 
@@ -389,14 +480,13 @@ const app = createApp({
         if (resetAll) {
           completedMissions.value = {};
           shoppingChecked.value = {};
-          streakDays.value = 0;
           xp.value = 0;
           unlockedBadges.value = [];
-          localStorage.removeItem('detox_completed_missions');
-          localStorage.removeItem('detox_shopping_checked');
-          localStorage.removeItem('detox_streak');
-          localStorage.removeItem('detox_xp');
-          localStorage.removeItem('detox_unlocked_badges');
+          safeStorage.remove('detox_completed_missions');
+          safeStorage.remove('detox_shopping_checked');
+          safeStorage.remove('detox_streak');
+          safeStorage.remove('detox_xp');
+          safeStorage.remove('detox_unlocked_badges');
           triggerToast('🔄 Reto reiniciado por completo a foja cero.');
         } else {
           triggerToast('🔄 Fecha reiniciada. Ya podés elegir una nueva fecha de arranque.');
@@ -780,7 +870,16 @@ const app = createApp({
         unlockedBadges.value = [];
         xp.value = 0;
         selectedDay.value = 1;
-        localStorage.clear();
+        startDate.value = null;
+        [
+          'detox_completed_missions',
+          'detox_shopping_checked',
+          'detox_unlocked_badges',
+          'detox_xp',
+          'detox_selected_day',
+          'detox_start_date',
+          'detox_start_mode'
+        ].forEach(k => safeStorage.remove(k));
         triggerToast("🔄 Progreso reiniciado con éxito.");
       }
     };

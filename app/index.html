@@ -21,10 +21,16 @@
 
   <!-- Early Dark Mode init to prevent FOUC -->
   <script>
-    if (localStorage.getItem('detox_dark_mode') === 'true' || (!('detox_dark_mode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    try {
+      if (localStorage.getItem('detox_dark_mode') === 'true' || (!('detox_dark_mode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (e) {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
     }
   </script>
 
@@ -875,8 +881,8 @@
       <!-- ========================================== -->
       <section v-show="activeTab === 'sos'" class="space-y-5">
         
-        <!-- Segmented Switch Móvil/Desktop para SOS vs Taller -->
-        <div class="flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-md mx-auto">
+        <!-- Segmented Switch Móvil para SOS vs Taller (Oculto en desktop donde ya existen las pestañas dedicadas) -->
+        <div class="md:hidden flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-md mx-auto mb-2">
           <button @click="activeTab = 'sos'" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100">
             <span>🆘</span> <span>Botiquín SOS</span>
           </button>
@@ -938,8 +944,8 @@
       <!-- ========================================== -->
       <section v-show="activeTab === 'taller'" class="space-y-5">
         
-        <!-- Segmented Switch Móvil/Desktop para SOS vs Taller -->
-        <div class="flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-md mx-auto">
+        <!-- Segmented Switch Móvil para SOS vs Taller (Oculto en desktop donde ya existen las pestañas dedicadas) -->
+        <div class="md:hidden flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-md mx-auto mb-2">
           <button @click="activeTab = 'sos'" class="flex-1 py-2 rounded-xl text-xs font-medium transition-all text-center flex items-center justify-center gap-1.5 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200">
             <span>🆘</span> <span>Botiquín SOS</span>
           </button>

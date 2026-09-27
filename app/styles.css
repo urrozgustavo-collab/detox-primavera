@@ -23,19 +23,27 @@ button, a, input, select {
   touch-action: manipulation;
 }
 
-html, body {
+html {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, 0.4) rgba(0, 0, 0, 0.03);
+}
+
+html.dark {
+  scrollbar-color: rgba(148, 163, 184, 0.4) rgba(255, 255, 255, 0.03);
+}
+
+body {
   overflow-x: hidden;
-  max-width: 100vw;
   width: 100%;
+  min-height: 100vh;
 }
 
 #app {
-  overflow-x: hidden;
-  max-width: 100vw;
   width: 100%;
+  min-height: 100vh;
   min-width: 0;
 }
 
@@ -93,23 +101,40 @@ html, body {
   animation: badge-glow 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Barra de scroll limpia */
+/* Barra de scroll moderna, visible y 100% interactiva en desktop */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.2);
+  background: rgba(100, 116, 139, 0.4);
   border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 0.7);
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.2);
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(203, 213, 225, 0.7);
 }
 
 /* Checkbox estilizado */
