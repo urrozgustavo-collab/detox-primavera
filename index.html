@@ -1,0 +1,2375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Detox de Primavera — App & Tracker 21 Días</title>
+  
+  <!-- Web App & PWA Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Detox 21D">
+  <meta name="theme-color" content="#283728">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Early Dark Mode init to prevent FOUC -->
+  <script>
+    if (localStorage.getItem('detox_dark_mode') === 'true' || (!('detox_dark_mode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            sage: {
+              50: '#f4f7f4',
+              100: '#e5ede5',
+              200: '#cbdbcb',
+              300: '#a3bea3',
+              400: '#7a9f7a',
+              500: '#5a825a',
+              600: '#466746',
+              700: '#385238',
+              800: '#2f422f',
+              900: '#283728',
+              950: '#141d14',
+            },
+            warmcream: '#FAF8F5',
+            earthslate: '#1E2923',
+          },
+          boxShadow: {
+            '2xs': '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+            'xs': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+          },
+          backdropBlur: {
+            'xs': '2px',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Vue.js 3 CDN (Full build with template compiler) -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+  <!-- Estilos y Base de Datos Local -->
+  <style>
+/* Estilos personalizados y tema botánico - Detox de Primavera */
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-sage-50: #f4f7f4;
+  --color-sage-100: #e5ede5;
+  --color-sage-200: #cbdbcb;
+  --color-sage-600: #496b49;
+  --color-sage-700: #3b563b;
+  --color-sage-900: #1f301f;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+[v-cloak] {
+  display: none !important;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, a, input, select {
+  touch-action: manipulation;
+}
+
+html, body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: contain;
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+#app {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Safe areas para celulares modernos */
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
+}
+
+.pt-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), 8px);
+}
+
+/* Animación para Bottom Sheets en móviles */
+@keyframes slideUpSheet {
+  from {
+    transform: translateY(100%);
+    opacity: 0.9;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUpSheet 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Microinteracciones y transiciones */
+.transition-card {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.transition-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Ocultar barra de scroll manteniendo navegación táctil/horizontal */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Animación de logro desbloqueado */
+@keyframes badge-glow {
+  0% { transform: scale(0.95); opacity: 0.85; box-shadow: 0 0 0 rgba(245, 158, 11, 0); }
+  50% { transform: scale(1.04); box-shadow: 0 0 22px rgba(245, 158, 11, 0.45); }
+  100% { transform: scale(1); opacity: 1; box-shadow: 0 0 8px rgba(245, 158, 11, 0.2); }
+}
+
+.animate-badge {
+  animation: badge-glow 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Barra de scroll limpia */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.2);
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+/* Checkbox estilizado */
+.custom-checkbox {
+  appearance: none;
+  background-color: transparent;
+  margin: 0;
+  font: inherit;
+  color: currentColor;
+  width: 1.25em;
+  height: 1.25em;
+  border: 2px solid currentColor;
+  border-radius: 0.375em;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.custom-checkbox::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1em 1em currentColor;
+  transform-origin: center;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+.custom-checkbox:checked::before {
+  transform: scale(1);
+}
+
+/* Modo Cocina (Full Screen) */
+.cooking-mode-overlay {
+  backdrop-filter: blur(16px);
+}
+
+/* Soporte de Impresión */
+@media print {
+  header, nav, .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+</style>
+  <script>
+// Base de datos oficial del Taller Detox de Primavera - Isa Caparra
+// Extraído de las guías y comunicaciones oficiales (Septiembre 2026)
+
+const DETOX_DATA = {
+  info: {
+    title: "Detox de Primavera",
+    guia: "Isabel Caparra",
+    contactoEmail: "isabelcaparramtc@gmail.com",
+    contactoWhatsApp: "+54 9 11 5709-5441",
+    grupoWhatsAppUrl: "https://chat.whatsapp.com/DkP14EhdEqk0A7rFz6jcap?s=cl&p=a&mlu=4&ilr=4",
+    meetUrl: "https://meet.google.com/jgi-psdh-aak",
+    meetFechas: [
+      { fecha: "Lunes 28 de Septiembre 2026", hora: "18:30 hs", motivo: "Resolución de dudas antes de empezar" },
+      { fecha: "Miércoles 14 de Octubre 2026", hora: "18:30 hs", motivo: "Encuentro de seguimiento y consultas en vivo" }
+    ],
+    videos: [
+      { id: "4-anhQirqug", titulo: "Primer encuentro grabado (Esencial antes de empezar)", url: "https://youtu.be/4-anhQirqug" },
+      { id: "ap8eZGPi4-Y", titulo: "Segundo encuentro grabado", url: "https://youtu.be/ap8eZGPi4-Y" }
+    ],
+    productores: [
+      { nombre: "Enzo (Verduras orgánicas y Salsa Shoyu MOA)", tel: "11 4065-0088", nota: "Venta directa del productor, mitad de precio que en dietéticas." },
+      { nombre: "Soledad - Kalimera Alimentos", tel: "+54 9 11 5881-2907", nota: "Panes de sarraceno aptos, chucrut y vinagre de manzana vivo a domicilio." },
+      { nombre: "Tienda Macrobiótica Mario Levenson", tel: "11 7365-8388", ig: "@genmail.tiendanatural", nota: "Barrio Almagro. Shoyu MOA y alimentos macrobióticos." },
+      { nombre: "Círculo Once", tel: "11 5134-6546", ig: "@circuloonce", nota: "Alimentos naturales y fermentos seleccionados." }
+    ]
+  },
+
+  gamification: {
+    xpPerMission: 15,
+    xpPerDayComplete: 50,
+    dailyMissions: [
+      { id: "limon", text: "Agua tibia con 1/2 limón en ayunas", icon: "citrus", tip: "Si sos friolento, agregale pizca de jengibre." },
+      { id: "masticacion", text: "Masticar al menos 20 veces por bocado", icon: "utensils", tip: "Comer siempre sentado, tranquilo, no parado ni manejando." },
+      { id: "infusion", text: "2 a 4 tazas de infusión depurativa (ortiga/diente de león)", icon: "coffee", tip: "Sin endulzar nunca." },
+      { id: "no_estimulantes", text: "Cero café, yerba mate tradicional, alcohol ni azúcar", icon: "shield-alert", tip: "Si necesitás bombillear, usá mate 100% de yuyos." },
+      { id: "hidratacion", text: "Termo de agua tibia a lo largo del día", icon: "droplet", tip: "Tonifica el sistema digestivo y drena toxinas." },
+      { id: "plato_verde", text: "Al menos una comida abundante en crucíferas o verdes", icon: "leaf", tip: "Brócoli, coliflor, espinaca o repollitos al vapor/nituke." }
+    ],
+    badges: [
+      { id: "inicio", title: "Primer Paso", desc: "Completaste las misiones del Día 1", icon: "seedling", requiredDays: 1, xp: 50 },
+      { id: "monodieta", title: "Purificación Inicial", desc: "Superaste los días de manzana y arroz integral", icon: "apple", requiredDays: 3, xp: 100 },
+      { id: "adios_cafeina", title: "Libre de Estimulantes", desc: "3 días consecutivos sin café ni yerba mate tradicional", icon: "zap-off", requiredDays: 3, xp: 100 },
+      { id: "semana1", title: "Semana Impecable", desc: "Completaste los primeros 7 días de detox", icon: "flame", requiredDays: 7, xp: 200 },
+      { id: "maestro_nituke", title: "Chef Consciente", desc: "14 días comiendo platos limpios y masticando con presencia", icon: "chef-hat", requiredDays: 14, xp: 300 },
+      { id: "detox_champion", title: "Renacimiento de Primavera", desc: "Completaste los 21 días de detox con éxito", icon: "trophy", requiredDays: 21, xp: 500 }
+    ]
+  },
+
+  cookingMethods: [
+    {
+      id: "nituke",
+      nombre: "Cocimiento sin agua (Nituke)",
+      desc: "Cocción tradicional en cacerola pesada tapada herméticamente a fuego pelusa o con difusor.",
+      pasos: [
+        "Poner 2 cucharadas soperas de agua en una cacerola de fondo grueso.",
+        "Agregar las verduras cortadas (ej. manzanas, zanahorias, cebollas) con una pizca de sal marina.",
+        "Tapar bien y cocinar a fuego ultra bajo (fuego pelusa) durante 35-40 minutos.",
+        "El vapor generado en el fondo cocina los alimentos concentrando sus azúcares naturales."
+      ]
+    },
+    {
+      id: "vapor",
+      nombre: "Cocción al Vapor",
+      desc: "La técnica reina para conservar vitaminas hidrosolubles y clorofila.",
+      pasos: [
+        "Usar vaporera de bambú, canasta de acero o rejilla sobre agua hirviendo sin que toque los vegetales.",
+        "Crucíferas (brócoli, coliflor): 5 a 7 minutos para que queden crocantes y de verde brillante.",
+        "Hojas verdes (espinaca, kale): 2 a 3 minutos apenas ablandadas.",
+        "Aliñar una vez servido con aceite de oliva crudo y sal marina."
+      ]
+    },
+    {
+      id: "salteado_agua",
+      nombre: "Salteado en Agua (Sin Aceite)",
+      desc: "Prohibido saltear en aceite caliente durante el detox; se saltea con cucharadas de agua o caldo.",
+      pasos: [
+        "Calentar sartén o wok a fuego medio-alto.",
+        "Agregar los vegetales picados y 2 cucharadas de agua o caldo.",
+        "Revolver constantemente para que no se pegue; si se seca antes de dorar, agregar otra cucharada de agua.",
+        "Al retirar del fuego y servir en el plato, agregar un hilo de aceite de oliva crudo prensado en frío."
+      ]
+    },
+    {
+      id: "legumbres_digestivas",
+      nombre: "Cocción Digestiva de Legumbres",
+      desc: "Protocolo para evitar gases y digestiones pesadas con porotos mung o aduki.",
+      pasos: [
+        "Remojo obligatorio: dejar las legumbres en abundante agua entre 8 y 12 horas.",
+        "Desechar completamente el agua de remojo y enjuagar bien.",
+        "Cocinar en olla con agua fresca que duplique el volumen, agregando un trozo de alga kombu o laurel.",
+        "Espumar continuamente los primeros 10 minutos de hervor para retirar saponinas.",
+        "Agregar la sal SIEMPRE al final de la cocción, cuando el grano ya esté tierno."
+      ]
+    }
+  ],
+
+  recipes: [
+    {
+      id: "caldo-detox",
+      titulo: "Caldo Détox Alcalinizante",
+      categoria: "caldos",
+      tiempo: "35 min",
+      metodo: "Hervido suave tapado",
+      ingredientes: [
+        "4 pencas de apio cortadas",
+        "2 dientes de ajo enteros aplastados",
+        "1 a 2 puerros cortados",
+        "1/2 alcaucil (si hay en estación)",
+        "1 taza de repollo blanco en tiras",
+        "1 o 2 zanahorias en rodajas",
+        "1 puñado de perejil fresco",
+        "1 manzana entera con corazón y semillas",
+        "Sal marina a gusto"
+      ],
+      pasos: [
+        "Colocar todas las verduras y la manzana en una olla grande.",
+        "Llenar con agua fría duplicando holgadamente el volumen de los vegetales (unos 5 cm por encima).",
+        "Hervir tapado a fuego mínimo durante 35-40 minutos hasta que el caldo tome color y sabor profundo.",
+        "Colar el líquido y descartar las verduras (o usarlas para compost).",
+        "Tomar caliente o tibio a lo largo del día o antes de las comidas."
+      ],
+      tip: "La manzana aporta pectina y equilibra la acidez mineral del caldo."
+    },
+    {
+      id: "nituke-manzana",
+      titulo: "Nituke de Manzana (Desayuno / Merienda)",
+      categoria: "desayunos",
+      tiempo: "40 min",
+      metodo: "Nituke",
+      ingredientes: [
+        "3 o 4 manzanas rojas o verdes peladas y en cubos",
+        "2 cucharadas soperas de agua",
+        "1 pizca de sal marina",
+        "Opcional: Almendras tostadas picadas o semillas de lino molidas"
+      ],
+      pasos: [
+        "Calentar cacerola de fondo grueso con las 2 cucharadas de agua.",
+        "Agregar las manzanas y la pizca de sal.",
+        "Tapar herméticamente y dejar 40 minutos a fuego pelusa.",
+        "Cuanto más tiempo cocine, más dulce se vuelve por concentración natural.",
+        "Servir tibio espolvoreado con almendras picadas."
+      ],
+      tip: "Es el desayuno ideal para la monodieta y para personas friolentas."
+    },
+    {
+      id: "hummus-mung",
+      titulo: "Hummus de Porotos Mung",
+      categoria: "dips",
+      tiempo: "15 min (con porotos ya cocidos)",
+      metodo: "Procesado en frío",
+      ingredientes: [
+        "2 tazas de porotos mung cocidos y tiernos",
+        "1/4 a 1/2 taza del líquido de cocción del mung",
+        "1 diente de ajo pequeño",
+        "1 puñado de hojas frescas de albahaca",
+        "1 cucharada de aceite de oliva extra virgen",
+        "Gotitas de jugo de limón",
+        "Sal marina a gusto"
+      ],
+      pasos: [
+        "Colocar los porotos mung tibios en procesadora o vaso de minipimmer.",
+        "Sumar el ajo, albahaca, aceite de oliva, limón y sal.",
+        "Procesar agregando de a poco el líquido de cocción hasta lograr una textura cremosa y untable.",
+        "Servir con un chorrito de oliva crudo y páprika o sésamo por encima."
+      ],
+      tip: "El poroto mung no genera flatulencias como otras legumbres y es altamente depurativo."
+    },
+    {
+      id: "mayonesa-zanahoria",
+      titulo: "Mayonesa Suave de Zanahoria",
+      categoria: "dips",
+      tiempo: "20 min",
+      metodo: "Hervido + Procesado",
+      ingredientes: [
+        "4 zanahorias peladas",
+        "1 trozo pequeño de zapallo anco (aporta cremosidad)",
+        "1/2 puerro o trozo de cebolla",
+        "1 diente de ajo",
+        "1 cucharada de aceite de oliva crudo",
+        "Abundante jugo de limón fresco",
+        "Sal marina a gusto",
+        "Opcional: 3 o 4 aceitunas negras descarozadas"
+      ],
+      pasos: [
+        "Hervir las zanahorias, zapallo y puerro desde agua fría hasta que estén super tiernos.",
+        "Reservar el líquido de cocción (¡es muy dulce y sabroso!).",
+        "Procesar las verduras con el ajo, aceite de oliva, limón, sal y el líquido de cocción necesario para emulsionar.",
+        "Guardar en frasco de vidrio en heladera hasta por 4 días."
+      ],
+      tip: "Excelente aliño diluido con más limón para ensaladas de hojas amargas."
+    },
+    {
+      id: "babaganoush",
+      titulo: "Babaganoush Ahumado sin Aceite Cocido",
+      categoria: "dips",
+      tiempo: "25 min",
+      metodo: "Asado a la llama",
+      ingredientes: [
+        "2 berenjenas medianas enteras",
+        "1/2 diente de ajo rallado",
+        "Jugo de 1/2 limón",
+        "1 cucharada de aceite de oliva virgen extra en crudo",
+        "Sal marina y pizca de comino"
+      ],
+      pasos: [
+        "Colocar las berenjenas directo sobre el fuego de la hornalla, rotándolas con pinza hasta carbonizar la piel por completo y sentirlas blandas.",
+        "Meter en una bolsa limpia cerrada unos 10 minutos para que el vapor ayude a desprender la piel.",
+        "Pelar retirando los restos carbonizados y quedándose con la pulpa suave.",
+        "Pisar con tenedor junto con el ajo, limón, sal marina y oliva crudo."
+      ],
+      tip: "El sabor ahumado reemplaza la necesidad de salsas pesadas."
+    },
+    {
+      id: "queso-caju",
+      titulo: "Queso Untable de Castañas de Cajú",
+      categoria: "dips",
+      tiempo: "10 min + remojo",
+      metodo: "Remojo + Licuado",
+      ingredientes: [
+        "1 taza de castañas de cajú crudas sin sal (remojadas 8 hs)",
+        "1/4 a 1/2 taza de agua limpia de filtro",
+        "1 pizca de sal marina",
+        "Gotitas de limón",
+        "Opcional: Levadura nutricional o hierbas frescas picadas"
+      ],
+      pasos: [
+        "Desechar el agua de remojo de las castañas de cajú.",
+        "Licuar a potencia máxima con el agua fresca, sal y limón hasta que no queden grumos y parezca queso crema.",
+        "Guardar en frasco cerrado en la heladera hasta por 5 días."
+      ],
+      tip: "Si le agregás 1 cápsula de probiótico y lo dejás 12 hs a temperatura ambiente, fermenta en queso probiótico ácido."
+    },
+    {
+      id: "galletas-yamani",
+      titulo: "Maravillosas Galletas de Arroz Yamaní",
+      categoria: "panificados",
+      tiempo: "30 min",
+      metodo: "Horno 180°C",
+      ingredientes: [
+        "1 taza de arroz yamaní cocido pasado (1 taza arroz x 3 de agua)",
+        "1 taza de harina de arroz integral",
+        "4 cucharadas de semillas de lino",
+        "2 cucharadas de aceite de oliva",
+        "Chorrito de agua tibia (apenas para unir)",
+        "Sal marina y hierbas secas (orégano, tomillo o cúrcuma)"
+      ],
+      pasos: [
+        "Amasar el arroz cocido con las manos para que libere el almidón y se pegotee.",
+        "Mezclar con la harina de arroz, lino, aceite, sal y condimentos.",
+        "Agregar apenas el agua necesaria para armar una masa unida.",
+        "Formar bolitas pequeñas y aplastarlas bien finitas sobre placa para horno con papel o silicona.",
+        "Hornear a 180°C durante 10-12 minutos hasta que estén doradas y crocantes."
+      ],
+      tip: "Reemplazo crujiente ideal para las tostadas industriales de paquete."
+    },
+    {
+      id: "pan-centeno-masamadre",
+      titulo: "Pan de Centeno 100% de Masa Madre",
+      categoria: "panificados",
+      tiempo: "Leudado largo + 50 min horno",
+      metodo: "Fermentación natural y horneado",
+      ingredientes: [
+        "1 kg de harina de centeno integral pura",
+        "2 tazas de fermento de masa madre activo",
+        "1 cucharada colmada de sal marina",
+        "800 ml de agua tibia"
+      ],
+      pasos: [
+        "Mezclar la harina con la sal marina e integrar el fermento y el agua.",
+        "Amasar (queda una textura pegajosa típica del centeno).",
+        "Dejar levar entre 8 y 12 horas en bowl cubierto a temperatura ambiente.",
+        "Dar forma a dos panes de molde aceitados y dejar reposar 2 horas más.",
+        "Hornear a fuego medio (180°C) durante 50 minutos. Está listo cuando suena hueco al golpear la base."
+      ],
+      tip: "Si no tenés tiempo para hornearlo, compralo en locales como Hausbrot o Le Pain Quotidien, cortalo en rodajas y freezalo."
+    },
+    {
+      id: "chucrut-casero",
+      titulo: "Chucrut Probiótico Vivo",
+      categoria: "fermentos",
+      tiempo: "20 min prep + 21 días fermento",
+      metodo: "Fermentación láctica anaeróbica",
+      ingredientes: [
+        "1 repollo agroecológico (blanco o morado)",
+        "Sal marina (20 a 25 g por cada kilo de repollo picado, aprox 2% a 2.5%)"
+      ],
+      pasos: [
+        "Retirar y reservar intactas un par de hojas externas limpias del repollo.",
+        "Picar el repollo muy finito en tiras y pesarlo.",
+        "Pesar el 2% de sal marina correspondiente y mezclar con el repollo picado.",
+        "Amasar intensamente con las manos durante 5-8 minutos hasta que libere abundante líquido (salmuera propia).",
+        "Envasar en frasco de vidrio bien limpio, empujando con el puño para que no queden burbujas de aire.",
+        "Cubrir con las hojas exteriores reservadas y poner un peso para que todo quede sumergido bajo el líquido.",
+        "Tapar y dejar fermentar en oscuridad a temperatura ambiente por 21 a 28 días antes de llevar a heladera."
+      ],
+      tip: "1 cucharadita diaria antes de almorzar aporta billones de lactobacilos para restaurar la microbiota."
+    },
+    {
+      id: "leche-almendras",
+      titulo: "Leche Fresca de Almendras",
+      categoria: "leches",
+      tiempo: "10 min + remojo previo",
+      metodo: "Licuado + Filtrado en tela",
+      ingredientes: [
+        "100 g de almendras crudas (remojadas 8 a 12 hs)",
+        "1 litro de agua de filtro limpia",
+        "Opcional: pizca de sal marina o canela"
+      ],
+      pasos: [
+        "Tirar el agua de remojo de las almendras.",
+        "Poner las almendras en licuadora con el litro de agua fresca.",
+        "Licuar a potencia máxima durante 2 minutos hasta que el líquido quede blanco y cremoso.",
+        "Colar a través de una bolsa de tela para leches vegetales o colador ultra fino, apretando bien la pulpa.",
+        "Guardar en botella de vidrio tapada en la heladera por 4 a 5 días."
+      ],
+      tip: "La pulpa sobrante (bagazo) se puede hornear para hacer galletas o sumar a masas."
+    },
+    {
+      id: "bowl-yamani-cruciferas",
+      titulo: "Bowl Alcalino de Yamaní y Crucíferas",
+      categoria: "almuerzos",
+      tiempo: "25 min",
+      metodo: "Vapor + Ensamble",
+      ingredientes: [
+        "1 taza de arroz yamaní cocido caliente",
+        "1 taza de ramilletes de brócoli al vapor (5 min)",
+        "1 taza de coliflor al vapor (6 min)",
+        "1/2 taza de porotos mung cocidos",
+        "1/4 de palta en láminas",
+        "1 cucharadita de chucrut vivo",
+        "Aliño: 1 cda de aceite de oliva crudo, gotas de salsa Shoyu MOA y jugo de limón"
+      ],
+      pasos: [
+        "Disponer el arroz yamaní tibio en la base de un bowl amplio.",
+        "Acomodar a los lados el brócoli, coliflor y porotos mung.",
+        "Sumar la palta fresca y la cucharada de chucrut vivo al costado.",
+        "Rociar con el aceite de oliva, la salsa Shoyu MOA y el jugo de limón antes de servir."
+      ],
+      tip: "El plato perfecto que reúne carbohidrato complejo, proteína vegetal, verde amargo y probiótico."
+    }
+  ],
+
+  foodTrafficLight: [
+    // VERDE: LIBRE Y PROMOVIDO
+    { nombre: "Arroz Yamaní e Integral", estado: "green", cat: "Granos", desc: "Base energética del plan. Sin gluten, drena toxinas y calma el tracto digestivo." },
+    { nombre: "Porotos Mung", estado: "green", cat: "Legumbres", desc: "La legumbre estrella del detox. Muy digestiva, alta en proteínas y de fácil asimilación." },
+    { nombre: "Brócoli y Coliflor", estado: "green", cat: "Verduras", desc: "Crucíferas ricas en sulforafano, compuesto clave para la fase 2 de detoxificación hepática." },
+    { nombre: "Repollitos de Bruselas", estado: "green", cat: "Verduras", desc: "Estimulante del hígado y la vesícula. Consumir al vapor o salteado en agua." },
+    { nombre: "Manzana verde y roja", estado: "green", cat: "Frutas", desc: "Rica en ácido málico y pectina; ablanda posibles cálculos y limpia el colon." },
+    { nombre: "Limón", estado: "green", cat: "Cítricos", desc: "Alcalinizante sistémico. Tomar en ayunas con agua tibia para activar el peristaltismo." },
+    { nombre: "Aceite de Oliva Extra Virgen", estado: "green", cat: "Grasas", desc: "Solo en crudo prensado en frío. Jamás cocinar con él durante el detox." },
+    { nombre: "Quinoa", estado: "green", cat: "Granos", desc: "Pseudocereal completo rico en aminoácidos. Lavar bien antes de hervir." },
+    { nombre: "Espinaca y Kale", estado: "green", cat: "Verduras", desc: "Clorofila pura para oxigenar la sangre. Preferir cocidas si sos friolento." },
+    { nombre: "Apio y Puerro", estado: "green", cat: "Verduras", desc: "Diuréticos y limpiadores renales por excelencia. Base infalible del caldo detox." },
+    { nombre: "Remolacha", estado: "green", cat: "Verduras", desc: "Tónico hepático y hematopoyético. Consumir al vapor, en sopa o en pickles." },
+    { nombre: "Chucrut y Kimchi vivos", estado: "green", cat: "Fermentos", desc: "Aporte de bacterias vivas sin pasteurizar para regenerar la flora intestinal." },
+    { nombre: "Infusión de Ortiga y Diente de León", estado: "green", cat: "Bebidas", desc: "El dúo fitoterápico maestro: riñón e hígado trabajando al unísono." },
+    { nombre: "Mate 100% de Hierbas (Yuyos)", estado: "green", cat: "Bebidas", desc: "Apto para bombillear. Menta, cedrón, manzanilla, llantén, cola de caballo, ortiga, cáscaras secas de cítricos y stevia pura en hoja. Cero yerba mate." },
+    { nombre: "Salsa Shoyu MOA", estado: "green", cat: "Condimentos", desc: "Fermentación natural de soja sin azúcar ni agregados químicos." },
+    { nombre: "Semillas de Lino y Chía", estado: "green", cat: "Semillas", desc: "Aporte de omega 3 y mucílago para regular el tránsito intestinal. Precaución: Evitar el lino en caso de flojera intestinal o diarrea aguda." },
+
+    // AMARILLO: MODERACIÓN O SITUACIONES PUNTUALES
+    { nombre: "Té verde, Banchá o Matcha", estado: "yellow", cat: "Bebidas", desc: "Permitido los primeros 2 o 3 días para mitigar abstinencia de café. No abusar." },
+    { nombre: "Pescado fresco (blanco o azul)", estado: "yellow", cat: "Proteínas", desc: "Válvula de escape: al mediodía al vapor si sentís debilidad o fatiga marcada." },
+    { nombre: "Huevos pastoriles", estado: "yellow", cat: "Proteínas", desc: "Máximo 1 o 2 al mediodía si no podés sostener el régimen vegetal estricto." },
+    { nombre: "Caldo de Huesos pastoril", estado: "yellow", cat: "Proteínas", desc: "Opción reconstituyente si hay frío interno o debilidad extrema." },
+    { nombre: "Pan 100% centeno masa madre", estado: "yellow", cat: "Panificados", desc: "Apto solo si es puro centeno con fermento natural, tostado en desayuno." },
+    { nombre: "Palta", estado: "yellow", cat: "Grasas", desc: "Grasa saludable pero concentrada. Limitar a 1/4 o 1/2 unidad por comida." },
+    { nombre: "Castañas de Cajú y Almendras", estado: "yellow", cat: "Frutos Secos", desc: "Para leches o quesos caseros. Siempre activadas/remojadas previamente." },
+    { nombre: "Agua de Mar", estado: "yellow", cat: "Suplementos", desc: "Solo a partir del día 7 y diluida (1/4 vaso de mar, 3/4 dulce). No al inicio." },
+    { nombre: "Chlorella y Espirulina", estado: "yellow", cat: "Suplementos", desc: "Microalgas depurativas opcionales. Empezar con 1/4 cdita. Contraindicadas en hipertiroidismo; chlorella es más templada y apta para friolentos." },
+    { nombre: "Carbón Activado", estado: "yellow", cat: "Suplementos", desc: "Uso puntual para gases, diarrea o crisis depurativa. Tomar antes de dormir, separado al menos 2 horas de cualquier medicación o suplemento para no anular su absorción." },
+    { nombre: "Wheatgrass (Pasto de Trigo)", estado: "yellow", cat: "Suplementos", desc: "Depurativo alcalinizante potente. De naturaleza muy fría: contraindicado si tenés síntomas de frío o manos/pies fríos." },
+
+    // ROJO: TOTALMENTE RESTRINGIDO / PROHIBIDO
+    { nombre: "Café de cualquier tipo", estado: "red", cat: "Estimulantes", desc: "Sobrecarga la fase 1 hepática, irrita la mucosa gástrica y agota suprarrenales." },
+    { nombre: "Yerba Mate tradicional", estado: "red", cat: "Estimulantes", desc: "Contiene mateína y acidez. Reemplazar por mate 100% de yuyos o té verde." },
+    { nombre: "Alcohol (vino, cerveza, licores)", estado: "red", cat: "Bebidas", desc: "Tóxico celular directo. Bloquea la autofagia y la depuración hepática." },
+    { nombre: "Lácteos y derivados animales", estado: "red", cat: "Lácteos", desc: "Leche, quesos, yogur, manteca. Generan mucosidad, inflamación y congestión biliar." },
+    { nombre: "Harinas blancas refinadas", estado: "red", cat: "Harinas", desc: "Pastas comunes, galletitas, panadería tradicional. Provocan picos glucémicos y fermentación intestinal." },
+    { nombre: "Azúcar y edulcorantes artificiales", estado: "red", cat: "Dulces", desc: "Alimentan bacterias patógenas y saturan el hígado graso. Las infusiones van sin endulzar." },
+    { nombre: "Carnes rojas, embutidos y pollo industrial", estado: "red", cat: "Proteínas", desc: "Sobrecargan el filtro hepatorrenal con purinas y ácido úrico. Si requerís proteína animal por debilidad, recurrí exclusivamente a pescado fresco o huevos pastoriles." },
+    { nombre: "Cocinar con aceite (Frituras)", estado: "red", cat: "Cocción", desc: "El aceite caliente genera acroleínas tóxicas. Solo cocinar con vapor, agua o nituke." },
+    { nombre: "Ultraprocesados y Margarinas", estado: "red", cat: "Industriales", desc: "Grasas trans y conservantes químicos que saturan el filtro del hígado." },
+    { nombre: "Gaseosas y jugos envasados", estado: "red", cat: "Bebidas", desc: "Cargados de jarabe de maíz de alta fructosa (JMAF) y químicos." }
+  ],
+
+  sosProtocols: [
+    {
+      sintoma: "Constipación / Estreñimiento",
+      icono: "alert-circle",
+      causa: "Reacción típica al retirar la cafeína y estimulantes irritantes del intestino.",
+      pasos: [
+        "1. Tomar 2 vasos de agua tibia al despertarte antes de cualquier alimento.",
+        "2. Probar 1 vaso de agua tibia con 1 cucharada sopera de vinagre de manzana vivo.",
+        "3. Tomar 1 cucharada sopera de aceite de oliva con limón antes del almuerzo.",
+        "4. Agua de lino: dejar 1 cda de semillas de lino en remojo en 1 taza de agua caliente toda la noche; beber a la mañana con semillas incluidas.",
+        "5. Si persiste: 1 cdita de semillas de psyllium en un vaso grande de agua en ayunas."
+      ]
+    },
+    {
+      sintoma: "Flojera intestinal / Diarrea",
+      icono: "wind",
+      causa: "Eliminación acelerada de toxinas o adaptación al brusco incremento de fibra.",
+      pasos: [
+        "1. Tomar 1 cucharadita de polvo de psyllium en 1/2 vaso de agua al levantarte (absorbe líquido y da volumen).",
+        "2. Tomar 1 comprimido de carbón activado antes de dormir (al menos 2 hs lejos de remedios o suplementos).",
+        "3. Reponer minerales: agua mineral con una pizca de sal marina o electrolitos naturales.",
+        "4. Beber infusiones templadas de manzanilla o hinojo para relajar la musculatura entérica."
+      ]
+    },
+    {
+      sintoma: "Sensación de frío corporal / Manos frías",
+      icono: "thermometer-snowflake",
+      causa: "Descenso de grasas densas y carnes; constitución 'Yin' o viento frío digestivo.",
+      pasos: [
+        "1. Cero jugos crudos ni ensaladas frías: todo lo que ingieras debe ser caliente o tibio.",
+        "2. Agregar una puntita de jengibre seco o canela al agua con limón matutina.",
+        "3. Basar las comidas en caldos espesos, sopas con mijo o arroz yamaní caliente y verduras al vapor/nituke.",
+        "4. Mantener un termo de agua caliente con infusión de albahaca y jengibre fresco a mano todo el día."
+      ]
+    },
+    {
+      sintoma: "Dolor de cabeza / Jaqueca / Mal humor",
+      icono: "frown",
+      causa: "Síndrome de abstinencia a la cafeína y movilización masiva de toxinas en sangre.",
+      pasos: [
+        "1. Tomar una taza de té verde suave, té banchá o matcha (amortigua el shock sin irritar).",
+        "2. Tomar infusión de menta fresca con jengibre o flores de lavanda para despejar la tensión.",
+        "3. Aumentar drásticamente la ingesta de agua tibia; la deshidratación agrava el dolor de cabeza.",
+        "4. Si es muy molesto, aplicar una toalla húmeda fría en la nuca y descansar en penumbra 20 minutos."
+      ]
+    },
+    {
+      sintoma: "Debilidad extrema / Falta de energía",
+      icono: "battery-low",
+      causa: "Falta de costumbre al déficit de grasa animal o aporte calórico bajo.",
+      pasos: [
+        "1. No pasar hambre: podés repetir las porciones de arroz yamaní, quinoa o porotos mung.",
+        "2. Sumar al mediodía un filete de pescado fresco cocido al vapor o a la plancha con espárragos.",
+        "3. Como alternativa, incorporar 1 o 2 huevos pastoriles pasados por agua o en revuelto sin aceite.",
+        "4. Tomar una taza de caldo de huesos largo antes de almorzar."
+      ]
+    },
+    {
+      sintoma: "Acidez / Reflujo gástrico",
+      icono: "flame",
+      causa: "Reajuste del pH gástrico al retirar estimulantes o consumo inadecuado de líquidos fríos durante las comidas.",
+      pasos: [
+        "1. Beber infusión templada de manzanilla, llantén o hinojo (efecto emoliente y calmante de la mucosa).",
+        "2. Evitar beber agua fría o exceso de líquido durante el almuerzo o cena (diluye el ácido clorhídrico).",
+        "3. Priorizar preparaciones cocidas y calientes (caldos alcalinos, verduras al vapor o nituke de manzana); suspender crudos.",
+        "4. Masticar religiosamente un mínimo de 20 veces por bocado para predigerir con saliva alcalina.",
+        "5. Si el ardor es matutino: suspender temporalmente el limón en ayunas y reemplazarlo por 1 taza de caldo detox tibio o infusión de manzanilla."
+      ]
+    },
+    {
+      sintoma: "Mareos / Baja de presión / Hipotensión",
+      icono: "compass",
+      causa: "Descenso abrupto de sodio industrial, corte de cafeína y relajación del tono vascular periférico.",
+      pasos: [
+        "1. Sentarse o recostarse de inmediato, elevando las piernas a 45° durante 10 a 15 minutos.",
+        "2. Poner una pizca de sal marina pura bajo la lengua o disolver 1/4 cdita en 1/2 vaso de agua tibia.",
+        "3. Tomar una taza de caldo vegetal tibio o infusión tonificante de jengibre fresco con albahaca.",
+        "4. Asegurar que las porciones de arroz yamaní o quinoa en las comidas principales sean suficientes para estabilizar la glucemia.",
+        "5. Evitar incorporarse bruscamente de la cama o la silla; realizar respiraciones profundas y lentas."
+      ]
+    }
+  ],
+
+  shoppingList: [
+    // VERDULERÍA
+    { id: "v1", item: "Manzanas rojas o verdes (agroecológicas)", cat: "Verdulería", cant: "3 a 5 kg", esencial: true },
+    { id: "v2", item: "Limones frescos", cat: "Verdulería", cant: "1 a 2 docenas", esencial: true },
+    { id: "v3", item: "Jengibre fresco", cat: "Verdulería", cant: "2 raíces", esencial: true },
+    { id: "v4", item: "Brócoli fresco", cat: "Verdulería", cant: "2 plantas", esencial: true },
+    { id: "v5", item: "Coliflor", cat: "Verdulería", cant: "1 planta", esencial: true },
+    { id: "v6", item: "Repollitos de Bruselas o Repollo", cat: "Verdulería", cant: "1 bandeja / 1 repollo", esencial: true },
+    { id: "v7", item: "Zanahorias", cat: "Verdulería", cant: "2 kg", esencial: true },
+    { id: "v8", item: "Remolachas con hojas", cat: "Verdulería", cant: "2 atados", esencial: true },
+    { id: "v9", item: "Espinacas frescas", cat: "Verdulería", cant: "2 atados", esencial: true },
+    { id: "v10", item: "Kale", cat: "Verdulería", cant: "1 atado", esencial: false },
+    { id: "v11", item: "Espárragos y Alcauciles", cat: "Verdulería", cant: "1 atado / 3 unidades", esencial: false },
+    { id: "v12", item: "Apio entero", cat: "Verdulería", cant: "1 planta grande", esencial: true },
+    { id: "v13", item: "Zapallo cabutiá o anco", cat: "Verdulería", cant: "1 mediano", esencial: true },
+    { id: "v14", item: "Zucchinis", cat: "Verdulería", cant: "3 o 4 unidades", esencial: true },
+    { id: "v15", item: "Cebollas y Cebolla de verdeo", cat: "Verdulería", cant: "1 kg cebolla / 2 atados verdeo", esencial: true },
+    { id: "v16", item: "Puerro y Ajo", cat: "Verdulería", cant: "1 atado puerro / 2 cabezas ajo", esencial: true },
+    { id: "v17", item: "Hierbas: Cilantro, Perejil, Albahaca", cat: "Verdulería", cant: "1 atado de c/u", esencial: true },
+    { id: "v18", item: "Paltas maduras", cat: "Verdulería", cant: "3 a 4 unidades", esencial: false },
+    { id: "v19", item: "Frutillas, arándanos o pomelos", cat: "Verdulería", cant: "1 a 2 bandejas", esencial: false },
+
+    // DIETÉTICA
+    { id: "d1", item: "Arroz Yamaní o Basmati integral", cat: "Dietética", cant: "2 kg", esencial: true },
+    { id: "d2", item: "Arroz integral largo fino", cat: "Dietética", cant: "1 kg", esencial: false },
+    { id: "d3", item: "Quinoa real", cat: "Dietética", cant: "1 kg", esencial: true },
+    { id: "d4", item: "Porotos Mung", cat: "Dietética", cant: "1 kg", esencial: true },
+    { id: "d5", item: "Porotos negros o aduki", cat: "Dietética", cant: "500 g", esencial: false },
+    { id: "d6", item: "Aceite de Oliva Extra Virgen (1ra prensión)", cat: "Dietética", cant: "1 botella oscura", esencial: true },
+    { id: "d7", item: "Aceite o Semillas de Lino", cat: "Dietética", cant: "1 botellita / 250 g", esencial: true },
+    { id: "d8", item: "Semillas de Sésamo integral y Chía", cat: "Dietética", cant: "250 g de c/u", esencial: true },
+    { id: "d9", item: "Castañas de Cajú crudas (sin sal)", cat: "Dietética", cant: "250 a 500 g", esencial: false },
+    { id: "d10", item: "Almendras crudas", cat: "Dietética", cant: "250 g", esencial: false },
+    { id: "d11", item: "Sal marina fina o del Himalaya", cat: "Dietética", cant: "500 g", esencial: true },
+    { id: "d12", item: "Vinagre de sidra de manzana vivo (sin pasteurizar)", cat: "Dietética", cant: "1 botella", esencial: true },
+    { id: "d13", item: "Salsa de soja Shoyu MOA (fermento natural)", cat: "Dietética", cant: "1 botella", esencial: true },
+    { id: "d14", item: "Chucrut o Kimchi vivo en heladera", cat: "Dietética", cant: "1 frasco", esencial: false },
+    { id: "d15", item: "Tofu orgánico firme (Soyana)", cat: "Dietética", cant: "1 bloque", esencial: false },
+
+    // HERBORISTERÍA
+    { id: "h1", item: "Ortiga seca en hojas", cat: "Herboristería", cant: "100 g", esencial: true },
+    { id: "h2", item: "Diente de león seco", cat: "Herboristería", cant: "100 g", esencial: true },
+    { id: "h3", item: "Flores secas de Manzanilla", cat: "Herboristería", cant: "100 g", esencial: true },
+    { id: "h4", item: "Menta fresca o seca", cat: "Herboristería", cant: "100 g", esencial: false },
+    { id: "h5", item: "Flores de Lavanda y Caléndula", cat: "Herboristería", cant: "50 g de c/u", esencial: false },
+    { id: "h6", item: "Té verde, té Banchá o Matcha", cat: "Herboristería", cant: "1 paquete", esencial: false },
+    { id: "h7", item: "Yuyos para mate: Cedrón, cola de caballo, stevia en hoja", cat: "Herboristería", cant: "50 g de c/u", esencial: false },
+
+    // PANADERÍA ARTESANAL
+    { id: "p1", item: "Pan 100% puro centeno de masa madre", cat: "Panadería", cant: "1 hogaza (freezar en rodajas)", esencial: false },
+    { id: "p2", item: "Pan de trigo sarraceno puro masa madre", cat: "Panadería", cant: "1 unidad", esencial: false },
+
+    // FARMACIA / SUPLEMENTOS (OPCIONALES)
+    { id: "s1", item: "Carbón activado (comprimidos o polvo)", cat: "Farmacia", cant: "1 caja", esencial: false },
+    { id: "s2", item: "Chlorella en polvo o comprimidos (Organikal)", cat: "Farmacia", cant: "1 frasco", esencial: false },
+    { id: "s3", item: "Clorofila líquida", cat: "Farmacia", cant: "1 frasco", esencial: false },
+    { id: "s4", item: "Psyllium en polvo o semillas", cat: "Dietética", cant: "100 g", esencial: false },
+
+    // SOPORTE PROTEICO (OPCIONAL)
+    { id: "pr1", item: "Pescado fresco (merluza o abadejo)", cat: "Pescadería", cant: "1 kg", esencial: false },
+    { id: "pr2", item: "Huevos de campo pastoriles", cat: "Granja", cant: "1 docena", esencial: false },
+    { id: "pr3", item: "Huesos pastoriles para caldo", cat: "Carnicería pastura", cant: "1 kg", esencial: false }
+  ]
+};
+
+if (typeof window !== 'undefined') {
+  window.DETOX_DATA = DETOX_DATA;
+}
+if (typeof module !== 'undefined') {
+  module.exports = DETOX_DATA;
+}
+
+</script>
+</head>
+<body class="bg-warmcream text-stone-800 dark:bg-stone-950 dark:text-stone-100 min-h-screen transition-colors duration-200 overflow-x-hidden w-full">
+  <div id="app" v-cloak class="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
+    
+    <!-- Topbar Header (Compacto y nativo) -->
+    <header class="sticky top-0 z-30 bg-white/90 dark:bg-stone-900/90 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800 pt-safe transition-colors w-full">
+      <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
+        
+        <!-- Logo & Titulo -->
+        <div class="flex items-center gap-2 sm:gap-3 cursor-pointer min-w-0 flex-shrink" @click="activeTab = 'dia'">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-sage-500/15 dark:bg-sage-400/20 text-sage-700 dark:text-sage-400 flex items-center justify-center font-bold text-lg sm:text-xl shadow-xs border border-sage-500/20 flex-shrink-0">
+            🌱
+          </div>
+          <div class="min-w-0">
+            <h1 class="font-bold text-sm sm:text-lg leading-tight tracking-tight text-stone-900 dark:text-stone-50 flex items-center gap-1.5 truncate">
+              <span>Detox</span><span class="hidden xs:inline sm:inline"> Primavera</span>
+              <span class="text-[10px] sm:text-xs px-1.5 py-0.2 rounded-full font-semibold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex-shrink-0">
+                Día {{ selectedDay }}
+              </span>
+            </h1>
+            <p class="hidden sm:block text-xs text-stone-500 dark:text-stone-400">Guía interactiva & Tracker • Isa Caparra</p>
+          </div>
+        </div>
+
+        <!-- Badges & Acciones Rápidas -->
+        <div class="flex items-center gap-1 sm:gap-2.5 flex-shrink-0">
+          
+          <!-- Racha (Streak) -->
+          <div class="flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-full text-xs font-semibold text-amber-700 dark:text-amber-300 shadow-2xs" title="Racha de días completados">
+            <span>🔥</span>
+            <span>{{ streakDays }}d</span>
+          </div>
+
+          <!-- XP Acumulados (Solo desktop/tablet) -->
+          <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-sage-50 dark:bg-sage-950/40 border border-sage-200 dark:border-sage-800/60 rounded-full text-xs font-semibold text-sage-800 dark:text-sage-300 shadow-2xs" title="Puntos de experiencia ganados">
+            <span>✨</span>
+            <span>{{ xp }} XP</span>
+          </div>
+
+          <!-- Buscador Global Cmd+K / Lupa -->
+          <button 
+            @click="globalSearchOpen = true"
+            class="p-1.5 sm:px-3 sm:py-1.5 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 rounded-xl text-xs font-medium transition active:scale-95 flex items-center gap-1.5"
+            title="Buscar cualquier cosa (Cmd+K)">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <span class="hidden md:inline">Buscar...</span>
+            <kbd class="hidden md:inline px-1.5 py-0.5 text-[10px] bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded shadow-xs">⌘K</kbd>
+          </button>
+
+          <!-- Toggle Dark Mode -->
+          <button 
+            @click="isDarkMode = !isDarkMode" 
+            class="p-1.5 sm:p-2 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 transition active:scale-95" 
+            :title="isDarkMode ? 'Modo Claro' : 'Modo Noche'">
+            <span v-if="isDarkMode">☀️</span>
+            <span v-else>🌙</span>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Barra de Navegación Desktop (Oculta en Celular) -->
+    <nav class="hidden md:block bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 sticky top-[57px] z-20 transition-colors">
+      <div class="max-w-6xl mx-auto px-4 flex gap-1 sm:gap-2 overflow-x-auto no-scrollbar py-1">
+        <button 
+          @click="activeTab = 'dia'"
+          :class="activeTab === 'dia' ? 'border-sage-600 text-sage-800 dark:text-sage-300 bg-sage-50/60 dark:bg-sage-950/40 font-semibold' : 'border-transparent text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200'"
+          class="flex items-center gap-2 px-3.5 py-2.5 rounded-lg border-b-2 text-xs sm:text-sm whitespace-nowrap transition-all">
+          <span>📅</span>
+          <span>Mi Día & Tracker</span>
+        </button>
+
+        <button 
+          @click="activeTab = 'recetas'"
+          :class="activeTab === 'recetas' ? 'border-sage-600 text-sage-800 dark:text-sage-300 bg-sage-50/60 dark:bg-sage-950/40 font-semibold' : 'border-transparent text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200'"
+          class="flex items-center gap-2 px-3.5 py-2.5 rounded-lg border-b-2 text-xs sm:text-sm whitespace-nowrap transition-all">
+          <span>🥗</span>
+          <span>Menú & Recetario</span>
+        </button>
+
+        <button 
+          @click="activeTab = 'compras'"
+          :class="activeTab === 'compras' ? 'border-sage-600 text-sage-800 dark:text-sage-300 bg-sage-50/60 dark:bg-sage-950/40 font-semibold' : 'border-transparent text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200'"
+          class="flex items-center gap-2 px-3.5 py-2.5 rounded-lg border-b-2 text-xs sm:text-sm whitespace-nowrap transition-all">
+          <span>🛒</span>
+          <span>Lista de Compras</span>
+          <span v-if="shoppingStats.pending > 0" class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-amber-200 dark:bg-amber-900/80 text-amber-900 dark:text-amber-200 font-bold">
+            {{ shoppingStats.pending }}
+          </span>
+        </button>
+
+        <button 
+          @click="activeTab = 'semaforo'"
+          :class="activeTab === 'semaforo' ? 'border-sage-600 text-sage-800 dark:text-sage-300 bg-sage-50/60 dark:bg-sage-950/40 font-semibold' : 'border-transparent text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200'"
+          class="flex items-center gap-2 px-3.5 py-2.5 rounded-lg border-b-2 text-xs sm:text-sm whitespace-nowrap transition-all">
+          <span>🚦</span>
+          <span>¿Puedo comer esto?</span>
+        </button>
+
+        <button 
+          @click="activeTab = 'sos'"
+          :class="activeTab === 'sos' ? 'border-sage-600 text-sage-800 dark:text-sage-300 bg-sage-50/60 dark:bg-sage-950/40 font-semibold' : 'border-transparent text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200'"
+          class="flex items-center gap-2 px-3.5 py-2.5 rounded-lg border-b-2 text-xs sm:text-sm whitespace-nowrap transition-all">
+          <span>🆘</span>
+          <span>Botiquín SOS</span>
+        </button>
+
+        <button 
+          @click="activeTab = 'taller'"
+          :class="activeTab === 'taller' ? 'border-sage-600 text-sage-800 dark:text-sage-300 bg-sage-50/60 dark:bg-sage-950/40 font-semibold' : 'border-transparent text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200'"
+          class="flex items-center gap-2 px-3.5 py-2.5 rounded-lg border-b-2 text-xs sm:text-sm whitespace-nowrap transition-all">
+          <span>🌿</span>
+          <span>Herbolario & Taller</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 min-w-0 max-w-6xl w-full mx-auto px-3.5 sm:px-4 py-3 sm:py-6 pb-28 md:pb-8">
+
+      <!-- ========================================== -->
+      <!-- PESTANA 1: MI DIA & TRACKER 21 DIAS        -->
+      <!-- ========================================== -->
+      <section v-show="activeTab === 'dia'" class="space-y-6">
+        
+        <!-- Selector Horizontal de Dias -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 overflow-hidden">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h2 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>Línea de Tiempo del Detox</span>
+                <span class="text-xs px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 font-normal">
+                  Progreso Global: {{ overallProgressPercent }}%
+                </span>
+              </h2>
+              <p class="text-xs text-stone-500 dark:text-stone-400">Seleccioná el día para registrar tus misiones o revisar la pauta de esa jornada.</p>
+            </div>
+
+            <!-- Selector de Modo de Inicio -->
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-stone-500 dark:text-stone-400">Monodieta inicial:</span>
+              <select v-model="startMode" class="bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg px-2.5 py-1 text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-1 focus:ring-sage-500">
+                <option value="monodieta3">3 Días (Recomendado)</option>
+                <option value="monodieta2">2 Días</option>
+                <option value="monodieta1">1 Día</option>
+                <option value="directo">0 Días (Directo menú general)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Carrusel de Botones de Días con Snap Táctil -->
+          <div class="flex gap-2 overflow-x-auto pb-2 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-1 px-1">
+            <!-- Día 0: Preparación -->
+            <button 
+              @click="selectedDay = 0"
+              :class="selectedDay === 0 ? 'ring-2 ring-amber-500 bg-amber-500 text-white font-bold shadow-sm' : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'"
+              class="snap-start flex flex-col items-center justify-center min-w-[70px] h-[64px] rounded-xl text-center px-2 transition-all active:scale-95 shadow-2xs flex-shrink-0">
+              <span class="text-[10px] uppercase font-bold tracking-wider">Paso 0</span>
+              <span class="text-xs font-semibold">Previa</span>
+            </button>
+
+            <!-- Días 1 al 21 -->
+            <button 
+              v-for="d in 21" 
+              :key="d"
+              @click="selectedDay = d"
+              :class="[
+                selectedDay === d ? 'ring-2 ring-sage-600 bg-sage-600 text-white font-bold shadow-md' : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700',
+                d <= 3 && startMode === 'monodieta3' ? 'border-b-2 border-emerald-400' : ''
+              ]"
+              class="snap-start relative flex flex-col items-center justify-center min-w-[56px] h-[64px] rounded-xl text-center px-1 transition-all active:scale-95 flex-shrink-0">
+              <span class="text-[10px] opacity-75 font-medium">Día</span>
+              <span class="text-base font-bold">{{ d }}</span>
+              <!-- Checkmark si el día está completo -->
+              <span v-if="completedMissions[`day_${d}`] && Object.values(completedMissions[`day_${d}`]).filter(Boolean).length === data.gamification.dailyMissions.length" 
+                    class="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-stone-900">
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Banner de la Fase Actual -->
+        <div class="p-5 rounded-2xl border shadow-xs transition-all"
+             :class="currentPhaseInfo.tipo === 'preparacion' 
+                      ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/50' 
+                      : currentPhaseInfo.tipo === 'monodieta' 
+                        ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50'
+                        : 'bg-teal-50/70 dark:bg-teal-950/30 border-teal-200 dark:border-teal-800/50'">
+          <div class="flex items-start justify-between flex-wrap gap-3">
+            <div>
+              <span class="text-xs uppercase font-extrabold tracking-wider px-2.5 py-0.5 rounded-full bg-white/80 dark:bg-stone-900/80 shadow-2xs"
+                    :class="currentPhaseInfo.tipo === 'preparacion' ? 'text-amber-800 dark:text-amber-300' : 'text-emerald-800 dark:text-emerald-300'">
+                {{ currentPhaseInfo.fase }}
+              </span>
+              <h3 class="text-lg font-bold text-stone-900 dark:text-stone-100 mt-2">
+                {{ selectedDay === 0 ? 'Reducción Progresiva de Cafeína' : (currentPhaseInfo.tipo === 'monodieta' ? 'Monodieta de Manzana y Arroz Yamaní' : 'Régimen Alcalino & Depuración de 21 Días') }}
+              </h3>
+              <p class="text-sm text-stone-600 dark:text-stone-300 mt-1 max-w-3xl leading-relaxed">
+                {{ currentPhaseInfo.desc }}
+              </p>
+            </div>
+
+            <!-- Atajos rápidos según fase -->
+            <div class="flex gap-2">
+              <button v-if="currentPhaseInfo.tipo === 'monodieta'" 
+                      @click="activeTab = 'recetas'; recipeSearch = 'nituke'"
+                      class="px-3 py-1.5 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs font-semibold text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 shadow-2xs flex items-center gap-1.5 transition">
+                <span>🍎</span> Ver receta de Nituke
+              </button>
+              <button v-if="currentPhaseInfo.tipo === 'general'" 
+                      @click="activeTab = 'recetas'; recipeSearch = 'caldo'"
+                      class="px-3 py-1.5 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs font-semibold text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 shadow-2xs flex items-center gap-1.5 transition">
+                <span>🥣</span> Ver Caldo Détox
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Misiones Diarias del Día Seleccionado -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>Misiones de Hábitos — Día {{ selectedDay }}</span>
+                <span class="text-xs font-medium px-2 py-0.5 rounded-full"
+                      :class="isCurrentDayFullyCompleted ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'">
+                  {{ currentDayCompletionPercent }}% cumplido
+                </span>
+              </h3>
+              <p class="text-xs text-stone-500 dark:text-stone-400">Cada misión suma +15 XP. Completar todas las misiones del día suma +50 XP bonus y mantiene tu racha.</p>
+            </div>
+
+            <div class="w-full sm:w-48 bg-stone-100 dark:bg-stone-800 h-2.5 rounded-full overflow-hidden">
+              <div class="bg-emerald-500 h-full rounded-full transition-all duration-300"
+                   :style="{ width: `${currentDayCompletionPercent}%` }">
+              </div>
+            </div>
+          </div>
+
+          <!-- Lista de Hábitos Checkbox -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+            <div 
+              v-for="m in data.gamification.dailyMissions" 
+              :key="m.id"
+              @click="toggleMission(m.id)"
+              class="flex items-start gap-3.5 p-3.5 rounded-xl border transition-all cursor-pointer select-none"
+              :class="isMissionDone(m.id) 
+                      ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800 text-stone-800 dark:text-stone-100 shadow-2xs' 
+                      : 'bg-stone-50/60 dark:bg-stone-800/40 border-stone-200/70 dark:border-stone-800 text-stone-600 dark:text-stone-300 hover:border-stone-300 dark:hover:border-stone-700'">
+              
+              <!-- Checkbox Estilizado -->
+              <input 
+                type="checkbox" 
+                :checked="isMissionDone(m.id)" 
+                class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
+                @click.stop="toggleMission(m.id)">
+
+              <div class="flex-1">
+                <p class="text-sm font-semibold" :class="isMissionDone(m.id) ? 'line-through opacity-75' : ''">
+                  {{ m.text }}
+                </p>
+                <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                  💡 {{ m.tip }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Banner de Felicitación si el día está completo -->
+          <div v-if="isCurrentDayFullyCompleted" 
+               class="p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-emerald-500/10 border border-emerald-300 dark:border-emerald-800 flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">🎉</span>
+              <div>
+                <h4 class="text-sm font-bold text-emerald-900 dark:text-emerald-200">¡Objetivo diario superado con honores!</h4>
+                <p class="text-xs text-emerald-800/80 dark:text-emerald-300/80">Mantuviste tu cuerpo en depuración profunda y ganaste tu bono diario de XP.</p>
+              </div>
+            </div>
+            <button @click="selectedDay < 21 ? selectedDay++ : null" 
+                    v-if="selectedDay < 21"
+                    class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition">
+              Pasar al Día {{ selectedDay + 1 }} →
+            </button>
+          </div>
+        </div>
+
+        <!-- Vitrina de Logros / Medallas Desbloqueables -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>🏆 Salón de Medallas & Logros</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold">
+                  {{ unlockedBadges.length }} / {{ data.gamification.badges.length }}
+                </span>
+              </h3>
+              <p class="text-xs text-stone-500 dark:text-stone-400">Desbloqueá hitos a medida que avanzás en los 21 días de desintoxicación.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            <div 
+              v-for="b in data.gamification.badges" 
+              :key="b.id"
+              class="p-3.5 rounded-xl border text-center flex flex-col items-center justify-center transition-all"
+              :class="isBadgeUnlocked(b.id) 
+                      ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700/60 text-stone-900 dark:text-stone-100 shadow-2xs animate-badge ring-1 ring-amber-400/40' 
+                      : 'bg-stone-50/50 dark:bg-stone-800/30 border-stone-200/60 dark:border-stone-800 text-stone-400 opacity-60 grayscale'">
+              
+              <div class="text-3xl mb-1.5">
+                <span v-if="b.id === 'inicio'">🌱</span>
+                <span v-else-if="b.id === 'monodieta'">🍎</span>
+                <span v-else-if="b.id === 'adios_cafeina'">⚡</span>
+                <span v-else-if="b.id === 'semana1'">🔥</span>
+                <span v-else-if="b.id === 'maestro_nituke'">🍲</span>
+                <span v-else-if="b.id === 'detox_champion'">👑</span>
+                <span v-else>🏅</span>
+              </div>
+
+              <h4 class="text-xs font-bold leading-tight">{{ b.title }}</h4>
+              <p class="text-[10px] text-stone-500 dark:text-stone-400 mt-1 leading-tight line-clamp-2">{{ b.desc }}</p>
+              
+              <span class="mt-2 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded"
+                    :class="isBadgeUnlocked(b.id) ? 'bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-200' : 'bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300'">
+                {{ isBadgeUnlocked(b.id) ? 'Desbloqueado' : `Requiere día ${b.requiredDays}` }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- PESTANA 2: RECETARIO & MENUS               -->
+      <!-- ========================================== -->
+      <section v-show="activeTab === 'recetas'" class="space-y-6">
+        
+        <!-- Header con Buscador y Filtros de Recetas -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>Catálogo de Recetas & Cocina Limpia</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-900/60 text-sage-800 dark:text-sage-300 font-medium">
+                  {{ filteredRecipes.length }} disponibles
+                </span>
+              </h2>
+              <p class="text-xs text-stone-500 dark:text-stone-400">Recetas oficiales del PDF con ingredientes exactos, métodos de cocción y modo de cocina paso a paso.</p>
+            </div>
+
+            <!-- Buscador en tiempo real -->
+            <div class="w-full sm:w-72 relative">
+              <input 
+                type="text" 
+                v-model="recipeSearch" 
+                placeholder="Buscar por plato o ingrediente..."
+                class="w-full pl-9 pr-4 py-2 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs sm:text-sm text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-sage-500">
+              <span class="absolute left-3 top-2.5 text-stone-400">🔍</span>
+              <button v-if="recipeSearch" @click="recipeSearch = ''" class="absolute right-3 top-2.5 text-xs text-stone-400 hover:text-stone-600">✕</button>
+            </div>
+          </div>
+
+          <!-- Filtros de Categoría -->
+          <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
+            <button 
+              v-for="cat in ['todas', 'desayunos', 'almuerzos', 'caldos', 'dips', 'panificados', 'fermentos', 'leches']"
+              :key="cat"
+              @click="recipeFilterCategory = cat"
+              :class="recipeFilterCategory === cat ? 'bg-sage-600 text-white font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
+              class="px-3 py-1.5 rounded-lg capitalize whitespace-nowrap transition">
+              {{ cat === 'todas' ? 'Todas las recetas' : cat }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Métodos de Cocción Destacados -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div v-for="m in data.cookingMethods" :key="m.id" 
+               class="p-4 rounded-xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 shadow-2xs space-y-1.5">
+            <h4 class="text-xs font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+              <span>♨️</span> {{ m.nombre }}
+            </h4>
+            <p class="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">{{ m.desc }}</p>
+          </div>
+        </div>
+
+        <!-- Grilla de Tarjetas de Recetas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div 
+            v-for="r in filteredRecipes" 
+            :key="r.id"
+            class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200/80 dark:border-stone-800 overflow-hidden shadow-xs hover:shadow-md transition-card flex flex-col justify-between">
+            
+            <div class="p-5 space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
+                  {{ r.categoria }}
+                </span>
+                <span class="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1">
+                  ⏱️ {{ r.tiempo }}
+                </span>
+              </div>
+
+              <div>
+                <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 leading-snug">{{ r.titulo }}</h3>
+                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">Método: <span class="font-medium text-stone-700 dark:text-stone-300">{{ r.metodo }}</span></p>
+              </div>
+
+              <!-- Ingredientes resumidos -->
+              <div class="pt-2 border-t border-stone-100 dark:border-stone-800">
+                <p class="text-[11px] font-semibold text-stone-700 dark:text-stone-300 mb-1">Ingredientes clave:</p>
+                <ul class="text-xs text-stone-600 dark:text-stone-400 space-y-0.5">
+                  <li v-for="(ing, idx) in r.ingredientes.slice(0, 3)" :key="idx" class="truncate">
+                    • {{ ing }}
+                  </li>
+                  <li v-if="r.ingredientes.length > 3" class="text-[10px] text-stone-400 italic">
+                    + {{ r.ingredientes.length - 3 }} ingredientes más...
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Footer con Botones de Acción -->
+            <div class="p-4 bg-stone-50/60 dark:bg-stone-800/40 border-t border-stone-100 dark:border-stone-800 flex items-center gap-2">
+              <button 
+                @click="openRecipe(r)" 
+                class="flex-1 py-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-xs font-semibold text-stone-800 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition">
+                Ver Detalles
+              </button>
+              <button 
+                @click="startCooking(r)" 
+                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 transition"
+                title="Modo Pantalla Completa para cocinar paso a paso">
+                <span>👨‍🍳</span> Cocinar
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- PESTANA 3: LISTA DE COMPRAS INTERACTIVA    -->
+      <!-- ========================================== -->
+      <section v-show="activeTab === 'compras'" class="space-y-6">
+        
+        <!-- Header con Contadores y Boton WhatsApp -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>Lista de Compras — Detox de Primavera</span>
+                <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold">
+                  {{ shoppingStats.percent }}% comprado
+                </span>
+              </h2>
+              <p class="text-xs text-stone-500 dark:text-stone-400">
+                {{ shoppingStats.completed }} de {{ shoppingStats.total }} items conseguidos • {{ shoppingStats.pending }} pendientes
+              </p>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex items-center gap-2">
+              <button 
+                @click="copyShoppingList" 
+                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-2 transition">
+                <span>💬</span> Copiar pendientes a WhatsApp
+              </button>
+            </div>
+          </div>
+
+          <!-- Barra de Progreso de Compras -->
+          <div class="w-full bg-stone-100 dark:bg-stone-800 h-2.5 rounded-full overflow-hidden">
+            <div class="bg-emerald-500 h-full rounded-full transition-all duration-300"
+                 :style="{ width: `${shoppingStats.percent}%` }">
+            </div>
+          </div>
+
+          <!-- Filtros por Comercio / Lugar de Compra -->
+          <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-stone-100 dark:border-stone-800 text-xs">
+            <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-1">
+              <button 
+                v-for="cat in ['todas', 'Verdulería', 'Dietética', 'Herboristería', 'Panadería', 'Farmacia', 'Pescadería']" 
+                :key="cat"
+                @click="shoppingFilterCategory = cat"
+                :class="shoppingFilterCategory === cat ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
+                class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">
+                {{ cat === 'todas' ? 'Todos los comercios' : cat }}
+              </button>
+            </div>
+
+            <label class="flex items-center gap-2 text-stone-600 dark:text-stone-400 cursor-pointer select-none">
+              <input type="checkbox" v-model="shoppingOnlyPending" class="rounded text-emerald-600 focus:ring-emerald-500">
+              <span>Ocultar ya comprados</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Lista de Items Agrupados / Filtrados -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl shadow-xs border border-stone-200/80 dark:border-stone-800 divide-y divide-stone-100 dark:divide-stone-800 overflow-hidden">
+          <div 
+            v-for="item in filteredShopping" 
+            :key="item.id"
+            @click="toggleShopping(item.id)"
+            class="p-4 flex items-center justify-between gap-3 hover:bg-stone-50/80 dark:hover:bg-stone-800/40 cursor-pointer transition select-none"
+            :class="shoppingChecked[item.id] ? 'bg-stone-50/50 dark:bg-stone-900/50 opacity-60' : ''">
+            
+            <div class="flex items-center gap-3.5">
+              <input 
+                type="checkbox" 
+                :checked="!!shoppingChecked[item.id]" 
+                class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
+                @click.stop="toggleShopping(item.id)">
+              
+              <div>
+                <p class="text-sm font-semibold text-stone-900 dark:text-stone-100"
+                   :class="shoppingChecked[item.id] ? 'line-through text-stone-400 dark:text-stone-500' : ''">
+                  {{ item.item }}
+                </p>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span class="text-[10px] px-2 py-0.2 rounded font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400">
+                    {{ item.cat }}
+                  </span>
+                  <span v-if="item.esencial" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                    ★ Esencial
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cantidad sugerida -->
+            <span class="text-xs font-mono font-medium text-stone-600 dark:text-stone-400 bg-stone-100 dark:bg-stone-800 px-2.5 py-1 rounded-md">
+              {{ item.cant }}
+            </span>
+          </div>
+
+          <div v-if="filteredShopping.length === 0" class="p-8 text-center text-stone-400 text-sm">
+            No hay items pendientes en esta categoría.
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- PESTANA 4: SEMAFORO ¿PUEDO COMER ESTO?     -->
+      <!-- ========================================== -->
+      <section v-show="activeTab === 'semaforo'" class="space-y-6">
+        
+        <!-- Header con Buscador y Filtro Verde/Amarillo/Rojo -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <span>Semáforo Nutricional del Detox</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 font-medium">
+                  Guía Rápida de Dudas
+                </span>
+              </h2>
+              <p class="text-xs text-stone-500 dark:text-stone-400">Consultá en segundos si un alimento está permitido, restringido o si requiere moderación según el protocolo de Isa.</p>
+            </div>
+
+            <!-- Buscador instantáneo -->
+            <div class="w-full sm:w-80 relative">
+              <input 
+                type="text" 
+                v-model="foodSearch" 
+                placeholder="Escribí: mate, pollo, café, miel, avena..."
+                class="w-full pl-9 pr-4 py-2 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs sm:text-sm text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-sage-500">
+              <span class="absolute left-3 top-2.5 text-stone-400">🔍</span>
+              <button v-if="foodSearch" @click="foodSearch = ''" class="absolute right-3 top-2.5 text-xs text-stone-400 hover:text-stone-600">✕</button>
+            </div>
+          </div>
+
+          <!-- Filtro Semáforo Pills -->
+          <div class="flex gap-2 text-xs">
+            <button 
+              @click="foodStatusFilter = 'todos'"
+              :class="foodStatusFilter === 'todos' ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'"
+              class="px-3 py-1.5 rounded-lg transition">
+              Todos ({{ data.foodTrafficLight.length }})
+            </button>
+            <button 
+              @click="foodStatusFilter = 'green'"
+              :class="foodStatusFilter === 'green' ? 'bg-emerald-600 text-white font-bold ring-2 ring-emerald-300' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'"
+              class="px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+              <span>🟢</span> Permitidos / Libres
+            </button>
+            <button 
+              @click="foodStatusFilter = 'yellow'"
+              :class="foodStatusFilter === 'yellow' ? 'bg-amber-500 text-white font-bold ring-2 ring-amber-300' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'"
+              class="px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+              <span>🟡</span> Moderación / Opcionales
+            </button>
+            <button 
+              @click="foodStatusFilter = 'red'"
+              :class="foodStatusFilter === 'red' ? 'bg-rose-600 text-white font-bold ring-2 ring-rose-300' : 'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800'"
+              class="px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+              <span>🔴</span> Prohibidos
+            </button>
+          </div>
+        </div>
+
+        <!-- Tarjetas del Semáforo -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div 
+            v-for="(f, idx) in filteredFoods" 
+            :key="idx"
+            class="p-4 rounded-xl border shadow-2xs transition-card flex flex-col justify-between"
+            :class="f.estado === 'green' 
+                    ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/60' 
+                    : f.estado === 'yellow' 
+                      ? 'bg-amber-50/40 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/60' 
+                      : 'bg-rose-50/40 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/60'">
+            
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full"
+                      :class="f.estado === 'green' ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200' : f.estado === 'yellow' ? 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200' : 'bg-rose-100 dark:bg-rose-900 text-rose-800 dark:text-rose-200'">
+                  {{ f.estado === 'green' ? '🟢 PERMITIDO' : f.estado === 'yellow' ? '🟡 MODERACIÓN' : '🔴 EXCLUIDO' }}
+                </span>
+                <span class="text-[11px] text-stone-500 font-medium">{{ f.cat }}</span>
+              </div>
+
+              <h4 class="text-sm font-bold text-stone-900 dark:text-stone-100">{{ f.nombre }}</h4>
+              <p class="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">{{ f.desc }}</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- PESTANA 5: BOTIQUIN SOS / SINTOMAS         -->
+      <!-- ========================================== -->
+      <section v-show="activeTab === 'sos'" class="space-y-5">
+        
+        <!-- Segmented Switch Móvil/Desktop para SOS vs Taller -->
+        <div class="flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-md mx-auto">
+          <button @click="activeTab = 'sos'" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100">
+            <span>🆘</span> <span>Botiquín SOS</span>
+          </button>
+          <button @click="activeTab = 'taller'" class="flex-1 py-2 rounded-xl text-xs font-medium transition-all text-center flex items-center justify-center gap-1.5 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200">
+            <span>🌿</span> <span>Herbolario & Taller</span>
+          </button>
+        </div>
+
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-2">
+          <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+            <span>🆘 Botiquín SOS — Manejo de Crisis Depurativa</span>
+          </h2>
+          <p class="text-xs text-stone-500 dark:text-stone-400">
+            Al retirar café, azúcares y alimentos pesados, el cuerpo moviliza toxinas y pueden surgir síntomas temporales. Acá tenés el protocolo paso a paso que indica la guía de Isa Caparra para cada caso.
+          </p>
+        </div>
+
+        <!-- Tarjetas de Síntomas SOS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div 
+            v-for="(sos, idx) in data.sosProtocols" 
+            :key="idx"
+            class="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200/80 dark:border-stone-800 shadow-xs space-y-3">
+            
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 flex items-center justify-center font-bold text-sm">
+                ⚠️
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-stone-900 dark:text-stone-100">{{ sos.sintoma }}</h3>
+                <p class="text-[11px] text-stone-500 dark:text-stone-400">Causa: {{ sos.causa }}</p>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-stone-100 dark:border-stone-800">
+              <p class="text-xs font-semibold text-stone-800 dark:text-stone-200 mb-2">Protocolo de solución:</p>
+              <ul class="space-y-1.5 text-xs text-stone-600 dark:text-stone-300">
+                <li v-for="(p, pIdx) in sos.pasos" :key="pIdx" class="flex items-start gap-1.5 leading-relaxed">
+                  <span class="text-emerald-500 font-bold">✔</span>
+                  <span>{{ p }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recordatorio Clínico -->
+        <div class="p-4 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 text-xs text-amber-900 dark:text-amber-200 leading-relaxed flex items-center gap-3">
+          <span class="text-2xl">🩺</span>
+          <div>
+            <strong>Pauta médica:</strong> Si algún síntoma persiste más de 48 hs o genera malestar agudo, consultá en el grupo de WhatsApp del taller o directamente con un profesional de salud. La desintoxicación nunca debe generar sufrimiento.
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- PESTANA 6: HERBOLARIO & HUB DEL TALLER     -->
+      <!-- ========================================== -->
+      <section v-show="activeTab === 'taller'" class="space-y-5">
+        
+        <!-- Segmented Switch Móvil/Desktop para SOS vs Taller -->
+        <div class="flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-md mx-auto">
+          <button @click="activeTab = 'sos'" class="flex-1 py-2 rounded-xl text-xs font-medium transition-all text-center flex items-center justify-center gap-1.5 text-stone-500 hover:text-stone-800 dark:hover:text-stone-200">
+            <span>🆘</span> <span>Botiquín SOS</span>
+          </button>
+          <button @click="activeTab = 'taller'" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100">
+            <span>🌿</span> <span>Herbolario & Taller</span>
+          </button>
+        </div>
+        
+        <!-- Enlaces a Encuentros en Vivo -->
+        <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-md space-y-4">
+          <div class="flex items-start justify-between flex-wrap gap-4">
+            <div>
+              <span class="text-xs uppercase font-extrabold tracking-wider px-2.5 py-0.5 rounded-full bg-white/20 text-white">
+                Encuentros en Vivo por Google Meet
+              </span>
+              <h2 class="text-xl font-bold mt-2">Dudas, Consultas y Seguimiento en Directo</h2>
+              <p class="text-xs text-emerald-100 mt-1 max-w-xl">
+                Los encuentros en vivo no quedan grabados. Quienes no puedan asistir deben enviar sus dudas por el grupo de WhatsApp.
+              </p>
+            </div>
+
+            <a :href="data.info.meetUrl" target="_blank" 
+               class="px-5 py-2.5 rounded-xl bg-white text-emerald-800 font-bold text-xs hover:bg-emerald-50 transition shadow-sm flex items-center gap-2">
+              <span>📹</span> Entrar a la Sala de Google Meet
+            </a>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/20">
+            <div v-for="(f, idx) in data.info.meetFechas" :key="idx" class="bg-white/10 p-3 rounded-xl">
+              <p class="text-xs font-bold text-white">{{ f.fecha }} — {{ f.hora }}</p>
+              <p class="text-[11px] text-emerald-100 mt-0.5">{{ f.motivo }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grabaciones de YouTube & Grupo de WhatsApp -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <!-- YouTube Videos -->
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200/80 dark:border-stone-800 shadow-xs space-y-3">
+            <h3 class="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <span>▶️</span> Grabaciones Previas del Taller
+            </h3>
+            <p class="text-xs text-stone-500 dark:text-stone-400">Isa recomienda mirar el primer video antes de empezar el detox.</p>
+
+            <div class="space-y-2 pt-1">
+              <a v-for="v in data.info.videos" :key="v.id" :href="v.url" target="_blank" 
+                 class="p-3 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-emerald-500 dark:hover:border-emerald-500 bg-stone-50 dark:bg-stone-800/60 flex items-center justify-between text-xs font-semibold text-stone-800 dark:text-stone-200 transition">
+                <span class="flex items-center gap-2">
+                  <span class="text-rose-500">▶</span> {{ v.titulo }}
+                </span>
+                <span class="text-stone-400">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- WhatsApp & Contactos -->
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200/80 dark:border-stone-800 shadow-xs space-y-3">
+            <h3 class="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <span>💬</span> Canal de Acompañamiento
+            </h3>
+            <p class="text-xs text-stone-500 dark:text-stone-400">Comunidad activa y consultas directas con Isa durante todo el proceso.</p>
+
+            <div class="space-y-2 pt-1">
+              <a :href="data.info.grupoWhatsAppUrl" target="_blank" 
+                 class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 font-bold text-xs flex items-center justify-between hover:bg-emerald-100 dark:hover:bg-emerald-950/70 transition">
+                <span class="flex items-center gap-2">
+                  <span>📱</span> Unirme al Grupo Oficial de WhatsApp
+                </span>
+                <span>↗</span>
+              </a>
+
+              <div class="p-3 rounded-xl bg-stone-50 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-700 text-xs space-y-1">
+                <p class="text-stone-500 dark:text-stone-400">Contacto personal de Isa Caparra:</p>
+                <p class="font-semibold text-stone-800 dark:text-stone-200">WhatsApp: <span class="font-mono">{{ data.info.contactoWhatsApp }}</span></p>
+                <p class="font-semibold text-stone-800 dark:text-stone-200">Email: <span class="font-mono">{{ data.info.contactoEmail }}</span></p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Directorio de Productores Recomendados -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200/80 dark:border-stone-800 shadow-xs space-y-3">
+          <h3 class="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+            <span>📦</span> Proveedores y Productores Recomendados en la Guía
+          </h3>
+          <p class="text-xs text-stone-500 dark:text-stone-400">Para conseguir Shoyu MOA natural, verduras orgánicas sin intermediarios y panes aptos.</p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <div v-for="(p, idx) in data.info.productores" :key="idx" 
+                 class="p-3.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50/50 dark:bg-stone-800/30 space-y-1">
+              <h4 class="text-xs font-bold text-stone-900 dark:text-stone-100">{{ p.nombre }}</h4>
+              <p class="text-xs text-emerald-700 dark:text-emerald-400 font-mono font-medium">📞 {{ p.tel }}</p>
+              <p class="text-[11px] text-stone-500 dark:text-stone-400 leading-tight">{{ p.nota }}</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-stone-200 dark:border-stone-800 py-6 text-center text-xs text-stone-500 dark:text-stone-400 bg-white/50 dark:bg-stone-900/50">
+      <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p>Detox de Primavera • Material de referencia recibido en Septiembre 2026</p>
+        <button @click="resetAllData" class="text-rose-500 hover:text-rose-700 text-xs font-medium underline">
+          Reiniciar Progreso de la App
+        </button>
+      </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- MODAL: DETALLES DE RECETA (BOTTOM SHEET EN MOVIL) -->
+    <!-- ========================================== -->
+    <div v-if="activeRecipe" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-xs" @click.self="closeRecipe">
+      <div class="bg-white dark:bg-stone-900 rounded-t-3xl sm:rounded-3xl max-w-xl w-full max-h-[88vh] sm:max-h-[90vh] overflow-y-auto p-5 sm:p-6 shadow-2xl border-t sm:border border-stone-200 dark:border-stone-800 space-y-4 animate-slide-up sm:animate-none">
+        
+        <!-- Pull bar para móviles -->
+        <div class="sm:hidden w-10 h-1 bg-stone-300 dark:bg-stone-700 rounded-full mx-auto -mt-1 mb-2 cursor-pointer" @click="closeRecipe"></div>
+
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <span class="text-xs uppercase font-extrabold px-2.5 py-0.5 rounded-full bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
+              {{ activeRecipe.categoria }}
+            </span>
+            <h3 class="text-xl font-bold text-stone-900 dark:text-stone-100 mt-1.5">{{ activeRecipe.titulo }}</h3>
+            <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">⏱️ {{ activeRecipe.tiempo }} • Método: {{ activeRecipe.metodo }}</p>
+          </div>
+          <button @click="closeRecipe" class="p-1.5 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-lg">✕</button>
+        </div>
+
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">Ingredientes:</h4>
+          <ul class="text-xs text-stone-600 dark:text-stone-300 space-y-1 bg-stone-50 dark:bg-stone-800/50 p-3.5 rounded-xl border border-stone-100 dark:border-stone-800">
+            <li v-for="(ing, idx) in activeRecipe.ingredientes" :key="idx">
+              • {{ ing }}
+            </li>
+          </ul>
+        </div>
+
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">Instrucciones:</h4>
+          <ol class="text-xs text-stone-600 dark:text-stone-300 space-y-2">
+            <li v-for="(paso, idx) in activeRecipe.pasos" :key="idx" class="flex items-start gap-2 leading-relaxed">
+              <span class="font-bold text-sage-600 dark:text-sage-400">{{ idx + 1 }}.</span>
+              <span>{{ paso }}</span>
+            </li>
+          </ol>
+        </div>
+
+        <div v-if="activeRecipe.tip" class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300">
+          💡 <strong>Tip del taller:</strong> {{ activeRecipe.tip }}
+        </div>
+
+        <div class="pt-3 border-t border-stone-100 dark:border-stone-800 flex justify-end gap-2">
+          <button @click="closeRecipe" class="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800">
+            Cerrar
+          </button>
+          <button @click="startCooking(activeRecipe)" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs flex items-center gap-1.5">
+            <span>👨‍🍳</span> Iniciar Modo Cocina
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: MODO COCINA PANTALLA COMPLETA       -->
+    <!-- ========================================== -->
+    <div v-if="activeCookingRecipe" class="fixed inset-0 z-50 bg-stone-950 text-white flex flex-col justify-between p-6 sm:p-10 select-none">
+      
+      <!-- Top header -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="text-3xl">👨‍🍳</span>
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold text-white">{{ activeCookingRecipe.titulo }}</h2>
+            <p class="text-xs text-stone-400">Paso {{ cookingStepIndex + 1 }} de {{ activeCookingRecipe.pasos.length }}</p>
+          </div>
+        </div>
+
+        <button @click="exitCooking" class="px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-xs font-semibold text-stone-300 transition">
+          ✕ Salir de Modo Cocina
+        </button>
+      </div>
+
+      <!-- Barra de progreso de pasos -->
+      <div class="w-full bg-stone-800 h-2 rounded-full overflow-hidden my-4">
+        <div class="bg-emerald-500 h-full rounded-full transition-all duration-300"
+             :style="{ width: `${((cookingStepIndex + 1) / activeCookingRecipe.pasos.length) * 100}%` }">
+        </div>
+      </div>
+
+      <!-- Paso actual grande -->
+      <div class="my-auto max-w-3xl mx-auto text-center space-y-6">
+        <span class="text-xs uppercase font-extrabold tracking-widest text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-800">
+          Paso {{ cookingStepIndex + 1 }}
+        </span>
+        <p class="text-xl sm:text-3xl font-medium leading-relaxed text-stone-100">
+          {{ activeCookingRecipe.pasos[cookingStepIndex] }}
+        </p>
+        <p v-if="activeCookingRecipe.tip && cookingStepIndex === 0" class="text-xs text-amber-300 bg-amber-950/40 p-3 rounded-xl border border-amber-900 inline-block">
+          💡 {{ activeCookingRecipe.tip }}
+        </p>
+      </div>
+
+      <!-- Controles de navegación de pasos -->
+      <div class="flex items-center justify-between max-w-xl w-full mx-auto gap-4">
+        <button 
+          @click="prevCookingStep" 
+          :disabled="cookingStepIndex === 0"
+          :class="cookingStepIndex === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-stone-800'"
+          class="px-6 py-3 rounded-2xl bg-stone-900 border border-stone-800 text-sm font-bold text-stone-300 transition">
+          ← Anterior
+        </button>
+
+        <button 
+          @click="nextCookingStep" 
+          class="flex-1 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-stone-950 text-sm font-extrabold shadow-lg shadow-emerald-500/20 transition">
+          {{ cookingStepIndex === activeCookingRecipe.pasos.length - 1 ? '¡Listo! Finalizar Receta' : 'Siguiente Paso →' }}
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: BUSCADOR GLOBAL (Cmd+K)             -->
+    <!-- ========================================== -->
+    <div v-if="globalSearchOpen" class="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-black/50 backdrop-blur-xs" @click.self="globalSearchOpen = false">
+      <div class="bg-white dark:bg-stone-900 rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl border border-stone-200 dark:border-stone-800 flex flex-col">
+        
+        <div class="p-4 border-b border-stone-100 dark:border-stone-800 flex items-center gap-3">
+          <span class="text-stone-400">🔍</span>
+          <input 
+            type="text" 
+            v-model="globalSearchQuery" 
+            ref="globalInput"
+            autofocus
+            placeholder="Buscar recetas, alimentos del semáforo, síntomas o compras..."
+            class="w-full bg-transparent text-sm text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none">
+          <button @click="globalSearchOpen = false" class="text-xs text-stone-400 hover:text-stone-600">Esc</button>
+        </div>
+
+        <div class="max-h-80 overflow-y-auto divide-y divide-stone-100 dark:divide-stone-800 p-2">
+          <div 
+            v-for="(res, idx) in globalSearchResults" 
+            :key="idx"
+            @click="res.action()"
+            class="p-3 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/60 cursor-pointer flex items-center justify-between text-xs transition">
+            
+            <div class="space-y-0.5">
+              <span class="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400">
+                {{ res.tipo }}
+              </span>
+              <p class="font-bold text-stone-900 dark:text-stone-100">{{ res.titulo }}</p>
+              <p class="text-[11px] text-stone-500 dark:text-stone-400 truncate max-w-md">{{ res.subtitulo }}</p>
+            </div>
+
+            <span class="text-stone-400 text-xs">Ir →</span>
+          </div>
+
+          <div v-if="globalSearchQuery && globalSearchResults.length === 0" class="p-8 text-center text-xs text-stone-400">
+            No se encontraron resultados para "{{ globalSearchQuery }}".
+          </div>
+          <div v-if="!globalSearchQuery" class="p-6 text-center text-xs text-stone-400">
+            Escribí para buscar en todo el contenido del detox.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Toast Notification Flotante -->
+    <div v-if="showToast" 
+         class="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 px-4 py-3 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 transition-all animate-bounce">
+      <span>✨</span>
+      <span>{{ toastMessage }}</span>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- BARRA DE NAVEGACION INFERIOR (CELULAR)     -->
+    <!-- ========================================== -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-stone-900/95 backdrop-blur-lg border-t border-stone-200/80 dark:border-stone-800 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] pb-safe transition-colors">
+      <div class="grid grid-cols-5 h-14 items-center px-1">
+        
+        <!-- Tab 1: Mi Día -->
+        <button 
+          @click="activeTab = 'dia'" 
+          class="flex flex-col items-center justify-center h-full gap-0.5 py-1 transition-all active:scale-90" 
+          :class="activeTab === 'dia' ? 'text-sage-700 dark:text-sage-400 font-bold' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 font-medium'">
+          <div class="relative flex items-center justify-center w-7 h-7 rounded-full transition-colors" :class="activeTab === 'dia' ? 'bg-sage-100 dark:bg-sage-950/80' : ''">
+            <span class="text-base">📅</span>
+          </div>
+          <span class="text-[10px] leading-tight">Mi Día</span>
+        </button>
+
+        <!-- Tab 2: Recetas -->
+        <button 
+          @click="activeTab = 'recetas'" 
+          class="flex flex-col items-center justify-center h-full gap-0.5 py-1 transition-all active:scale-90" 
+          :class="activeTab === 'recetas' ? 'text-sage-700 dark:text-sage-400 font-bold' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 font-medium'">
+          <div class="relative flex items-center justify-center w-7 h-7 rounded-full transition-colors" :class="activeTab === 'recetas' ? 'bg-sage-100 dark:bg-sage-950/80' : ''">
+            <span class="text-base">🥗</span>
+          </div>
+          <span class="text-[10px] leading-tight">Recetas</span>
+        </button>
+
+        <!-- Tab 3: Compras -->
+        <button 
+          @click="activeTab = 'compras'" 
+          class="flex flex-col items-center justify-center h-full gap-0.5 py-1 transition-all active:scale-90" 
+          :class="activeTab === 'compras' ? 'text-sage-700 dark:text-sage-400 font-bold' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 font-medium'">
+          <div class="relative flex items-center justify-center w-7 h-7 rounded-full transition-colors" :class="activeTab === 'compras' ? 'bg-sage-100 dark:bg-sage-950/80' : ''">
+            <span class="text-base">🛒</span>
+            <span v-if="shoppingStats.pending > 0" class="absolute -top-1 -right-1.5 px-1.5 py-0.2 rounded-full text-[9px] bg-amber-500 text-white font-extrabold shadow-2xs leading-tight">
+              {{ shoppingStats.pending }}
+            </span>
+          </div>
+          <span class="text-[10px] leading-tight">Compras</span>
+        </button>
+
+        <!-- Tab 4: Semáforo -->
+        <button 
+          @click="activeTab = 'semaforo'" 
+          class="flex flex-col items-center justify-center h-full gap-0.5 py-1 transition-all active:scale-90" 
+          :class="activeTab === 'semaforo' ? 'text-sage-700 dark:text-sage-400 font-bold' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 font-medium'">
+          <div class="relative flex items-center justify-center w-7 h-7 rounded-full transition-colors" :class="activeTab === 'semaforo' ? 'bg-sage-100 dark:bg-sage-950/80' : ''">
+            <span class="text-base">🚦</span>
+          </div>
+          <span class="text-[10px] leading-tight">Semáforo</span>
+        </button>
+
+        <!-- Tab 5: SOS & Taller -->
+        <button 
+          @click="activeTab = (activeTab === 'taller' ? 'taller' : 'sos')" 
+          class="flex flex-col items-center justify-center h-full gap-0.5 py-1 transition-all active:scale-90" 
+          :class="(activeTab === 'sos' || activeTab === 'taller') ? 'text-sage-700 dark:text-sage-400 font-bold' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 font-medium'">
+          <div class="relative flex items-center justify-center w-7 h-7 rounded-full transition-colors" :class="(activeTab === 'sos' || activeTab === 'taller') ? 'bg-sage-100 dark:bg-sage-950/80' : ''">
+            <span class="text-base">🆘</span>
+          </div>
+          <span class="text-[10px] leading-tight">SOS & Guía</span>
+        </button>
+
+      </div>
+    </nav>
+
+  </div>
+
+  <!-- Scripts -->
+  <script>
+// Logica Reactiva de la WebApp - Detox de Primavera
+// Powered by Vue 3 (CDN), LocalStorage y Canvas-Confetti
+
+const { createApp, ref, computed, watch, onMounted } = Vue;
+
+const app = createApp({
+  setup() {
+    // 1. Datos base
+    const data = (typeof window !== 'undefined' && window.DETOX_DATA) ? window.DETOX_DATA : DETOX_DATA;
+
+    // 2. Estado de Navegacion y Tema
+    const getInitialDarkMode = () => {
+      const saved = localStorage.getItem('detox_dark_mode');
+      if (saved !== null) return saved === 'true';
+      return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    };
+    const isDarkMode = ref(getInitialDarkMode());
+    const activeTab = ref(localStorage.getItem('detox_active_tab') || 'dia');
+
+    // 3. Estado de Gamificacion y Seguimiento
+    const selectedDay = ref(parseInt(localStorage.getItem('detox_selected_day') || '1', 10));
+    const startMode = ref(localStorage.getItem('detox_start_mode') || 'monodieta3'); // monodieta3, monodieta2, monodieta1, directo
+    const completedMissions = ref(JSON.parse(localStorage.getItem('detox_completed_missions') || '{}'));
+    const shoppingChecked = ref(JSON.parse(localStorage.getItem('detox_shopping_checked') || '{}'));
+    const unlockedBadges = ref(JSON.parse(localStorage.getItem('detox_unlocked_badges') || '[]'));
+    const xp = ref(parseInt(localStorage.getItem('detox_xp') || '0', 10));
+
+    // 4. Filtros de Recetas
+    const recipeSearch = ref('');
+    const recipeFilterCategory = ref('todas');
+    const activeRecipe = ref(null);
+    const activeCookingRecipe = ref(null);
+    const cookingStepIndex = ref(0);
+
+    // 5. Filtros de Compras
+    const shoppingFilterCategory = ref('todas');
+    const shoppingOnlyPending = ref(false);
+
+    // 6. Semáforo de Alimentos
+    const foodSearch = ref('');
+    const foodStatusFilter = ref('todos');
+
+    // 7. Buscador Global (Cmd+K)
+    const globalSearchOpen = ref(false);
+    const globalSearchQuery = ref('');
+
+    // 8. Notificaciones Toast
+    const toastMessage = ref('');
+    const showToast = ref(false);
+
+    // Persistencia reactiva a LocalStorage
+    watch(activeTab, (val) => localStorage.setItem('detox_active_tab', val));
+    watch(isDarkMode, (val) => {
+      localStorage.setItem('detox_dark_mode', val);
+      if (val) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    });
+    watch(selectedDay, (val) => localStorage.setItem('detox_selected_day', val));
+    watch(startMode, (val) => localStorage.setItem('detox_start_mode', val));
+    watch(completedMissions, (val) => localStorage.setItem('detox_completed_missions', JSON.stringify(val)), { deep: true });
+    watch(shoppingChecked, (val) => localStorage.setItem('detox_shopping_checked', JSON.stringify(val)), { deep: true });
+    watch(unlockedBadges, (val) => localStorage.setItem('detox_unlocked_badges', JSON.stringify(val)), { deep: true });
+    watch(xp, (val) => localStorage.setItem('detox_xp', val));
+
+    // Funciones auxiliares
+    const triggerToast = (msg) => {
+      toastMessage.value = msg;
+      showToast.value = true;
+      setTimeout(() => {
+        showToast.value = false;
+      }, 3500);
+    };
+
+    const fireConfetti = () => {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+    };
+
+    // Computados de Gamificación
+    const dayMissionsStatus = computed(() => {
+      const dayKey = `day_${selectedDay.value}`;
+      return completedMissions.value[dayKey] || {};
+    });
+
+    const currentDayCompletionPercent = computed(() => {
+      const total = data.gamification.dailyMissions.length;
+      if (total === 0) return 0;
+      const status = dayMissionsStatus.value;
+      const done = Object.values(status).filter(Boolean).length;
+      return Math.round((done / total) * 100);
+    });
+
+    const isCurrentDayFullyCompleted = computed(() => {
+      return currentDayCompletionPercent.value === 100;
+    });
+
+    const totalDaysCompleted = computed(() => {
+      let count = 0;
+      const totalM = data.gamification.dailyMissions.length;
+      for (let d = 1; d <= 21; d++) {
+        const dayKey = `day_${d}`;
+        const status = completedMissions.value[dayKey] || {};
+        const done = Object.values(status).filter(Boolean).length;
+        if (done === totalM) count++;
+      }
+      return count;
+    });
+
+    const overallProgressPercent = computed(() => {
+      return Math.round((totalDaysCompleted.value / 21) * 100);
+    });
+
+    const streakDays = computed(() => {
+      let streak = 0;
+      const totalM = data.gamification.dailyMissions.length;
+      for (let d = selectedDay.value; d >= 1; d--) {
+        const dayKey = `day_${d}`;
+        const status = completedMissions.value[dayKey] || {};
+        const done = Object.values(status).filter(Boolean).length;
+        if (done === totalM) {
+          streak++;
+        } else if (d !== selectedDay.value) {
+          break;
+        }
+      }
+      return streak;
+    });
+
+    const currentPhaseInfo = computed(() => {
+      const d = selectedDay.value;
+      let monodietDays = 3;
+      if (startMode.value === 'monodieta2') monodietDays = 2;
+      if (startMode.value === 'monodieta1') monodietDays = 1;
+      if (startMode.value === 'directo') monodietDays = 0;
+
+      if (d === 0) {
+        return {
+          fase: "Fase 0: Preparación previa",
+          desc: "Baja gradual de cafeína/mateína a la mitad cada 2 días para amortiguar la abstinencia.",
+          color: "amber",
+          tipo: "preparacion"
+        };
+      } else if (d <= monodietDays) {
+        return {
+          fase: `Fase 1: Monodieta Purificadora (Día ${d} de ${monodietDays})`,
+          desc: "Alimentación basada exclusivamente en manzana (cruda, compota o nituke) y arroz integral caliente con agua tibia y sal marina.",
+          color: "emerald",
+          tipo: "monodieta"
+        };
+      } else {
+        return {
+          fase: `Fase 2: Menú Depurativo General (Día ${d} de 21)`,
+          desc: "Abundancia de crucíferas, verduras verdes, arroz yamaní, porotos mung, quinoa, fermentos y caldos calientes.",
+          color: "teal",
+          tipo: "general"
+        };
+      }
+    });
+
+    // Misiones y Checkboxes
+    const toggleMission = (missionId) => {
+      const dayKey = `day_${selectedDay.value}`;
+      if (!completedMissions.value[dayKey]) {
+        completedMissions.value[dayKey] = {};
+      }
+      const current = !!completedMissions.value[dayKey][missionId];
+      completedMissions.value[dayKey][missionId] = !current;
+
+      if (!current) {
+        xp.value += data.gamification.xpPerMission;
+        triggerToast(`+${data.gamification.xpPerMission} XP ¡Hábito cumplido!`);
+      } else {
+        xp.value = Math.max(0, xp.value - data.gamification.xpPerMission);
+      }
+
+      // Chequeo si completó el día entero
+      const totalM = data.gamification.dailyMissions.length;
+      const done = Object.values(completedMissions.value[dayKey]).filter(Boolean).length;
+      if (done === totalM && !current) {
+        xp.value += data.gamification.xpPerDayComplete;
+        fireConfetti();
+        triggerToast(`🎉 ¡Día ${selectedDay.value} completado al 100%! (+${data.gamification.xpPerDayComplete} XP bonus)`);
+      }
+
+      checkBadges();
+    };
+
+    const isMissionDone = (missionId) => {
+      const dayKey = `day_${selectedDay.value}`;
+      return !!(completedMissions.value[dayKey] && completedMissions.value[dayKey][missionId]);
+    };
+
+    // Badges / Medallas
+    const checkBadges = () => {
+      data.gamification.badges.forEach((b) => {
+        if (!unlockedBadges.value.includes(b.id)) {
+          let unlocked = false;
+          if (b.id === 'inicio' && totalDaysCompleted.value >= 1) unlocked = true;
+          if (b.id === 'monodieta' && selectedDay.value > 3 && totalDaysCompleted.value >= 3) unlocked = true;
+          if (b.id === 'adios_cafeina' && streakDays.value >= 3) unlocked = true;
+          if (b.id === 'semana1' && totalDaysCompleted.value >= 7) unlocked = true;
+          if (b.id === 'maestro_nituke' && totalDaysCompleted.value >= 14) unlocked = true;
+          if (b.id === 'detox_champion' && totalDaysCompleted.value >= 21) unlocked = true;
+
+          if (unlocked) {
+            unlockedBadges.value.push(b.id);
+            xp.value += b.xp;
+            fireConfetti();
+            triggerToast(`🏆 ¡MEDALLA DESBLOQUEADA!: ${b.title} (+${b.xp} XP)`);
+          }
+        }
+      });
+    };
+
+    const isBadgeUnlocked = (badgeId) => {
+      return unlockedBadges.value.includes(badgeId);
+    };
+
+    // Computados de Recetas
+    const filteredRecipes = computed(() => {
+      return data.recipes.filter((r) => {
+        const matchCat = recipeFilterCategory.value === 'todas' || r.categoria === recipeFilterCategory.value;
+        const q = recipeSearch.value.trim().toLowerCase();
+        const matchQ = !q || r.titulo.toLowerCase().includes(q) ||
+          r.ingredientes.some(i => i.toLowerCase().includes(q)) ||
+          r.metodo.toLowerCase().includes(q);
+        return matchCat && matchQ;
+      });
+    });
+
+    const openRecipe = (recipe) => {
+      activeRecipe.value = recipe;
+    };
+
+    const closeRecipe = () => {
+      activeRecipe.value = null;
+    };
+
+    // Modo Cocina Pantalla Completa
+    const startCooking = (recipe) => {
+      activeCookingRecipe.value = recipe;
+      cookingStepIndex.value = 0;
+      activeRecipe.value = null;
+    };
+
+    const nextCookingStep = () => {
+      if (activeCookingRecipe.value && cookingStepIndex.value < activeCookingRecipe.value.pasos.length - 1) {
+        cookingStepIndex.value++;
+      } else {
+        fireConfetti();
+        triggerToast("👨‍🍳 ¡Plato listo! A disfrutar sentado y con presencia.");
+        exitCooking();
+      }
+    };
+
+    const prevCookingStep = () => {
+      if (cookingStepIndex.value > 0) {
+        cookingStepIndex.value--;
+      }
+    };
+
+    const exitCooking = () => {
+      activeCookingRecipe.value = null;
+      cookingStepIndex.value = 0;
+    };
+
+    // Computados de Semáforo
+    const filteredFoods = computed(() => {
+      return data.foodTrafficLight.filter((f) => {
+        const matchStatus = foodStatusFilter.value === 'todos' || f.estado === foodStatusFilter.value;
+        const q = foodSearch.value.trim().toLowerCase();
+        const matchQ = !q || f.nombre.toLowerCase().includes(q) ||
+          f.cat.toLowerCase().includes(q) ||
+          f.desc.toLowerCase().includes(q);
+        return matchStatus && matchQ;
+      });
+    });
+
+    // Computados de Compras
+    const filteredShopping = computed(() => {
+      return data.shoppingList.filter((item) => {
+        const matchCat = shoppingFilterCategory.value === 'todas' || item.cat === shoppingFilterCategory.value;
+        const isChecked = !!shoppingChecked.value[item.id];
+        const matchPending = !shoppingOnlyPending.value || !isChecked;
+        return matchCat && matchPending;
+      });
+    });
+
+    const shoppingStats = computed(() => {
+      const total = data.shoppingList.length;
+      const completed = Object.values(shoppingChecked.value).filter(Boolean).length;
+      const pending = Math.max(0, total - completed);
+      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+      return { total, completed, pending, percent };
+    });
+
+    const toggleShopping = (itemId) => {
+      shoppingChecked.value[itemId] = !shoppingChecked.value[itemId];
+    };
+
+    const copyShoppingList = async () => {
+      const pendingItems = data.shoppingList.filter(item => !shoppingChecked.value[item.id]);
+
+      if (pendingItems.length === 0) {
+        triggerToast("✅ ¡Ya compraste todo! No hay pendientes.");
+        return;
+      }
+
+      // Agrupar por categoría / comercio
+      const grouped = {};
+      pendingItems.forEach(item => {
+        if (!grouped[item.cat]) grouped[item.cat] = [];
+        grouped[item.cat].push(`• ${item.item} (${item.cant})`);
+      });
+
+      let text = "🛒 *LISTA DE COMPRAS - DETOX DE PRIMAVERA*\n\n";
+      for (const [cat, items] of Object.entries(grouped)) {
+        text += `📍 *${cat.toUpperCase()}*\n${items.join('\n')}\n\n`;
+      }
+      text += "✨ Generado desde la WebApp del Detox de Primavera";
+
+      try {
+        await navigator.clipboard.writeText(text);
+        triggerToast("📋 ¡Copiado al portapapeles! Listo para pegar en WhatsApp.");
+      } catch (err) {
+        // Fallback
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        triggerToast("📋 ¡Copiado al portapapeles!");
+      }
+    };
+
+    // Buscador Global (Cmd+K)
+    const globalSearchResults = computed(() => {
+      const q = globalSearchQuery.value.trim().toLowerCase();
+      if (!q || q.length < 2) return [];
+
+      const results = [];
+
+      // Buscar en recetas
+      data.recipes.forEach(r => {
+        if (r.titulo.toLowerCase().includes(q) || r.ingredientes.some(i => i.toLowerCase().includes(q))) {
+          results.push({
+            tipo: "Receta",
+            icono: "utensils",
+            titulo: r.titulo,
+            subtitulo: `${r.categoria} • ${r.tiempo}`,
+            action: () => {
+              activeTab.value = 'recetas';
+              openRecipe(r);
+              globalSearchOpen.value = false;
+            }
+          });
+        }
+      });
+
+      // Buscar en semáforo
+      data.foodTrafficLight.forEach(f => {
+        if (f.nombre.toLowerCase().includes(q) || f.desc.toLowerCase().includes(q)) {
+          const badge = f.estado === 'green' ? '🟢 PERMITIDO' : f.estado === 'yellow' ? '🟡 MODERACIÓN' : '🔴 RESTRINGIDO';
+          results.push({
+            tipo: "Semáforo",
+            icono: "shield",
+            titulo: f.nombre,
+            subtitulo: `${badge} • ${f.desc}`,
+            action: () => {
+              activeTab.value = 'semaforo';
+              foodSearch.value = f.nombre;
+              globalSearchOpen.value = false;
+            }
+          });
+        }
+      });
+
+      // Buscar en SOS
+      data.sosProtocols.forEach(s => {
+        if (s.sintoma.toLowerCase().includes(q) || s.causa.toLowerCase().includes(q) || s.pasos.some(p => p.toLowerCase().includes(q))) {
+          results.push({
+            tipo: "Botiquín SOS",
+            icono: "alert-triangle",
+            titulo: s.sintoma,
+            subtitulo: s.causa,
+            action: () => {
+              activeTab.value = 'sos';
+              globalSearchOpen.value = false;
+            }
+          });
+        }
+      });
+
+      // Buscar en compras
+      data.shoppingList.forEach(s => {
+        if (s.item.toLowerCase().includes(q)) {
+          results.push({
+            tipo: "Compras",
+            icono: "shopping-bag",
+            titulo: s.item,
+            subtitulo: `${s.cat} • Cantidad: ${s.cant}`,
+            action: () => {
+              activeTab.value = 'compras';
+              shoppingFilterCategory.value = s.cat;
+              globalSearchOpen.value = false;
+            }
+          });
+        }
+      });
+
+      return results.slice(0, 10);
+    });
+
+    const resetAllData = () => {
+      if (confirm("¿Estás seguro de que querés reiniciar todo tu progreso, racha y listas de compras?")) {
+        completedMissions.value = {};
+        shoppingChecked.value = {};
+        unlockedBadges.value = [];
+        xp.value = 0;
+        selectedDay.value = 1;
+        localStorage.clear();
+        triggerToast("🔄 Progreso reiniciado con éxito.");
+      }
+    };
+
+    // Hotkey listener para Cmd+K / Ctrl+K
+    onMounted(() => {
+      if (isDarkMode.value) {
+        document.documentElement.classList.add('dark');
+      }
+
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault();
+          globalSearchOpen.value = !globalSearchOpen.value;
+        }
+        if (e.key === 'Escape') {
+          globalSearchOpen.value = false;
+          activeRecipe.value = null;
+        }
+      });
+
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    });
+
+    watch([activeTab, activeRecipe, activeCookingRecipe, globalSearchOpen], () => {
+      setTimeout(() => {
+        if (window.lucide) window.lucide.createIcons();
+      }, 50);
+    });
+
+    return {
+      data,
+      activeTab,
+      isDarkMode,
+      selectedDay,
+      startMode,
+      completedMissions,
+      shoppingChecked,
+      unlockedBadges,
+      xp,
+      recipeSearch,
+      recipeFilterCategory,
+      activeRecipe,
+      activeCookingRecipe,
+      cookingStepIndex,
+      shoppingFilterCategory,
+      shoppingOnlyPending,
+      foodSearch,
+      foodStatusFilter,
+      globalSearchOpen,
+      globalSearchQuery,
+      toastMessage,
+      showToast,
+      // Computados
+      dayMissionsStatus,
+      currentDayCompletionPercent,
+      isCurrentDayFullyCompleted,
+      totalDaysCompleted,
+      overallProgressPercent,
+      streakDays,
+      currentPhaseInfo,
+      filteredRecipes,
+      filteredFoods,
+      filteredShopping,
+      shoppingStats,
+      globalSearchResults,
+      // Metodos
+      toggleMission,
+      isMissionDone,
+      isBadgeUnlocked,
+      openRecipe,
+      closeRecipe,
+      startCooking,
+      nextCookingStep,
+      prevCookingStep,
+      exitCooking,
+      toggleShopping,
+      copyShoppingList,
+      resetAllData,
+      triggerToast
+    };
+  }
+});
+
+window.__VUE_LOGS__ = [];
+app.config.warnHandler = (msg, vm, trace) => {
+  window.__VUE_LOGS__.push({ type: 'warn', msg, trace });
+  console.warn('VUE WARN:', msg, trace);
+};
+app.config.errorHandler = (err, vm, info) => {
+  window.__VUE_LOGS__.push({ type: 'error', msg: err.message, stack: err.stack, info });
+  console.error('VUE ERROR:', err, info);
+};
+
+try {
+  app.mount('#app');
+} catch (e) {
+  window.__VUE_LOGS__.push({ type: 'mount_error', msg: e.message, stack: e.stack });
+  console.error('MOUNT CATCH:', e);
+}
+
+</script>
+</body>
+</html>
