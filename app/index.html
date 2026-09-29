@@ -644,6 +644,128 @@
         </div>
 
         <!-- ========================================== -->
+        <!-- TARJETA: PERFIL DE ALERGIAS E INTOLERANCIAS -->
+        <!-- ========================================== -->
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 transition-all space-y-3">
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 h-10 rounded-xl bg-rose-500/10 dark:bg-rose-400/20 text-rose-700 dark:text-rose-300 flex items-center justify-center text-xl flex-shrink-0">
+                🛡️
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="text-sm sm:text-base font-bold text-stone-900 dark:text-stone-100">
+                    Alergias e Intolerancias
+                  </h3>
+                  <span v-if="userAllergies && userAllergies.length > 0" 
+                        class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-300/80 dark:border-rose-800">
+                    {{ userAllergies.length }} {{ userAllergies.length === 1 ? 'activa' : 'activas' }}
+                  </span>
+                  <span v-else 
+                        class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800">
+                    Sin restricciones
+                  </span>
+                </div>
+                <p class="text-xs text-stone-500 dark:text-stone-400 truncate sm:whitespace-normal">
+                  Filtro de seguridad alimentaria para sugerencias y recetas de tu día.
+                </p>
+              </div>
+            </div>
+
+            <!-- Botón abrir/cerrar selector -->
+            <button 
+              type="button"
+              @click="showAllergySelector = !showAllergySelector"
+              class="px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all active:scale-95 flex items-center gap-1.5"
+              :class="showAllergySelector 
+                      ? 'bg-stone-200 dark:bg-stone-700 text-stone-900 dark:text-stone-100 border-stone-300 dark:border-stone-600 shadow-2xs' 
+                      : 'bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-200 border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-750'">
+              <span>⚙️</span>
+              <span>{{ showAllergySelector ? 'Cerrar selector' : 'Gestionar alergias' }}</span>
+              <span class="text-[10px] transition-transform duration-200" :class="showAllergySelector ? 'rotate-180' : ''">▼</span>
+            </button>
+          </div>
+
+          <!-- Píldoras de Alergias Activas -->
+          <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
+            <template v-if="userAllergies && userAllergies.length > 0">
+              <div 
+                v-for="allergy in userAllergies" 
+                :key="allergy"
+                class="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-full text-xs font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-800/80 shadow-2xs">
+                <span>⚠️</span>
+                <span>{{ allergy }}</span>
+                <button 
+                  type="button"
+                  @click="removeAllergy(allergy)"
+                  class="w-4 h-4 rounded-full bg-rose-200/80 dark:bg-rose-800/80 hover:bg-rose-300 dark:hover:bg-rose-700 text-rose-900 dark:text-rose-100 flex items-center justify-center text-[10px] font-bold transition active:scale-90"
+                  title="Quitar esta alergia">
+                  &times;
+                </button>
+              </div>
+            </template>
+            <p v-else class="text-xs text-stone-400 dark:text-stone-500 italic flex items-center gap-1.5 py-0.5">
+              <span>🌿</span> No tenés alérgenos declarados. Podés agregar restricciones tocando "Gestionar alergias".
+            </p>
+          </div>
+
+          <!-- Panel Desplegable: Selector de Alergias & Tags Rápidos -->
+          <div v-if="showAllergySelector" class="pt-3.5 border-t border-stone-100 dark:border-stone-800 space-y-3.5">
+            <!-- Mensaje informativo -->
+            <div class="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/90 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
+              <span class="text-base flex-shrink-0 mt-0.5">💡</span>
+              <p class="leading-relaxed">
+                Las recetas con estos ingredientes se excluirán automáticamente de las sugerencias y te avisarán antes de agregarlas.
+              </p>
+            </div>
+
+            <!-- Tags rápidos predeterminados -->
+            <div class="space-y-1.5">
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+                Selección Rápida de Alérgenos Frecuentes:
+              </label>
+              <div class="flex flex-wrap gap-1.5">
+                <button 
+                  v-for="tag in (defaultAllergies || ['Frutos secos', 'Semillas', 'Algas', 'Gluten / Trigo', 'Soja / Shoyu', 'Cítricos', 'Apio', 'Sésamo', 'Legumbres'])" 
+                  :key="tag"
+                  type="button"
+                  @click="toggleAllergy(tag)"
+                  class="px-2.5 py-1 rounded-lg text-xs font-medium transition active:scale-95 border flex items-center gap-1.5"
+                  :class="userAllergies?.includes(tag) 
+                          ? 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 border-rose-300 dark:border-rose-800 font-bold shadow-2xs' 
+                          : 'bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-stone-300 dark:hover:border-stone-600'">
+                  <span>{{ userAllergies?.includes(tag) ? '✓' : '+' }}</span>
+                  <span>{{ tag }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Input para Alérgeno Personalizado -->
+            <div class="space-y-1.5">
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+                Agregar Alérgeno Personalizado:
+              </label>
+              <div class="flex items-center gap-2">
+                <input 
+                  type="text" 
+                  v-model="customAllergyInput"
+                  @keyup.enter="if(customAllergyInput && customAllergyInput.trim()){ addAllergy(customAllergyInput.trim()); customAllergyInput = ''; }"
+                  placeholder="Otro ingrediente a excluir (ej: nueces, sésamo, palta)..." 
+                  class="flex-1 bg-stone-50 dark:bg-stone-800/90 border border-stone-200 dark:border-stone-700 rounded-xl px-3 py-2 text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
+                <button 
+                  type="button"
+                  @click="if(customAllergyInput && customAllergyInput.trim()){ addAllergy(customAllergyInput.trim()); customAllergyInput = ''; }"
+                  :disabled="!customAllergyInput || !customAllergyInput.trim()"
+                  class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-40 disabled:pointer-events-none active:scale-95 text-white font-semibold text-xs rounded-xl shadow-2xs transition flex items-center gap-1 flex-shrink-0">
+                  <span>+</span>
+                  <span>Agregar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
         <!-- SECCIÓN: REGISTRO DE COMIDAS DEL DÍA       -->
         <!-- ========================================== -->
         <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
@@ -652,61 +774,224 @@
               <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
                 <span>🍽️ Comidas e Ingestas — Día {{ selectedDay }}</span>
                 <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
-                  {{ ['desayuno', 'almuerzo', 'merienda', 'cena'].filter(s => currentDayMeals[s] && currentDayMeals[s].done).length }} / 4 registradas
+                  {{ ['desayuno', 'almuerzo', 'merienda', 'cena'].filter(s => normalizeSlot(currentDayMeals[s]).items.some(i => i.done) || normalizeSlot(currentDayMeals[s]).done).length }} / 4 registradas
                 </span>
               </h3>
               <p class="text-xs text-stone-500 dark:text-stone-400">
-                Registrá qué comiste en cada momento o seleccioná una receta sugerida de la guía. Podés escribir libremente si hiciste alguna adaptación.
+                Registrá múltiples alimentos por momento, buscá recetas oficiales de la guía o ingresá platos libres.
               </p>
             </div>
           </div>
 
           <!-- Grilla de los 4 momentos del día -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
             <div 
               v-for="slot in data.journalOptions.mealSlots" 
               :key="slot.id"
-              class="p-4 rounded-xl border transition-all space-y-2.5"
-              :class="currentDayMeals[slot.id]?.done 
+              class="p-4 rounded-xl border transition-all space-y-3"
+              :class="normalizeSlot(currentDayMeals[slot.id]).items.length > 0 && normalizeSlot(currentDayMeals[slot.id]).items.every(i => i.done)
                       ? 'bg-sage-50/50 dark:bg-sage-950/20 border-sage-300 dark:border-sage-800/80' 
                       : 'bg-stone-50/50 dark:bg-stone-800/30 border-stone-200/70 dark:border-stone-800'">
               
               <!-- Cabecera del Slot -->
-              <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center justify-between gap-2 pb-1 border-b border-stone-200/60 dark:border-stone-800">
                 <div class="flex items-center gap-2">
                   <span class="text-lg">{{ slot.icon }}</span>
                   <span class="text-xs font-bold uppercase tracking-wider text-stone-800 dark:text-stone-200">{{ slot.label }}</span>
+                  <!-- Badge contador consumidos -->
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" 
+                        :class="normalizeSlot(currentDayMeals[slot.id]).items.length > 0 && normalizeSlot(currentDayMeals[slot.id]).items.every(i => i.done) 
+                                ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300' 
+                                : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'">
+                    <template v-if="normalizeSlot(currentDayMeals[slot.id]).items.length > 0">
+                      {{ normalizeSlot(currentDayMeals[slot.id]).items.filter(i => i.done).length }}/{{ normalizeSlot(currentDayMeals[slot.id]).items.length }} consumidos
+                    </template>
+                    <template v-else-if="normalizeSlot(currentDayMeals[slot.id]).text">
+                      {{ normalizeSlot(currentDayMeals[slot.id]).done ? 'Consumido ✓' : '1 registrado' }}
+                    </template>
+                    <template v-else>0 alimentos</template>
+                  </span>
                 </div>
-                <label class="flex items-center gap-1.5 cursor-pointer text-[11px] font-semibold select-none text-stone-600 dark:text-stone-300">
-                  <input 
-                    type="checkbox" 
-                    :checked="currentDayMeals[slot.id]?.done"
-                    @change="updateMealSlot(slot.id, { done: $event.target.checked })"
-                    class="rounded text-sage-600 focus:ring-sage-500 w-4 h-4 cursor-pointer">
-                  <span>{{ currentDayMeals[slot.id]?.done ? 'Consumido ✓' : 'Marcar consumo' }}</span>
-                </label>
+                
+                <!-- Toggle rápido marcar todo el slot -->
+                <button 
+                  type="button" 
+                  @click="toggleSlotAllDone(slot.id)" 
+                  class="text-[11px] font-semibold text-stone-500 hover:text-sage-700 dark:text-stone-400 dark:hover:text-sage-300 transition active:scale-95 flex items-center gap-1 select-none"
+                  title="Conmutar consumo completo de este momento">
+                  <span>{{ normalizeSlot(currentDayMeals[slot.id]).done ? 'Desmarcar' : 'Marcar todo ✓' }}</span>
+                </button>
               </div>
 
-              <!-- Input de Texto Libre -->
-              <div>
-                <input 
-                  type="text" 
-                  :value="currentDayMeals[slot.id]?.text || ''"
-                  @input="updateMealSlot(slot.id, { text: $event.target.value })"
-                  :placeholder="slot.id === 'desayuno' ? 'Ej: Manzana tibia con canela e infusión de jengibre' : (slot.id === 'almuerzo' ? 'Ej: Arroz yamaní al nituke con semillas' : (slot.id === 'merienda' ? 'Ej: Infusión de melisa y compota' : 'Ej: Caldo détox caliente con perejil'))"
-                  class="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700/80 rounded-lg px-3 py-2 text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-sage-500 transition">
+              <!-- Lista de Alimentos Consumidos -->
+              <div class="space-y-1.5 pt-0.5">
+                <template v-if="normalizeSlot(currentDayMeals[slot.id]).items && normalizeSlot(currentDayMeals[slot.id]).items.length > 0">
+                  <div 
+                    v-for="item in normalizeSlot(currentDayMeals[slot.id]).items" 
+                    :key="item.id"
+                    class="flex items-center justify-between gap-2 p-2.5 rounded-xl border transition-all text-xs"
+                    :class="item.done 
+                            ? 'bg-sage-50/70 dark:bg-sage-950/30 border-sage-200 dark:border-sage-800/60 shadow-2xs' 
+                            : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800 shadow-2xs'">
+                    
+                    <!-- Checkbox de consumo individual -->
+                    <label class="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer select-none">
+                      <input 
+                        type="checkbox" 
+                        :checked="item.done"
+                        @change="toggleMealItemDone(slot.id, item.id)"
+                        class="rounded text-sage-600 focus:ring-sage-500 w-4 h-4 cursor-pointer flex-shrink-0">
+                      <span class="font-medium text-stone-800 dark:text-stone-200 truncate" 
+                            :class="item.done ? 'line-through opacity-60 text-stone-500 dark:text-stone-400' : ''">
+                        {{ item.name }}
+                      </span>
+                    </label>
+
+                    <!-- Badge Receta / Comida Libre y Botón Eliminar -->
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                      <span v-if="item.isRecipe" 
+                            class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                        📖 Receta
+                      </span>
+                      <span v-else 
+                            class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700">
+                        Libre
+                      </span>
+                      <button 
+                        type="button" 
+                        @click="removeMealItem(slot.id, item.id)"
+                        class="text-stone-400 hover:text-rose-600 dark:hover:text-rose-400 p-1 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/50 transition active:scale-90"
+                        title="Eliminar este alimento">
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- Fallback si solo había texto legado -->
+                <template v-else-if="normalizeSlot(currentDayMeals[slot.id]).text">
+                  <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-xs">
+                    <label class="flex items-center gap-2 flex-1 min-w-0 cursor-pointer select-none">
+                      <input 
+                        type="checkbox" 
+                        :checked="normalizeSlot(currentDayMeals[slot.id]).done"
+                        @change="toggleSlotAllDone(slot.id)"
+                        class="rounded text-sage-600 focus:ring-sage-500 w-4 h-4 cursor-pointer flex-shrink-0">
+                      <span class="font-medium text-stone-800 dark:text-stone-200 truncate" 
+                            :class="normalizeSlot(currentDayMeals[slot.id]).done ? 'line-through opacity-60 text-stone-500' : ''">
+                        {{ normalizeSlot(currentDayMeals[slot.id]).text }}
+                      </span>
+                    </label>
+                    <button 
+                      type="button" 
+                      @click="updateMealSlot(slot.id, { text: '', done: false, items: [] })" 
+                      class="text-stone-400 hover:text-rose-600 p-1"
+                      title="Eliminar">
+                      🗑️
+                    </button>
+                  </div>
+                </template>
+
+                <!-- Estado vacío -->
+                <template v-else>
+                  <div class="p-2.5 text-center rounded-xl bg-stone-50/50 dark:bg-stone-800/20 border border-dashed border-stone-200 dark:border-stone-800">
+                    <p class="text-[11px] text-stone-400 dark:text-stone-500 italic">No hay alimentos registrados en este momento.</p>
+                  </div>
+                </template>
               </div>
 
-              <!-- Sugerencias de recetas para este momento -->
-              <div class="space-y-1">
-                <p class="text-[10px] font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Sugerencias recomendadas:</p>
+              <!-- Buscador con Dropdown interactivo -->
+              <div class="relative pt-1">
+                <div class="flex items-center gap-1.5">
+                  <div class="relative flex-1">
+                    <input 
+                      type="text" 
+                      v-model="mealSearchQueries[slot.id]"
+                      @keyup.enter="if(mealSearchQueries[slot.id]?.trim()){ addMealItem(slot.id, { name: mealSearchQueries[slot.id].trim(), isRecipe: false }); mealSearchQueries[slot.id] = ''; }"
+                      placeholder="Buscar receta por nombre o ingrediente (ej: manzana)..." 
+                      class="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700/80 rounded-xl pl-8 pr-7 py-2 text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-sage-500 transition">
+                    <span class="absolute left-2.5 top-2.5 text-stone-400 text-xs pointer-events-none">🔍</span>
+                    <button 
+                      v-if="mealSearchQueries[slot.id]" 
+                      @click="mealSearchQueries[slot.id] = ''" 
+                      type="button" 
+                      class="absolute right-2 top-2 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 text-xs p-0.5 rounded-full"
+                      title="Borrar texto">
+                      &times;
+                    </button>
+                  </div>
+
+                  <!-- Botón directo Agregar al lado del input -->
+                  <button 
+                    type="button" 
+                    @click="if(mealSearchQueries[slot.id]?.trim()){ addMealItem(slot.id, { name: mealSearchQueries[slot.id].trim(), isRecipe: false }); mealSearchQueries[slot.id] = ''; }"
+                    :disabled="!mealSearchQueries[slot.id]?.trim()"
+                    class="px-3.5 py-2 bg-sage-600 hover:bg-sage-700 disabled:opacity-40 disabled:pointer-events-none active:scale-95 text-white font-semibold text-xs rounded-xl shadow-2xs transition flex items-center gap-1 flex-shrink-0"
+                    title="Agregar como comida libre sin desplegar">
+                    <span>+</span>
+                    <span>Agregar</span>
+                  </button>
+                </div>
+
+                <!-- Dropdown de sugerencias cuando hay texto -->
+                <div 
+                  v-if="mealSearchQueries[slot.id] && mealSearchQueries[slot.id].trim().length > 0" 
+                  class="absolute z-30 left-0 right-0 mt-1.5 bg-white dark:bg-stone-900 rounded-xl shadow-xl border border-stone-200 dark:border-stone-750 max-h-56 overflow-y-auto divide-y divide-stone-100 dark:divide-stone-800 text-xs">
+                  
+                  <!-- Lista de recetas coincidentes -->
+                  <div 
+                    v-for="rec in getMealSearchResults(slot.id)" 
+                    :key="rec.id" 
+                    @click="addMealItem(slot.id, { name: rec.titulo, recipeId: rec.id, isRecipe: true }); mealSearchQueries[slot.id] = ''" 
+                    class="p-2.5 hover:bg-sage-50 dark:hover:bg-stone-800/80 cursor-pointer transition flex items-start justify-between gap-2">
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="font-bold text-stone-900 dark:text-stone-100">{{ rec.titulo }}</span>
+                        <span class="text-[9px] uppercase font-semibold px-1.5 py-0.2 rounded bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400">
+                          {{ rec.categoria }}
+                        </span>
+                      </div>
+                      <!-- Advertencia visual roja si tiene alérgeno -->
+                      <p v-if="rec.hasAllergen" class="text-[10px] font-bold text-rose-600 dark:text-rose-400 mt-0.5 flex items-center gap-1">
+                        <span>⚠️</span> <span>Contiene {{ rec.detectedAllergens?.join(', ') }}</span>
+                      </p>
+                    </div>
+                    <span class="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-0.5 flex-shrink-0 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                      <span>+</span> <span>Receta</span>
+                    </span>
+                  </div>
+
+                  <!-- Estado si no hubo recetas coincidentes -->
+                  <div v-if="getMealSearchResults(slot.id).length === 0" class="p-2.5 text-stone-400 dark:text-stone-500 italic text-[11px]">
+                    Sin recetas de la guía que coincidan.
+                  </div>
+
+                  <!-- Opción destacada al final: Registrar "[texto]" como comida libre -->
+                  <div 
+                    @click="addMealItem(slot.id, { name: mealSearchQueries[slot.id].trim(), isRecipe: false }); mealSearchQueries[slot.id] = '';" 
+                    class="p-2.5 bg-sage-50/90 dark:bg-stone-800/90 hover:bg-sage-100 dark:hover:bg-stone-700 cursor-pointer transition text-sage-900 dark:text-sage-100 font-semibold flex items-center justify-between gap-2 border-t border-stone-200/80 dark:border-stone-700">
+                    <span class="truncate">➕ Registrar "<strong>{{ mealSearchQueries[slot.id] }}</strong>" como comida libre</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-500 font-mono">Enter</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bloque de Sugerencias Recomendadas (Rotación) -->
+              <div class="space-y-1.5 pt-0.5">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500">Sugerencias recomendadas:</p>
                 <div class="flex flex-wrap gap-1.5">
                   <button 
                     v-for="sug in getMealSuggestions(slot.id)" 
-                    :key="sug.id"
-                    @click="updateMealSlot(slot.id, { text: sug.titulo, done: true })"
-                    class="text-[10px] px-2 py-0.5 rounded-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-sage-400 hover:text-sage-700 dark:hover:text-sage-300 shadow-2xs transition active:scale-95 flex items-center gap-1">
-                    <span>+</span> <span>{{ sug.titulo }}</span>
+                    :key="sug.id" 
+                    @click="addMealItem(slot.id, { name: sug.titulo, recipeId: sug.id, isRecipe: true })" 
+                    class="text-[11px] px-2.5 py-1 rounded-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-sage-400 hover:text-sage-700 dark:hover:text-sage-300 shadow-2xs transition active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                    <span class="font-bold text-sage-600 dark:text-sage-400">+</span>
+                    <span class="font-medium truncate max-w-[140px] sm:max-w-none">{{ sug.titulo }}</span>
+                    <span v-if="sug.badge" 
+                          class="text-[9px] font-extrabold px-1.5 py-0.2 rounded-full" 
+                          :class="sug.badge.includes('Aún no probada') ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'bg-teal-100 dark:bg-teal-950 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800'">
+                      {{ sug.badge }}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -734,7 +1019,7 @@
             </div>
 
             <div class="flex items-center gap-2">
-              <!-- Selector de Vistas: Día / Semana / Global -->
+              <!-- Selector de Vistas: Día / Semana / Comidas / Global -->
               <div class="inline-flex p-1 bg-stone-100 dark:bg-stone-800 rounded-xl border border-stone-200/80 dark:border-stone-700 text-xs">
                 <button 
                   @click="journalView = 'dia'"
@@ -747,6 +1032,13 @@
                   class="px-2.5 py-1 rounded-lg font-semibold transition"
                   :class="journalView === 'semana' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
                   Semana
+                </button>
+                <button 
+                  @click="journalView = 'comidas'"
+                  class="px-2.5 py-1 rounded-lg font-semibold transition flex items-center gap-1"
+                  :class="journalView === 'comidas' ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-2xs' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
+                  <span>🍽️</span>
+                  <span>Comidas</span>
                 </button>
                 <button 
                   @click="journalView = 'global'"
@@ -772,21 +1064,28 @@
             
             <!-- 1. Nivel de Energía -->
             <div class="space-y-1.5">
-              <label class="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
-                ⚡ Nivel de Energía Vital
-              </label>
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+                  ⚡ Nivel de Energía Vital
+                </label>
+                <span class="text-[10px] text-stone-400">Tocá de nuevo para deseleccionar</span>
+              </div>
               <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
                 <button 
                   v-for="lvl in data.journalOptions.energyLevels" 
                   :key="lvl.id"
-                  @click="updateCurrentJournal({ energy: lvl.id })"
-                  class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between"
-                  :class="currentDayJournal.energy === lvl.id 
-                          ? 'bg-sage-100/80 dark:bg-sage-950/60 border-sage-500 dark:border-sage-500 text-sage-900 dark:text-sage-100 shadow-2xs ring-1 ring-sage-500' 
-                          : 'bg-stone-50/60 dark:bg-stone-800/40 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:border-stone-300'">
+                  type="button"
+                  @click="setJournalEnergy(lvl.id)"
+                  class="p-2.5 rounded-xl border text-left transition-all active:scale-95 flex flex-col justify-between select-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-sage-500/40"
+                  :class="Number(currentDayJournal.energy) === lvl.id 
+                          ? 'bg-sage-100/90 dark:bg-sage-950/70 border-sage-500 dark:border-sage-500 text-sage-900 dark:text-sage-100 shadow-xs ring-2 ring-sage-500/50' 
+                          : 'bg-stone-50/60 dark:bg-stone-800/40 border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 hover:border-stone-300 dark:hover:border-stone-700'">
                   <div class="flex items-center justify-between">
                     <span class="text-xl">{{ lvl.icon }}</span>
-                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/70 dark:bg-stone-900/70">{{ lvl.id }}/5</span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                          :class="Number(currentDayJournal.energy) === lvl.id ? 'bg-sage-200/80 dark:bg-sage-900/80 text-sage-900 dark:text-sage-200' : 'bg-white/70 dark:bg-stone-900/70'">
+                      {{ lvl.id }}/5
+                    </span>
                   </div>
                   <div class="mt-1">
                     <p class="text-xs font-bold">{{ lvl.label }}</p>
@@ -805,7 +1104,7 @@
                 <button 
                   v-for="dig in data.journalOptions.digestionStates" 
                   :key="dig.id"
-                  @click="updateCurrentJournal({ digestion: dig.id })"
+                  @click="setJournalDigestion(dig.id)"
                   class="p-2.5 rounded-xl border text-left transition flex items-center gap-2.5"
                   :class="currentDayJournal.digestion === dig.id 
                           ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-100 shadow-2xs ring-1 ring-emerald-500' 
@@ -908,17 +1207,143 @@
             </div>
           </div>
 
+          <!-- ========================================== -->
+          <!-- VISTA: HISTORIAL DE COMIDAS & RECETAS     -->
+          <!-- ========================================== -->
+          <div v-else-if="journalView === 'comidas'" class="space-y-4">
+            
+            <!-- Encabezado con métricas de recetas de la guía -->
+            <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-sage-50 dark:from-stone-900 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-2xs space-y-3.5">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <h4 class="text-sm sm:text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                    <span>📊 Cobertura Culinaria & Recetas del Reto</span>
+                    <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-extrabold shadow-2xs">
+                      {{ recipeStats.coveragePercent }}%
+                    </span>
+                  </h4>
+                  <p class="text-xs text-stone-600 dark:text-stone-400 mt-0.5">
+                    Métricas de recetas oficiales probadas durante los 21 días de desintoxicación.
+                  </p>
+                </div>
+                <button 
+                  @click="showExportModal = true"
+                  class="text-xs font-semibold px-2.5 py-1.5 rounded-xl bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-750 transition flex items-center gap-1 active:scale-95 text-stone-700 dark:text-stone-200">
+                  <span>📋 Exportar informe</span>
+                </button>
+              </div>
+
+              <!-- Tarjetas de Métricas -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                <div class="p-3 rounded-xl bg-white/80 dark:bg-stone-800/80 border border-emerald-200/60 dark:border-emerald-800/40">
+                  <p class="text-[10px] uppercase font-bold text-stone-400 dark:text-stone-500 tracking-wider">Recetas Probadas</p>
+                  <p class="text-lg font-black text-emerald-800 dark:text-emerald-300 mt-0.5">
+                    {{ recipeStats.preparedCount }} <span class="text-xs font-normal text-stone-500">/ {{ recipeStats.totalRecipes }}</span>
+                  </p>
+                  <p class="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5">De la guía oficial</p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-white/80 dark:bg-stone-800/80 border border-amber-200/60 dark:border-amber-800/40">
+                  <p class="text-[10px] uppercase font-bold text-stone-400 dark:text-stone-500 tracking-wider">Pendientes por Probar</p>
+                  <p class="text-lg font-black text-amber-800 dark:text-amber-300 mt-0.5">
+                    {{ recipeStats.neverPreparedCount }}
+                  </p>
+                  <p class="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5">Nuevas preparaciones</p>
+                </div>
+
+                <div class="p-3 rounded-xl bg-white/80 dark:bg-stone-800/80 border border-stone-200 dark:border-stone-700">
+                  <p class="text-[10px] uppercase font-bold text-stone-400 dark:text-stone-500 tracking-wider">Total de Ingestas</p>
+                  <p class="text-lg font-black text-stone-800 dark:text-stone-200 mt-0.5">
+                    {{ consumedMealsHistory.length }}
+                  </p>
+                  <p class="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5">Platos registrados</p>
+                </div>
+              </div>
+
+              <!-- Barra de Cobertura -->
+              <div class="space-y-1 pt-1">
+                <div class="flex items-center justify-between text-xs font-medium text-stone-700 dark:text-stone-300">
+                  <span>Progreso de rotación culinaria</span>
+                  <span>{{ recipeStats.preparedCount }} de {{ recipeStats.totalRecipes }} recetas probadas</span>
+                </div>
+                <div class="w-full h-2.5 rounded-full bg-stone-200/80 dark:bg-stone-800 overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
+                       :style="{ width: `${recipeStats.coveragePercent}%` }">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Línea de Tiempo de Alimentos Consumidos Día por Día -->
+            <div class="space-y-3 pt-1">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 flex items-center gap-1.5">
+                  <span>⏳</span>
+                  <span>Línea de Tiempo de Ingestas (Día por Día)</span>
+                </h4>
+                <span class="text-[11px] text-stone-400">{{ consumedMealsHistory.length }} consumidas en total</span>
+              </div>
+
+              <!-- Lista Cronológica -->
+              <div v-if="consumedMealsHistory && consumedMealsHistory.length > 0" class="space-y-2 max-h-[440px] overflow-y-auto pr-1">
+                <div 
+                  v-for="item in consumedMealsHistory" 
+                  :key="item.itemId || item.name + item.day"
+                  class="p-3 bg-stone-50 dark:bg-stone-800/40 rounded-xl border border-stone-200/80 dark:border-stone-800 transition hover:border-sage-300 dark:hover:border-stone-700 flex items-center justify-between gap-3 text-xs">
+                  
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="px-2 py-1 rounded-lg bg-stone-200 dark:bg-stone-700 font-extrabold text-stone-800 dark:text-stone-200 text-[11px] flex-shrink-0">
+                      Día {{ item.day }}
+                    </span>
+                    <span class="text-base flex-shrink-0">{{ item.slotIcon }}</span>
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="font-bold text-stone-800 dark:text-stone-200 truncate">{{ item.name }}</span>
+                        <span class="text-[10px] text-stone-500 dark:text-stone-400 capitalize">({{ item.slotLabel }})</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-2 flex-shrink-0">
+                    <span v-if="item.isRecipe" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                      📖 Receta
+                    </span>
+                    <span v-else class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700">
+                      Libre
+                    </span>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold text-xs">✓</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Estado Vacío -->
+              <div v-else class="p-6 text-center text-stone-400 dark:text-stone-500 italic space-y-1.5 bg-stone-50/50 dark:bg-stone-800/20 rounded-xl border border-stone-200/60 dark:border-stone-800/50">
+                <p class="text-2xl">🍽️</p>
+                <p class="text-xs font-medium text-stone-600 dark:text-stone-300">Todavía no hay comidas marcadas como consumidas.</p>
+                <p class="text-[11px]">A medida que tildes los alimentos en tu día actual, se irá construyendo automáticamente tu historial de ingestas y rotación.</p>
+              </div>
+            </div>
+
+          </div>
+
           <!-- VISTA 3: HISTORIAL GLOBAL (TODOS LOS REGISTROS APILADOS) -->
           <div v-else-if="journalView === 'global'" class="space-y-3">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between flex-wrap gap-2">
               <h4 class="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300">
                 Historial Clínico Completo (Días 1 al 21)
               </h4>
-              <button 
-                @click="showExportModal = true"
-                class="text-xs text-sage-600 dark:text-sage-400 hover:underline font-semibold flex items-center gap-1">
-                <span>📋 Exportar informe completo</span>
-              </button>
+              <div class="flex items-center gap-2">
+                <button 
+                  @click="journalView = 'comidas'"
+                  class="text-xs text-emerald-700 dark:text-emerald-400 hover:underline font-semibold flex items-center gap-1">
+                  <span>🍽️ Cobertura: {{ recipeStats.coveragePercent }}%</span>
+                </button>
+                <button 
+                  @click="showExportModal = true"
+                  class="text-xs text-sage-600 dark:text-sage-400 hover:underline font-semibold flex items-center gap-1">
+                  <span>📋 Exportar informe</span>
+                </button>
+              </div>
             </div>
 
             <!-- Listado Apilado -->
@@ -1099,12 +1524,24 @@
             <!-- Filtros de Categoría -->
             <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
               <button 
-                v-for="cat in ['todas', 'desayunos', 'almuerzos', 'caldos', 'dips', 'panificados', 'fermentos', 'leches']"
-                :key="cat"
-                @click="recipeFilterCategory = cat"
-                :class="recipeFilterCategory === cat ? 'bg-sage-600 text-white font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
-                class="px-3 py-1.5 rounded-lg capitalize whitespace-nowrap transition">
-                {{ cat === 'todas' ? 'Todas las recetas' : cat }}
+                v-for="cat in [
+                  { id: 'todas', label: 'Todas las recetas' },
+                  { id: 'almuerzos', label: 'Platos & Guisos' },
+                  { id: 'sopas', label: 'Sopas Clínicas' },
+                  { id: 'caldos', label: 'Caldos' },
+                  { id: 'desayunos', label: 'Desayunos & Meriendas' },
+                  { id: 'dips', label: 'Dips & Untables' },
+                  { id: 'alinos', label: 'Aliños & Condimentos' },
+                  { id: 'panificados', label: 'Panificados' },
+                  { id: 'fermentos', label: 'Fermentos & Pickles' },
+                  { id: 'leches', label: 'Leches Vegetales' },
+                  { id: 'infusiones', label: 'Infusiones & Fitoterapia' }
+                ]"
+                :key="cat.id"
+                @click="recipeFilterCategory = cat.id"
+                :class="recipeFilterCategory === cat.id ? 'bg-sage-600 text-white font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
+                class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">
+                {{ cat.label }}
               </button>
             </div>
           </div>
@@ -1961,7 +2398,7 @@
     <!-- Footer -->
     <footer class="mt-auto border-t border-stone-200 dark:border-stone-800 py-6 text-center text-xs text-stone-500 dark:text-stone-400 bg-white/50 dark:bg-stone-900/50">
       <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p>Detox de Primavera • <span class="font-mono font-semibold text-sage-600 dark:text-sage-400">v1.2.1</span> • Material de referencia Septiembre 2026</p>
+        <p>Detox de Primavera • <span class="font-mono font-semibold text-sage-600 dark:text-sage-400">v1.4.0</span> • Material de referencia Septiembre 2026</p>
         <button @click="resetAllData" class="text-rose-500 hover:text-rose-700 text-xs font-medium underline">
           Reiniciar Progreso de la App
         </button>
@@ -2174,14 +2611,32 @@
                   <p class="text-[10px] text-stone-500 dark:text-stone-400">Tu código personal:</p>
                   <p class="text-lg font-mono font-bold tracking-wider text-stone-900 dark:text-stone-100">{{ syncKey }}</p>
                 </div>
-                <button 
-                  @click="copySyncLink()"
-                  class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold rounded-lg shadow-2xs transition flex items-center gap-1 text-xs">
-                  <span>📋</span>
-                  <span>Copiar Link</span>
-                </button>
+                <div class="flex items-center gap-1.5">
+                  <button 
+                    @click="copySyncLink()"
+                    title="Copiar enlace web de vinculación"
+                    class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold rounded-lg shadow-2xs transition flex items-center gap-1 text-xs">
+                    <span>📋</span>
+                    <span>Copiar Link</span>
+                  </button>
+                  <button 
+                    @click="shareViaWhatsApp()"
+                    title="Enviar enlace por WhatsApp"
+                    class="px-2.5 py-1.5 bg-emerald-700/90 hover:bg-emerald-800 active:scale-95 text-white font-semibold rounded-lg shadow-2xs transition flex items-center gap-1 text-xs">
+                    <span>💬</span>
+                    <span class="hidden sm:inline">WhatsApp</span>
+                  </button>
+                </div>
               </div>
             </div>
+
+            <!-- Botón directo WhatsApp -->
+            <button 
+              @click="shareViaWhatsApp()"
+              class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-medium rounded-xl transition flex items-center justify-center gap-2 text-xs shadow-xs">
+              <span class="text-base">💬</span>
+              <span>Enviar enlace por WhatsApp a mi celular o a Jime</span>
+            </button>
 
             <!-- Paso a paso para vincular Celular / Otra PC -->
             <div class="space-y-2.5">
@@ -2194,20 +2649,30 @@
                 <p class="text-[11px] text-stone-600 dark:text-stone-300 font-medium">
                   📸 Escaneá con la cámara de tu celular:
                 </p>
-                <div class="flex justify-center p-2 bg-white rounded-lg inline-block mx-auto border border-stone-200">
-                  <img :src="qrCodeUrl" alt="Código QR de vinculación" class="w-36 h-36 rounded-md">
+                <div class="flex justify-center p-2.5 bg-white rounded-xl inline-block mx-auto border border-stone-200 shadow-2xs">
+                  <img :src="qrCodeUrl" alt="Código QR de vinculación" class="w-40 h-40 rounded-md object-contain">
                 </div>
-                <p class="text-[10px] text-stone-400">Al abrir el link escaneado, tu celular queda vinculado para siempre.</p>
+                <p class="text-[10px] text-stone-500 dark:text-stone-400">
+                  Al escanearlo, tu celular abrirá la aplicación web oficial y se vinculará de inmediato.
+                </p>
+                <div class="pt-0.5">
+                  <span class="text-[9px] font-mono text-stone-400 dark:text-stone-500 break-all select-all">
+                    {{ syncShareUrl }}
+                  </span>
+                </div>
               </div>
 
               <!-- Opción Código manual -->
-              <div class="p-3 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700/60 space-y-1">
+              <div class="p-3 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700/60 space-y-1.5">
                 <p class="text-[11px] text-stone-600 dark:text-stone-300 font-medium">
                   💻 O ingresá este código en otra compu:
                 </p>
                 <div class="flex items-center justify-between bg-white dark:bg-stone-900 p-2 rounded-lg border border-stone-200 dark:border-stone-700">
-                  <code class="font-mono font-bold text-emerald-600 dark:text-emerald-400">{{ syncKey }}</code>
-                  <button @click="copySyncLink()" class="text-xs text-stone-500 hover:text-stone-800 dark:hover:text-stone-200">Copiar</button>
+                  <code class="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">{{ syncKey }}</code>
+                  <div class="flex items-center gap-1">
+                    <button @click="copySyncCode()" class="px-2 py-1 text-xs bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 rounded font-medium transition active:scale-95">Copiar código</button>
+                    <button @click="copySyncLink()" class="px-2 py-1 text-xs bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 rounded font-medium transition active:scale-95">Copiar link</button>
+                  </div>
                 </div>
               </div>
 

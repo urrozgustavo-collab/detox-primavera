@@ -61,12 +61,24 @@
             <!-- Filtros de Categoría -->
             <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
               <button 
-                v-for="cat in ['todas', 'desayunos', 'almuerzos', 'caldos', 'dips', 'panificados', 'fermentos', 'leches']"
-                :key="cat"
-                @click="recipeFilterCategory = cat"
-                :class="recipeFilterCategory === cat ? 'bg-sage-600 text-white font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
-                class="px-3 py-1.5 rounded-lg capitalize whitespace-nowrap transition">
-                {{ cat === 'todas' ? 'Todas las recetas' : cat }}
+                v-for="cat in [
+                  { id: 'todas', label: 'Todas las recetas' },
+                  { id: 'almuerzos', label: 'Platos & Guisos' },
+                  { id: 'sopas', label: 'Sopas Clínicas' },
+                  { id: 'caldos', label: 'Caldos' },
+                  { id: 'desayunos', label: 'Desayunos & Meriendas' },
+                  { id: 'dips', label: 'Dips & Untables' },
+                  { id: 'alinos', label: 'Aliños & Condimentos' },
+                  { id: 'panificados', label: 'Panificados' },
+                  { id: 'fermentos', label: 'Fermentos & Pickles' },
+                  { id: 'leches', label: 'Leches Vegetales' },
+                  { id: 'infusiones', label: 'Infusiones & Fitoterapia' }
+                ]"
+                :key="cat.id"
+                @click="recipeFilterCategory = cat.id"
+                :class="recipeFilterCategory === cat.id ? 'bg-sage-600 text-white font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
+                class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">
+                {{ cat.label }}
               </button>
             </div>
           </div>

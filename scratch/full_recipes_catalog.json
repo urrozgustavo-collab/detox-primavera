@@ -1,0 +1,1944 @@
+[
+  {
+    "id": "caldo-detox",
+    "titulo": "Caldo Détox Alcalinizante",
+    "categoria": "caldos",
+    "tiempo": "35 min",
+    "metodo": "Hervido suave tapado",
+    "ingredientes": [
+      "4 pencas de apio cortadas",
+      "2 dientes de ajo enteros aplastados",
+      "1 a 2 puerros cortados",
+      "1/2 alcaucil (si hay en estación)",
+      "1 taza de repollo blanco en tiras",
+      "1 o 2 zanahorias en rodajas",
+      "1 puñado de perejil fresco",
+      "1 manzana entera con corazón y semillas",
+      "Sal marina a gusto"
+    ],
+    "pasos": [
+      "Colocar todas las verduras y la manzana en una olla grande.",
+      "Llenar con agua fría duplicando holgadamente el volumen de los vegetales (unos 5 cm por encima).",
+      "Hervir tapado a fuego mínimo durante 35-40 minutos hasta que el caldo tome color y sabor profundo.",
+      "Colar el líquido y descartar las verduras (o usarlas para compost).",
+      "Tomar caliente o tibio a lo largo del día o antes de las comidas."
+    ],
+    "tip": "La manzana aporta pectina y equilibra la acidez mineral del caldo.",
+    "alergenos": [
+      "apio"
+    ]
+  },
+  {
+    "id": "nituke-manzana",
+    "titulo": "Nituke de Manzana (Desayuno / Merienda)",
+    "categoria": "desayunos",
+    "tiempo": "40 min",
+    "metodo": "Nituke",
+    "ingredientes": [
+      "3 o 4 manzanas rojas o verdes peladas y en cubos",
+      "2 cucharadas soperas de agua",
+      "1 pizca de sal marina",
+      "Opcional: Almendras tostadas picadas o semillas de lino molidas"
+    ],
+    "pasos": [
+      "Calentar una cacerola de fondo grueso que tape herméticamente con 2 cucharadas soperas de agua.",
+      "Incorporar las manzanas peladas y cortadas con la pizca de sal marina.",
+      "Tapar bien y poner a fuego mínimo pelusa (usar difusor de calor si es necesario).",
+      "Cocinar durante 40 minutos sin destapar continuamente; chequear que no se pegue.",
+      "Cuanto más tiempo se cocine más dulce queda. Servir tibio con almendras o lino molido."
+    ],
+    "tip": "Es el desayuno ideal para la monodieta y para personas friolentas.",
+    "alergenos": []
+  },
+  {
+    "id": "hummus-mung",
+    "titulo": "Hummus de Porotos Mung",
+    "categoria": "dips",
+    "tiempo": "15 min (con porotos ya cocidos)",
+    "metodo": "Procesado en frío",
+    "ingredientes": [
+      "2 tazas de porotos mung cocidos tiernos (remojados la noche anterior y hervidos 35 min)",
+      "1 diente de ajo pequeño",
+      "1 puñado de hojas de albahaca fresca",
+      "1 cucharada sopera de aceite de oliva crudo",
+      "Gotitas de jugo de limón fresco",
+      "Sal marina a gusto",
+      "Caldo de cocción de los porotos mung (cantidad necesaria)"
+    ],
+    "pasos": [
+      "Colocar los porotos mung cocidos en la procesadora o vaso de licuadora.",
+      "Agregar el ajo, la albahaca, el aceite de oliva, el limón y la sal marina.",
+      "Procesar incorporando el caldo de cocción reservado de a poco hasta obtener una pasta untable cremosa.",
+      "Servir con un chorrito de oliva crudo y páprika o sésamo por encima."
+    ],
+    "tip": "El poroto mung no genera flatulencias como otras legumbres y es altamente depurativo.",
+    "alergenos": []
+  },
+  {
+    "id": "mayonesa-zanahoria",
+    "titulo": "Mayonesa Suave de Zanahoria",
+    "categoria": "dips",
+    "tiempo": "20 min",
+    "metodo": "Hervido + Procesado",
+    "ingredientes": [
+      "4 zanahorias peladas",
+      "1 trozo pequeño de zapallo anco (aporta cremosidad)",
+      "1/2 puerro o trozo de cebolla",
+      "1 diente de ajo",
+      "1 cucharada de aceite de oliva crudo",
+      "Abundante jugo de limón fresco",
+      "Sal marina a gusto",
+      "Opcional: 3 o 4 aceitunas negras descarozadas"
+    ],
+    "pasos": [
+      "Hervir las zanahorias, zapallo y puerro desde agua fría hasta que estén super tiernos.",
+      "Reservar el líquido de cocción (¡es muy dulce y sabroso!).",
+      "Procesar las verduras con el ajo, aceite de oliva, limón, sal y el líquido de cocción necesario para emulsionar.",
+      "Guardar en frasco de vidrio en heladera hasta por 4 días."
+    ],
+    "tip": "Excelente aliño diluido con más limón para ensaladas de hojas amargas.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "babaganoush",
+    "titulo": "Babaganoush Ahumado sin Aceite Cocido",
+    "categoria": "dips",
+    "tiempo": "25 min",
+    "metodo": "Asado a la llama",
+    "ingredientes": [
+      "2 berenjenas medianas enteras",
+      "1/2 diente de ajo rallado",
+      "Jugo de 1/2 limón",
+      "1 cucharada de aceite de oliva virgen extra en crudo",
+      "Sal marina y pizca de comino"
+    ],
+    "pasos": [
+      "Colocar las berenjenas directo sobre el fuego de la hornalla, rotándolas con pinza hasta carbonizar la piel por completo y sentirlas blandas.",
+      "Meter en una bolsa limpia cerrada unos 10 minutos para que el vapor ayude a desprender la piel.",
+      "Pelar retirando los restos carbonizados y quedándose con la pulpa suave.",
+      "Pisar con tenedor junto con el ajo, limón, sal marina y oliva crudo."
+    ],
+    "tip": "El sabor ahumado reemplaza la necesidad de salsas pesadas.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "queso-caju",
+    "titulo": "Queso Untable de Castañas de Cajú",
+    "categoria": "dips",
+    "tiempo": "10 min + remojo",
+    "metodo": "Remojo + Licuado",
+    "ingredientes": [
+      "1 taza de castañas de cajú crudas sin sal (remojadas 8 hs)",
+      "1/4 a 1/2 taza de agua limpia de filtro",
+      "1 pizca de sal marina",
+      "Gotitas de limón",
+      "Opcional: Levadura nutricional o hierbas frescas picadas"
+    ],
+    "pasos": [
+      "Desechar el agua de remojo de las castañas de cajú.",
+      "Licuar a potencia máxima con el agua fresca, sal y limón hasta que no queden grumos y parezca queso crema.",
+      "Guardar en frasco cerrado en la heladera hasta por 5 días."
+    ],
+    "tip": "Si le agregás 1 cápsula de probiótico y lo dejás 12 hs a temperatura ambiente, fermenta en queso probiótico ácido.",
+    "alergenos": [
+      "frutos_secos",
+      "citricos"
+    ]
+  },
+  {
+    "id": "galletas-yamani",
+    "titulo": "Maravillosas Galletas de Arroz Yamaní",
+    "categoria": "panificados",
+    "tiempo": "30 min",
+    "metodo": "Horno 180°C",
+    "ingredientes": [
+      "1 taza de arroz yamaní cocido pasado (1 taza arroz x 3 de agua)",
+      "1 taza de harina de arroz integral",
+      "4 cucharadas de semillas de lino",
+      "2 cucharadas de aceite de oliva",
+      "Chorrito de agua tibia (apenas para unir)",
+      "Sal marina y hierbas secas (orégano, tomillo o cúrcuma)"
+    ],
+    "pasos": [
+      "Amasar el arroz cocido con las manos para que libere el almidón y se pegotee.",
+      "Mezclar con la harina de arroz, lino, aceite, sal y condimentos.",
+      "Agregar apenas el agua necesaria para armar una masa unida.",
+      "Formar bolitas pequeñas y aplastarlas bien finitas sobre placa para horno con papel o silicona.",
+      "Hornear a 180°C durante 10-12 minutos hasta que estén doradas y crocantes."
+    ],
+    "tip": "Reemplazo crujiente ideal para las tostadas industriales de paquete.",
+    "alergenos": []
+  },
+  {
+    "id": "pan-centeno-masamadre",
+    "titulo": "Pan de Centeno 100% de Masa Madre",
+    "categoria": "panificados",
+    "tiempo": "Leudado largo + 50 min horno",
+    "metodo": "Fermentación natural y horneado",
+    "ingredientes": [
+      "1 kg de harina de centeno integral pura",
+      "2 tazas de fermento de masa madre activo",
+      "1 cucharada colmada de sal marina",
+      "800 ml de agua tibia"
+    ],
+    "pasos": [
+      "Mezclar la harina con la sal marina e integrar el fermento y el agua.",
+      "Amasar (queda una textura pegajosa típica del centeno).",
+      "Dejar levar entre 8 y 12 horas en bowl cubierto a temperatura ambiente.",
+      "Dar forma a dos panes de molde aceitados y dejar reposar 2 horas más.",
+      "Hornear a fuego medio (180°C) durante 50 minutos. Está listo cuando suena hueco al golpear la base."
+    ],
+    "tip": "Si no tenés tiempo para hornearlo, compralo en locales como Hausbrot o Le Pain Quotidien, cortalo en rodajas y freezalo.",
+    "alergenos": [
+      "gluten"
+    ]
+  },
+  {
+    "id": "chucrut-casero",
+    "titulo": "Chucrut Probiótico Vivo",
+    "categoria": "fermentos",
+    "tiempo": "20 min prep + 21 días fermento",
+    "metodo": "Fermentación láctica anaeróbica",
+    "ingredientes": [
+      "1 repollo agroecológico (blanco o morado)",
+      "Sal marina (20 a 25 g por cada kilo de repollo picado, aprox 2% a 2.5%)"
+    ],
+    "pasos": [
+      "Retirar y reservar intactas un par de hojas externas limpias del repollo.",
+      "Picar el repollo muy finito en tiras y pesarlo.",
+      "Pesar el 2% de sal marina correspondiente y mezclar con el repollo picado.",
+      "Amasar intensamente con las manos durante 5-8 minutos hasta que libere abundante líquido (salmuera propia).",
+      "Envasar en frasco de vidrio bien limpio, empujando con el puño para que no queden burbujas de aire.",
+      "Cubrir con las hojas exteriores reservadas y poner un peso para que todo quede sumergido bajo el líquido.",
+      "Tapar y dejar fermentar en oscuridad a temperatura ambiente por 21 a 28 días antes de llevar a heladera."
+    ],
+    "tip": "1 cucharadita diaria antes de almorzar aporta billones de lactobacilos para restaurar la microbiota.",
+    "alergenos": []
+  },
+  {
+    "id": "leche-almendras",
+    "titulo": "Leche Fresca de Almendras",
+    "categoria": "leches",
+    "tiempo": "10 min + remojo previo",
+    "metodo": "Licuado + Filtrado en tela",
+    "ingredientes": [
+      "100 g de almendras crudas (remojadas 8 a 12 hs)",
+      "1 litro de agua de filtro limpia",
+      "Opcional: pizca de sal marina o canela"
+    ],
+    "pasos": [
+      "Tirar el agua de remojo de las almendras.",
+      "Poner las almendras en licuadora con el litro de agua fresca.",
+      "Licuar a potencia máxima durante 2 minutos hasta que el líquido quede blanco y cremoso.",
+      "Colar a través de una bolsa de tela para leches vegetales o colador ultra fino, apretando bien la pulpa.",
+      "Guardar en botella de vidrio tapada en la heladera por 4 a 5 días."
+    ],
+    "tip": "La pulpa sobrante (bagazo) se puede hornear para hacer galletas o sumar a masas.",
+    "alergenos": [
+      "frutos_secos"
+    ]
+  },
+  {
+    "id": "bowl-yamani-cruciferas",
+    "titulo": "Bowl Alcalino de Yamaní y Crucíferas",
+    "categoria": "almuerzos",
+    "tiempo": "25 min",
+    "metodo": "Vapor + Ensamble",
+    "ingredientes": [
+      "1 taza de arroz yamaní cocido caliente",
+      "1 taza de ramilletes de brócoli al vapor (5 min)",
+      "1 taza de coliflor al vapor (6 min)",
+      "1/2 taza de porotos mung cocidos",
+      "1/4 de palta en láminas",
+      "1 cucharadita de chucrut vivo",
+      "Aliño: 1 cda de aceite de oliva crudo, gotas de salsa Shoyu MOA y jugo de limón"
+    ],
+    "pasos": [
+      "Disponer el arroz yamaní tibio en la base de un bowl amplio.",
+      "Acomodar a los lados el brócoli, coliflor y porotos mung.",
+      "Sumar la palta fresca y la cucharada de chucrut vivo al costado.",
+      "Rociar con el aceite de oliva, la salsa Shoyu MOA y el jugo de limón antes de servir."
+    ],
+    "tip": "El plato perfecto que reúne carbohidrato complejo, proteína vegetal, verde amargo y probiótico.",
+    "alergenos": [
+      "soja",
+      "citricos"
+    ]
+  },
+  {
+    "id": "leche-caju",
+    "titulo": "Leche Fresca de Castañas de Cajú al Instante",
+    "categoria": "leches",
+    "tiempo": "5 min",
+    "metodo": "Licuado en frío sin filtro",
+    "ingredientes": [
+      "100 g de castañas de cajú crudas (no tostadas, sin sal)",
+      "1 litro de agua pura de filtro a temperatura ambiente",
+      "Opcional: 1 pizca de sal marina o canela pura de Ceilán"
+    ],
+    "pasos": [
+      "Colocar las castañas de cajú directamente en la licuadora (el cajú es el único fruto seco que puede prescindir del remojo previo y de la bolsa de filtrado si se dispone de una licuadora potente).",
+      "Incorporar 1 litro de agua pura de filtro.",
+      "Licuar a potencia máxima durante 2 minutos continuos hasta obtener una emulsión blanca, sedosa y uniforme.",
+      "Verter directamente en una botella de vidrio limpia sin necesidad de pasar por filtro de tela.",
+      "Tapar y conservar en la heladera durante 4 a 5 días. Agitar enérgicamente antes de servir."
+    ],
+    "tip": "Al no requerir colado, se aprovecha el 100% de los lípidos y minerales del fruto seco con mínima fricción operativa.",
+    "alergenos": [
+      "frutos_secos"
+    ]
+  },
+  {
+    "id": "queso-crema-tofu",
+    "titulo": "Queso Crema de Tofu Orgánico",
+    "categoria": "dips",
+    "tiempo": "35 min",
+    "metodo": "Hervido suave + Procesado en caliente",
+    "ingredientes": [
+      "250 g de tofu firme orgánico certificado (marca Soyana)",
+      "3 cucharadas soperas de aceite de oliva extra virgen en crudo",
+      "2 a 3 cucharadas de agua pura o caldo de hervor del tofu",
+      "1 cucharada sopera de semillas de sésamo integral tostadas",
+      "1 cucharadita de sal marina o 1 cucharada sopera de salsa de soja natural (marca Shoyu MOA)",
+      "Opcional al gusto: cebollín fresco picado fino, pimentón dulce de alta gama o 1 cucharada de levadura de cerveza nutricional"
+    ],
+    "pasos": [
+      "Hervir el bloque de tofu entero en abundante agua hirviendo durante 30 minutos continuos para predigerir sus proteínas vegetales y suavizar el sabor.",
+      "Retirar del agua caliente y escurrir.",
+      "Cortar en cubos y colocar en el vaso de la procesadora o licuadora.",
+      "Incorporar el aceite de oliva extra virgen, el sésamo tostado, la sal marina (o salsa Shoyu MOA) y las cucharadas de agua.",
+      "Procesar a velocidad alta hasta emulsionar en una pasta untable cremosa, lisa y homogénea.",
+      "Sumar cebollín fresco, pimentón dulce o levadura nutricional según la variante elegida y revolver.",
+      "Envasar en frasco de vidrio hermético y refrigerar hasta por 4 días."
+    ],
+    "tip": "Es fundamental utilizar soja orgánica certificada y hervir el bloque 30 minutos para desactivar inhibidores enzimáticos.",
+    "alergenos": [
+      "soja",
+      "sesamo"
+    ]
+  },
+  {
+    "id": "untable-hinojo-citricos",
+    "titulo": "Untable Fresco de Hinojo y Cítricos",
+    "categoria": "dips",
+    "tiempo": "10 min",
+    "metodo": "Procesado en frío",
+    "ingredientes": [
+      "1 bulbo de hinojo mediano (sin las capas externas fibrosas, trozado)",
+      "1 trozo de puerro de 7,5 cm (solo la parte blanca y verde claro, picada)",
+      "1/4 taza de castañas de cajú crudas",
+      "5 cucharadas soperas de aceite de oliva extra virgen",
+      "3 cucharadas soperas de jugo fresco de lima o limón",
+      "1/2 diente de ajo fresco",
+      "1 cucharadita de sal marina fina",
+      "Opcional: 1 cucharadita de levadura nutricional o unas gotas de salsa Shoyu MOA",
+      "Variación aromática: 1/2 taza de hojas frescas de cilantro y 1/2 taza de menta fresca"
+    ],
+    "pasos": [
+      "Lavar y descartar las capas duras del hinojo, cortando el bulbo en pedazos medianos.",
+      "Colocar en la licuadora el hinojo, el puerro, las castañas de cajú y el medio ajo.",
+      "Agregar el aceite de oliva extra virgen, el jugo de lima y la sal marina fina.",
+      "Licuar a potencia media-alta, deteniendo el motor para bajar las paredes con una espátula de silicona.",
+      "Si se eligen las hierbas frescas (cilantro y menta), sumarlas al final y procesar brevemente para no recalentarlas.",
+      "Trasladar a frasco de vidrio hermético y mantener en la heladera hasta por 3 días."
+    ],
+    "tip": "El hinojo crudo combinado con cítricos es un poderoso carminativo que desinflama el tracto gástrico y alivia el meteorismo.",
+    "alergenos": [
+      "frutos_secos",
+      "citricos"
+    ]
+  },
+  {
+    "id": "pasta-remolacha-aduki",
+    "titulo": "Pasta de Remolachas y Porotos Aduki",
+    "categoria": "dips",
+    "tiempo": "15 min (con legumbres cocidas)",
+    "metodo": "Vapor + Procesado",
+    "ingredientes": [
+      "1 taza de porotos aduki cocidos tiernos (reservando su líquido de cocción)",
+      "1 remolacha grande cocida al vapor con cáscara hasta tiernizar y pelada",
+      "1/2 diente de ajo fresco",
+      "1 cucharada sopera de aceite de oliva extra virgen en crudo",
+      "1 chorrito de salsa de soja natural Shoyu MOA",
+      "1 pizca de comino molido",
+      "Caldo de cocción de los aduki (cantidad necesaria para dar untuosidad)"
+    ],
+    "pasos": [
+      "Pelar la remolacha cocida al vapor y cortarla en cuartos.",
+      "Colocar en la procesadora o jarra de minipimmer los porotos aduki escurridos y la remolacha.",
+      "Sumar el ajo machacado, el comino molido, el aceite de oliva y el chorrito de Shoyu MOA.",
+      "Procesar incorporando cucharadas del caldo caliente de los aduki hasta obtener una pasta untable suave y brillante.",
+      "Ajustar de sal marina y reservar en frasco hermético en la heladera."
+    ],
+    "tip": "El poroto aduki es la legumbre reina según la medicina china para drenar humedad patógena y tonificar la energía de los Riñones.",
+    "alergenos": [
+      "soja"
+    ]
+  },
+  {
+    "id": "pesto-hongos",
+    "titulo": "Pesto Rústico de Hongos Portobello y Rúcula",
+    "categoria": "dips",
+    "tiempo": "15 min",
+    "metodo": "Plancha seca + Picado rústico",
+    "ingredientes": [
+      "250 g de hongos portobello o champiñones frescos cortados en mitades o cuartos",
+      "1 taza colmada de hojas de rúcula fresca lavada y escurrida",
+      "1 diente de ajo finamente picado",
+      "3 cucharadas soperas de aceite de oliva extra virgen en crudo",
+      "Sal marina y pimienta negra recién molida a gusto"
+    ],
+    "pasos": [
+      "Calentar una sartén o plancha a fuego medio sin agregar absolutamente nada de aceite.",
+      "Dorar los portobellos en seco por ambos lados hasta que tomen color tostado y queden tiernos.",
+      "Retirar del fuego y picar finamente sobre la tabla junto con el diente de ajo y la rúcula fresca (o pulsar unos segundos en minipimmer).",
+      "Pasar a un recipiente, sazonar con sal marina y pimienta negra recién molida.",
+      "Incorporar el aceite de oliva extra virgen crudo integrando con cuchara para emulsionar los jugos.",
+      "Servir a temperatura ambiente sobre vegetales al vapor, cereales integrales o galletas aptas."
+    ],
+    "tip": "Asar los hongos en seco concentra su ácido glutámico natural generando un sabor umami profundo sin recalentar grasas.",
+    "alergenos": []
+  },
+  {
+    "id": "queso-caju-tomillo",
+    "titulo": "Queso Firme de Cajú y Tomillo al Agar-Agar",
+    "categoria": "dips",
+    "tiempo": "20 min cocción + 3 hs frío",
+    "metodo": "Cocción suave + Gelificación natural",
+    "ingredientes": [
+      "100 g de castañas de cajú crudas (remojadas en agua limpia de 4 a 8 horas)",
+      "300 ml de agua pura de filtro",
+      "1 cucharadita de sal marina fina",
+      "1 cucharadita de ajo en polvo",
+      "1 cucharadita de levadura de cerveza nutricional",
+      "1 cucharadita de agar-agar en polvo (alga gelificante natural)",
+      "Jugo recién exprimido de 1/2 limón",
+      "Unas gotas de aceite de oliva para encamisar el molde",
+      "Abundante tomillo seco o fresco para recubrir"
+    ],
+    "pasos": [
+      "Desechar el agua de remojo de las castañas de cajú y escurrirlas bien.",
+      "Colocar en la licuadora las castañas de cajú con los 300 ml de agua fresca, la sal, el ajo en polvo, la levadura nutricional, el agar-agar y el jugo de limón.",
+      "Licuar a potencia máxima durante 2 minutos hasta lograr un líquido blanco completamente sedoso y liso.",
+      "Volcar la preparación en una cacerolita a fuego medio y revolver continuamente con batidor de alambre.",
+      "Cuando rompa hervor, bajar el fuego al mínimo y continuar revolviendo sin parar durante 2 minutos exactos para activar el agar-agar.",
+      "Pincelar un bowl individual de vidrio con unas gotas de aceite de oliva y cubrir la base y paredes con abundante tomillo seco o fresco.",
+      "Verter la mezcla caliente en el molde, emparejar la superficie y dejar enfriar a temperatura ambiente.",
+      "Refrigerar durante al menos 3 a 4 horas hasta que cuaje firme; desmoldar antes de servir."
+    ],
+    "tip": "El agar-agar exige dos minutos exactos de ebullición suave para desarrollar su estructura gelificante libre de lácteos.",
+    "alergenos": [
+      "frutos_secos",
+      "citricos"
+    ]
+  },
+  {
+    "id": "untable-caju-basico",
+    "titulo": "Untable Básico de Castañas de Cajú",
+    "categoria": "dips",
+    "tiempo": "10 min + remojo nocturno",
+    "metodo": "Remojo + Licuado en frío",
+    "ingredientes": [
+      "1 taza de castañas de cajú crudas sin tostar ni salar",
+      "Agua pura de filtro para el remojo",
+      "1/3 a 1/2 taza de agua limpia de filtro para el licuado",
+      "1 pizca generosa de sal marina fina o sal del Himalaya"
+    ],
+    "pasos": [
+      "Cubrir las castañas de cajú con abundante agua y dejar en remojo durante la noche (8 a 12 horas).",
+      "A la mañana siguiente desechar por completo el agua de remojo y enjuagar los frutos.",
+      "Colocar las castañas en el vaso de la licuadora con la pizca de sal marina y un chorrito inicial de agua fresca de filtro.",
+      "Licuar aumentando la velocidad progresivamente, incorporando agua en hilo de a poco hasta conformar una pasta densa, tersa y untable similar a un queso blanco.",
+      "Traspasar a frasco de vidrio esterilizado y guardar en heladera bien tapado por 5 días."
+    ],
+    "tip": "El remojo previo desactiva los fitatos y ablanda las fibras de la castaña para obtener una untuosidad inigualable sin necesidad de grasas añadidas.",
+    "alergenos": [
+      "frutos_secos"
+    ]
+  },
+  {
+    "id": "untable-caju-fermentado",
+    "titulo": "Untable Probiótico de Cajú Fermentado",
+    "categoria": "fermentos",
+    "tiempo": "10 min + 6 a 12 hs fermentación",
+    "metodo": "Fermentación láctica activa",
+    "ingredientes": [
+      "1 taza de castañas de cajú crudas remojadas 8 horas y escurridas",
+      "1/3 taza de agua fresca de filtro",
+      "1 pizca de sal marina",
+      "Iniciador probiótico (elegir uno): 1 cápsula de probióticos en polvo abierta, o 1 cucharada de kéfir de agua vivo, o 15 gotas de probiótico líquido Kyojin, o 1 cucharada de una tanda previa"
+    ],
+    "pasos": [
+      "Licuar las castañas remojadas con el agua fresca, la sal marina y el inoculante probiótico elegido hasta obtener una textura completamente lisa.",
+      "Colocar la crema en un frasco de vidrio limpio, dejando al menos 3 cm libres debajo de la boca.",
+      "Tapar el frasco con una servilleta de tela limpia o papel absorbente sujeto con una banda elástica para permitir el escape de gases.",
+      "Dejar fermentar en un rincón oscuro a temperatura ambiente durante 6 a 8 horas en días templados (o 12 a 18 horas en invierno).",
+      "Comprobar que la preparación haya adquirido una textura aireada, ligeramente espumosa y un aroma limpio y agradablemente ácido.",
+      "Tapar con tapa hermética y llevar a la heladera para frenar la actividad. Reservar 1 cucharada para sembrar la siguiente tanda."
+    ],
+    "tip": "Las bacterias ácido-lácticas predigieren los carbohidratos del cajú generando un perfil probiótico que coloniza favorablemente el epitelio intestinal.",
+    "alergenos": [
+      "frutos_secos"
+    ]
+  },
+  {
+    "id": "pickle-expres-rabanitos",
+    "titulo": "Pickle Exprés de Rabanitos a la Cúrcuma",
+    "categoria": "fermentos",
+    "tiempo": "15 min prep + 2 hs reposo",
+    "metodo": "Maceración ácida rápida",
+    "ingredientes": [
+      "1 atado de rabanitos frescos y crujientes",
+      "6 cucharadas soperas de vinagre de sidra de manzana crudo sin pasteurizar",
+      "1 cucharadita de sal marina fina",
+      "1 trozo de 5 cm de raíz de cúrcuma fresca rallada o pelada (o 1 cdita de cúrcuma pura en polvo)",
+      "1 pizca en la punta de una cuchara de pimienta negra molida"
+    ],
+    "pasos": [
+      "Lavar los rabanitos eliminando hojas y raicillas.",
+      "Rebanar los rabanitos en rodajas casi translúcidas con mandolina o cuchillo muy afilado.",
+      "En un recipiente mezclar el vinagre de manzana vivo, la sal marina, la pimienta y la cúrcuma fresca machacada o rallada.",
+      "Integrar los rabanitos asegurando que todos tomen contacto con el líquido dorado.",
+      "Servir de inmediato o envasar en frasco de vidrio hermético refrigerado.",
+      "Invertir el frasco pasadas 1 o 2 horas para que el líquido impregne de manera pareja y la cúrcuma tiña los rabanitos uniformemente.",
+      "Dura en heladera en perfecto estado hasta por 2 semanas."
+    ],
+    "tip": "El sabor picante natural del rabanito mueve el Qi estancado del Hígado, mientras la cúrcuma y el ácido acético vivo estimulan la vesícula.",
+    "alergenos": []
+  },
+  {
+    "id": "pickle-remolacha-nabo-lima",
+    "titulo": "Pickle Vivo de Remolacha, Nabo y Lima",
+    "categoria": "fermentos",
+    "tiempo": "15 min prep + reposo",
+    "metodo": "Maceración ácida enzimática",
+    "ingredientes": [
+      "1 nabo mediano de aproximadamente 340 g pelado",
+      "2 remolachas pequeñas de aproximadamente 100 g peladas",
+      "1/4 taza de jugo fresco de lima recién exprimido",
+      "1 cucharadita de sal marina fina"
+    ],
+    "pasos": [
+      "Pelar el nabo y las dos remolachas crudas.",
+      "Cortar ambos vegetales con mandolina en fetas ultrafinas y parejas.",
+      "Disponer los vegetales en un cuenco amplio y rociar con el cuarto de taza de jugo de lima y la sal marina.",
+      "Mezclar suavemente con las manos limpias para impregnar cada lámina.",
+      "Servir tras unos minutos de maceración o conservar en frasco de vidrio en la heladera hasta por 2 semanas.",
+      "El color fucsia carmesí de la remolacha se intensificará y teñirá el nabo a medida que descanse en frío."
+    ],
+    "tip": "Guarnición cruda perfecta para acompañar platos densos de cereales o legumbres; dispersa la pesadez y alcaliniza la digestión.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "kimchi-artesanal",
+    "titulo": "Kimchi Tradicional de Akusay y Manzana",
+    "categoria": "fermentos",
+    "tiempo": "1 h salado + 3 días fermentación",
+    "metodo": "Fermentación anaeróbica láctica",
+    "ingredientes": [
+      "1 kg de col akusay (repollo chino)",
+      "2 cucharadas soperas de sal marina sin aditivos ni yodo",
+      "100 g de morrón rojo picado fino",
+      "300 g de manzana fresca rallada (verde o roja)",
+      "1 cucharadita de pimentón dulce",
+      "150 g de cebolla cortada en rodajas finas",
+      "50 g de bulbo de hinojo picado chiquito",
+      "4 dientes de ajo frescos picados",
+      "25 g de raíz de jengibre fresco pelado y picado fino",
+      "Ají picante o copos de chile seco a gusto personal",
+      "1 puñado de hojas frescas de cilantro picadas",
+      "1 puñado de hojas frescas de perejil picadas"
+    ],
+    "pasos": [
+      "Cortar el akusay en trozos de unos 3 a 4 cm.",
+      "Colocar en un cuenco grande, espolvorear las 2 cucharadas de sal marina y masajear con las manos enérgicamente durante 3 minutos.",
+      "Dejar reposar durante 1 hora completa a temperatura ambiente para que ablande y libere abundante agua de vegetación.",
+      "Agregar al cuenco el morrón picado, la manzana rallada, el pimentón, la cebolla, el hinojo, el ajo, el jengibre, el ají picante, el cilantro y el perejil.",
+      "Integrar todos los ingredientes amasando suavemente para repartir los jugos y sabores de forma homogénea.",
+      "Envasar en frascos de vidrio limpios presionando hacia abajo con el puño cerrado para eliminar bolsas de aire y asegurar que las verduras queden sumergidas bajo su propio líquido.",
+      "Cerrar la tapa y mantener a temperatura ambiente protegido de la luz solar durante 3 días para una fermentación láctica vigorosa.",
+      "Llevar a la heladera; listo para consumir de inmediato o conservar hasta por 1 mes en frío."
+    ],
+    "tip": "La manzana rallada provee azúcares fermentables naturales que nutren la microbiota sin acudir a harinas de arroz cocidas ni azúcares refinados.",
+    "alergenos": []
+  },
+  {
+    "id": "galletas-harina-arroz",
+    "titulo": "Galletas Crocantes de Harina de Arroz Integral y Semillas",
+    "categoria": "panificados",
+    "tiempo": "30 min",
+    "metodo": "Horno 180°C",
+    "ingredientes": [
+      "1 taza de harina de arroz integral pura",
+      "1 taza de harina de trigo sarraceno (o harina de avena arrollada sin TACC)",
+      "6 cucharadas soperas de semillas variadas (chía, linaza, sésamo integral o amapola)",
+      "4 cucharadas soperas de aceite de oliva extra virgen",
+      "1 cucharadita de sal marina machacada",
+      "Agua tibia de filtro (cantidad necesaria para unir la masa)",
+      "Condimentos secos a gusto: cúrcuma, pimienta negra, páprika, eneldo o romero"
+    ],
+    "pasos": [
+      "En un bowl grande integrar los secos: harinas de arroz y sarraceno, semillas seleccionadas, sal marina y condimentos elegidos.",
+      "Incorporar las 4 cucharadas de aceite de oliva extra virgen formando un arenado con espátula.",
+      "Añadir agua tibia de a chorritos pequeños mientras se amasa con las manos hasta unir en una masa maleable y lisa.",
+      "Tomar bolitas pequeñas y aplastarlas de forma muy delgada directamente sobre una asadera aceitada o con silicona.",
+      "Pinchar la superficie de cada galleta con los dientes de un tenedor.",
+      "Hornear a 180°C durante 12 a 15 minutos hasta que adquieran un tono dorado y textura crujiente.",
+      "Dejar enfriar completamente sobre rejilla antes de guardar en lata hermética."
+    ],
+    "tip": "La chía y el lino en contacto con el agua desprenden mucílagos que aglutinan la masa a la perfección sin necesidad de gluten.",
+    "alergenos": [
+      "sesamo"
+    ]
+  },
+  {
+    "id": "pan-quinoa-amaranto",
+    "titulo": "Pan Nutritivo de Quinoa y Amaranto sin Gluten",
+    "categoria": "panificados",
+    "tiempo": "8 hs remojo + 1 h 15 min horno",
+    "metodo": "Remojo + Procesado + Horno 160°C",
+    "ingredientes": [
+      "4 tazas de quinoa cruda en grano (blanca o tricolor)",
+      "2/3 taza de semillas de chía remojadas en 1/2 taza de agua durante 30 minutos",
+      "2,5 a 3 tazas de agua pura de filtro",
+      "1/2 taza de aceite de oliva extra virgen",
+      "1 cucharadita de bicarbonato de sodio",
+      "1 cucharadita de sal marina fina",
+      "6 cucharaditas de jugo de limón recién exprimido",
+      "1,5 tazas de harina de amaranto integral",
+      "Semillas variadas para espolvorear la cubierta"
+    ],
+    "pasos": [
+      "Remojar la quinoa durante una noche; al día siguiente enjuagarla bajo chorro de agua fría en colador fino hasta que el agua salga sin espuma.",
+      "Hidratar la chía en la media taza de agua 30 minutos hasta obtener un gel consistente.",
+      "Colocar en la procesadora la quinoa bien escurrida, el gel de chía, 2,5 a 3 tazas de agua, el aceite de oliva, el bicarbonato, la sal y las 6 cucharaditas de jugo de limón.",
+      "Procesar a fondo hasta lograr una masa densa y cremosa.",
+      "Volcar en un recipiente e incorporar la taza y media de harina de amaranto con movimientos envolventes.",
+      "Dejar reposar la masa en el recipiente durante 15 minutos mientras se precalienta el horno a 160°C.",
+      "Verter la masa en una budinera tipo Pyrex aceitada, emparejar y espolvorear con semillas variadas.",
+      "Hornear a 160°C durante 60 a 70 minutos hasta que la corteza esté dorada y al insertar un cuchillo salga seco.",
+      "Dejar enfriar totalmente antes de cortar en rebanadas."
+    ],
+    "tip": "La reacción efervescente del bicarbonato de sodio con el jugo de limón actúa como fermento natural gasificante sin recurrir a levaduras industriales.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "pan-trigo-sarraceno",
+    "titulo": "Pan Artesanal de Trigo Sarraceno y Psyllium",
+    "categoria": "panificados",
+    "tiempo": "6 hs remojo + 12 hs frío + 30 min horno",
+    "metodo": "Fermentación lenta en frío + Horno 220°C",
+    "ingredientes": [
+      "500 g de granos enteros de trigo sarraceno crudos",
+      "200 g de agua templada de filtro",
+      "2 cucharadas soperas de aceite de oliva extra virgen",
+      "2 cucharadas soperas de miel pura de abejas",
+      "30 g de cáscara de psyllium en polvo molido",
+      "5 g de levadura de panadería seca (o 10 g de fresca)",
+      "5 g de sal marina fina",
+      "Mix opcional para la cubierta: 1 cdita de chía, 1 cda de calabaza, 1 cda de girasol, 1 cda de lino"
+    ],
+    "pasos": [
+      "Colocar el trigo sarraceno en un recipiente amplio cubierto con abundante agua (que sobre un dedo por encima). Dejar en remojo un mínimo de 6 horas o toda la noche.",
+      "Enjuagar exhaustivamente y escurrir en colador.",
+      "Triturar el sarraceno en robot de cocina o licuadora potente con los 200 g de agua templada y la miel.",
+      "Pasar la masa obtenida a un cuenco e incorporar la sal marina, el aceite de oliva y el psyllium molido, revolviendo con espátula.",
+      "Añadir la levadura e integrar bien.",
+      "Cubrir el recipiente con papel film y llevar a la heladera durante 12 horas continuas para un leudado lento.",
+      "Aceitar y enharinar un molde de pan, verter la masa y dejar reposar 1 hora a temperatura ambiente fuera de la heladera.",
+      "Espolvorear con las semillas e introducir en horno precalentado a 220°C durante 30 a 35 minutos.",
+      "Desmoldar y enfriar sobre rejilla."
+    ],
+    "tip": "El psyllium absorbe agua y recrea la red viscoelástica del gluten, dando una miga húmeda y elástica que no se desgrana.",
+    "alergenos": []
+  },
+  {
+    "id": "mix-rawmesan",
+    "titulo": "Mix Rawmesan de Semillas y Levadura Nutricional",
+    "categoria": "alinos",
+    "tiempo": "5 min",
+    "metodo": "Molienda en seco",
+    "ingredientes": [
+      "1 taza de semillas de lino crudo",
+      "1 taza de semillas de calabaza tostadas suavemente en seco",
+      "1 cucharada sopera de levadura de cerveza nutricional",
+      "1 cucharada sopera de cúrcuma en polvo pura",
+      "1 cucharadita de sal marina fina o sal del Himalaya",
+      "Opcional: Semillas de sésamo integral tostadas o semillas de chía"
+    ],
+    "pasos": [
+      "Tostar brevemente las semillas de calabaza en una sartén seca a fuego mínimo hasta que se inflen.",
+      "Disponer el lino crudo y las semillas de calabaza en un molinillo de café o procesadora.",
+      "Moler en pulsos breves para lograr una textura arenosa similar a queso rallado, sin recalentar.",
+      "Mezclar el polvo obtenido con la levadura nutricional, la cúrcuma y la sal marina.",
+      "Envasar en frasco de vidrio hermético y conservar obligatoriamente en el freezer para evitar la oxidación de los ácidos grasos poliinsaturados. Se usa directo sin congelarse."
+    ],
+    "tip": "Excelente fuente de zinc, selenio y omega-3 vegetales para remineralizar y enriquecer cualquier plato tibio.",
+    "alergenos": []
+  },
+  {
+    "id": "pesto-cilantro-albahaca-hinojo",
+    "titulo": "Pesto Depurativo de Cilantro, Albahaca o Hinojo",
+    "categoria": "alinos",
+    "tiempo": "5 min",
+    "metodo": "Procesado en crudo",
+    "ingredientes": [
+      "1 atado de cilantro fresco, o 1 atado de albahaca fresca, o 1 taza de plumitas y hojas de hinojo",
+      "1 diente de ajo fresco",
+      "2 cucharadas soperas de aceite de oliva extra virgen en frío",
+      "Jugo recién exprimido de 1 lima o 1/2 limón",
+      "3 a 4 cucharadas de agua pura de filtro",
+      "1 cucharada sopera de frutos secos (cajú, pistachos, nueces, almendras o semillas)",
+      "Sal marina fina y pimienta negra a gusto"
+    ],
+    "pasos": [
+      "Lavar y secar muy bien las hierbas frescas elegidas.",
+      "Colocar en la jarra de la procesadora o vaso de licuadora las hierbas con el ajo, los frutos secos y el jugo cítrico.",
+      "Sumar el aceite de oliva extra virgen, las cucharadas de agua, sal marina y pimienta.",
+      "Procesar hasta emulsionar; si se desea una consistencia más ligera y vertible, añadir unas cucharadas extra de agua o limón.",
+      "Guardar en frasco hermético en la heladera por 4 a 5 días."
+    ],
+    "tip": "El cilantro crudo es un quelante biológico reconocido que atrapa partículas tóxicas favoreciendo su expulsión por vía biliar.",
+    "alergenos": [
+      "frutos_secos",
+      "citricos"
+    ]
+  },
+  {
+    "id": "alino-miel-mostaza",
+    "titulo": "Vinagreta Digestiva de Miel y Mostaza Antigua",
+    "categoria": "alinos",
+    "tiempo": "3 min",
+    "metodo": "Emulsión manual en frasco",
+    "ingredientes": [
+      "3 cucharadas soperas de vinagre de sidra de manzana crudo sin pasteurizar",
+      "1 cucharada sopera de aceite de oliva extra virgen",
+      "1 cucharadita de miel pura de abejas",
+      "1 cucharadita de mostaza de Dijón tradicional o semillas de mostaza molidas",
+      "1 pizca de sal marina fina"
+    ],
+    "pasos": [
+      "Colocar el vinagre de sidra de manzana crudo, la miel pura y la mostaza en un frasco pequeño con tapa.",
+      "Añadir la pizca de sal marina y la cucharada de aceite de oliva virgen extra.",
+      "Cerrar la tapa y agitar vigorosamente durante 15 a 20 segundos hasta que la mezcla se vuelva homogénea y densa.",
+      "Utilizar al momento sobre ensaladas de hojas amargas, espárragos blanqueados o alcauciles cocidos."
+    ],
+    "tip": "El vinagre vivo aporta ácido acético y enzimas que mejoran la digestibilidad gástrica antes de los platos fuertes.",
+    "alergenos": []
+  },
+  {
+    "id": "alino-zanahoria",
+    "titulo": "Aliño Fluido de Zanahoria y Limón",
+    "categoria": "alinos",
+    "tiempo": "15 min",
+    "metodo": "Hervido + Emulsión vertible",
+    "ingredientes": [
+      "2 zanahorias tiernas cocidas en agua sin sal",
+      "1/2 a 3/4 taza del caldo dulce de cocción de las zanahorias",
+      "1/2 diente de ajo fresco",
+      "3 a 4 cucharadas soperas de jugo de limón recién exprimido",
+      "1 cucharada sopera de aceite de oliva extra virgen en crudo",
+      "Sal marina a gusto"
+    ],
+    "pasos": [
+      "Cocinar las zanahorias en agua limpia hasta que estén tiernas y reservar el caldo.",
+      "Disponer las zanahorias en la licuadora con el medio ajo, la sal marina y el aceite de oliva.",
+      "Incorporar el jugo de limón y el caldo de cocción tibio en mayor proporción que para un dip, buscando consistencia ligera.",
+      "Licuar a alta potencia hasta conformar una salsa naranja brillante y corrediza.",
+      "Rociar sobre rúcula, achicoria, radicheta o vegetales al vapor."
+    ],
+    "tip": "Suave, dulce y refrescante; suaviza el sabor punzante de las crucíferas y verduras amargas depurativas.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "alino-palta",
+    "titulo": "Aliño Cremoso de Palta y Verdes",
+    "categoria": "alinos",
+    "tiempo": "5 min",
+    "metodo": "Procesado en frío",
+    "ingredientes": [
+      "1/2 palta madura y suave",
+      "Jugo recién exprimido de 1 limón entero",
+      "1 chorro de salsa de soja natural fermentada (marca Shoyu MOA)",
+      "1 puñado de hojas verdes a elección (cilantro, albahaca, espinaca o rúcula)",
+      "1/2 diente de ajo fresco (opcional)",
+      "Agua pura de filtro fresca (la necesaria para regular la consistencia)"
+    ],
+    "pasos": [
+      "Extraer la pulpa de la media palta con cuchara y colocarla en el vaso de la procesadora o minipimmer.",
+      "Añadir el jugo de limón, la salsa Shoyu MOA y las hojas verdes seleccionadas.",
+      "Sumar el medio ajo si se desea potenciar el efecto depurativo.",
+      "Procesar incorporando agua de a cucharadas hasta obtener una textura de crema ligera ideal para salsear.",
+      "Consumir preferentemente en el día para mantener vivos sus ácidos grasos."
+    ],
+    "tip": "Las grasas monoinsaturadas de la palta protegen el epitelio digestivo y optimizan la absorción de antioxidantes liposolubles.",
+    "alergenos": [
+      "soja",
+      "citricos"
+    ]
+  },
+  {
+    "id": "alino-caju",
+    "titulo": "Aliño Emulsionado de Cajú y Finas Hierbas",
+    "categoria": "alinos",
+    "tiempo": "5 min",
+    "metodo": "Licuado ligero",
+    "ingredientes": [
+      "3 cucharadas colmadas de untable de cajú casero (o 1 puñado de castañas remojadas)",
+      "Jugo recién exprimido de 1/2 limón",
+      "1/2 diente de ajo picado",
+      "1 cucharadita de mostaza de Dijón tradicional",
+      "1 puñado de hojas frescas finamente picadas (perejil, verdeo, albahaca, menta o cilantro)",
+      "Agua pura de filtro fresca para aligerar",
+      "Sal marina a gusto"
+    ],
+    "pasos": [
+      "Colocar el untable de cajú (o las castañas remojadas) en el vaso procesador.",
+      "Incorporar el jugo de limón, el ajo picado, la mostaza de Dijón y una pizca de sal marina.",
+      "Procesar añadiendo agua limpia poco a poco hasta lograr una salsa ligera pero con cuerpo.",
+      "Añadir las hierbas picadas e integrar con cuchara sin procesar para preservar su color y aroma.",
+      "Conservar en frasco cerrado en heladera por 3 días."
+    ],
+    "tip": "Aderezo cremoso sin lácteos ideal para bañar papas al horno, batatas asadas o granos integrales.",
+    "alergenos": [
+      "frutos_secos",
+      "citricos"
+    ]
+  },
+  {
+    "id": "alino-zucchini",
+    "titulo": "Aliño Refrescante de Zucchini y Lima",
+    "categoria": "alinos",
+    "tiempo": "7 min",
+    "metodo": "Licuado en crudo",
+    "ingredientes": [
+      "1 zucchini mediano crudo lavado y trozado",
+      "1 trozo de 7 cm de puerro (solo parte blanca y verde claro picada)",
+      "3 cucharadas soperas de jugo de lima recién exprimido",
+      "3 cucharadas soperas de aceite de oliva extra virgen o aceite de linaza prensado en frío",
+      "1/2 cucharadita de sal marina fina"
+    ],
+    "pasos": [
+      "Disponer el zucchini trozado y el puerro en la licuadora con el jugo de lima y la sal marina.",
+      "Comenzar a licuar en velocidad media, bajando los ingredientes con una espátula de goma si fuera necesario.",
+      "Verter el aceite de oliva o de linaza en hilo continuo mientras la máquina está en marcha para emulsionar.",
+      "Licuar hasta obtener una textura suave, homogénea y verde clara.",
+      "Guardar en frasco de vidrio tapado en heladera hasta por 3 días."
+    ],
+    "tip": "El zucchini crudo aporta una gran carga de agua viva vegetal y electrolitos sin aportar grasas densas ni pesadez.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "criolla-con-tutti",
+    "titulo": "Salsa Criolla Detox con Tutti",
+    "categoria": "alinos",
+    "tiempo": "10 min",
+    "metodo": "Maceración en crudo",
+    "ingredientes": [
+      "2 tallos de cebolla de verdeo o 1/2 cebolla colorada picada finita",
+      "4 a 6 rabanitos crocantes picados chicos o cortados en finas láminas",
+      "Ralladura de 1 limón limpio",
+      "Jugo recién exprimido de 1 limón grande",
+      "1 puñado generoso de hierbas frescas picadas (cilantro, perejil, albahaca y/o eneldo)",
+      "1 pizca de sal marina fina"
+    ],
+    "pasos": [
+      "Picar en brunoise muy fina la cebolla elegida y los rabanitos.",
+      "Picar finamente a cuchillo las hierbas aromáticas.",
+      "Disponer todo en un frasco o bowl de vidrio con la sal marina, la ralladura y el jugo de limón.",
+      "Remover bien para que todos los vegetales queden impregnados del jugo cítrico.",
+      "Dejar reposar 30 minutos antes de consumir para que el limón dome la crudeza del azufre de los bulbos.",
+      "Mantener tapado en la heladera durante 2 a 3 días."
+    ],
+    "tip": "Condimento tónico concentrado para reactivar el flujo del Qi biliar y disolver estancamientos en cada comida.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "temakis-nori",
+    "titulo": "Temakis de Alga Nori con Palta, Pepino y Tofu",
+    "categoria": "almuerzos",
+    "tiempo": "20 min",
+    "metodo": "Tostado rápido + Armado manual",
+    "ingredientes": [
+      "4 láminas de alga nori",
+      "1 taza de arroz yamaní, mijo o quinoa cocida tibia",
+      "1/2 palta cortada en tiras longitudinales",
+      "1 pepino firme en bastones finos sin semillas",
+      "1 taza de brotes frescos de alfalfa o de poroto mung",
+      "100 g de bastones de tofu dorados a la plancha sin aceite",
+      "Pickle de rabanitos o nabo rallado",
+      "Salsa Shoyu MOA para mojar"
+    ],
+    "pasos": [
+      "Cortar las hojas de alga nori por la mitad a lo largo.",
+      "Pasar cada lámina vuelta y vuelta muy rápido sobre la llama de la hornalla para tostarla ligeramente sin quemarla.",
+      "Colocar la media lámina sobre la palma con la cara rugosa hacia arriba.",
+      "Poner una cucharada del cereal tibio en una esquina diagonal.",
+      "Sumar bastones de palta, pepino, tofu dorado, brotes frescos y pickle.",
+      "Enrollar formando un cono y sellar el borde exterior humedeciendo con una gota de agua con el dedo.",
+      "Servir inmediatamente para mantener la textura crujiente del alga, acompañado de salsa Shoyu MOA."
+    ],
+    "tip": "Las algas nori aportan oligoelementos marinos e iodo esencial para estimular el metabolismo basal tiroideo.",
+    "alergenos": [
+      "soja"
+    ]
+  },
+  {
+    "id": "risotto-yamani-hongos",
+    "titulo": "Risotto de Yamaní y Hongos de Pino al Caldo de Setas",
+    "categoria": "almuerzos",
+    "tiempo": "45 min",
+    "metodo": "Salteado en agua + Reducción a fuego lento",
+    "ingredientes": [
+      "1 taza de arroz yamaní o arroz mochi integral (o quinoa)",
+      "30 g de hongos de pino secos",
+      "150 g de hongos portobello o champiñones frescos en cuartos",
+      "1 cebolla mediana picada en cubitos",
+      "1 diente de ajo machacado",
+      "2 cucharadas de agua caliente para rehogar",
+      "Sal marina a gusto",
+      "Pesto de albahaca o perejil fresco para servir",
+      "Acompañamiento: ramilletes de brócoli o espárragos blanqueados"
+    ],
+    "pasos": [
+      "Hidratar los hongos de pino en abundante agua hirviendo durante 15 minutos; escurrir, picar y conservar su caldo caliente.",
+      "En cacerola calentar las 2 cucharadas de agua y saltear la cebolla y el ajo con una pizca de sal marina hasta ablandar.",
+      "Sumar los portobellos y los hongos de pino picados salteando 2 minutos.",
+      "Agregar el arroz y remover suavemente.",
+      "Incorporar el caldo de los hongos caliente de a poco con cucharón a medida que el cereal lo absorba.",
+      "Cocinar a fuego mínimo tapado durante 35 a 40 minutos hasta lograr un grano tierno y jugoso.",
+      "Servir caliente salseado con una cucharada de pesto fresco y acompañado de crucíferas blanqueadas."
+    ],
+    "tip": "El caldo de hongos de pino proporciona un sabor umami profundo que brinda saciedad reconfortante sin requerir grasas saturadas.",
+    "alergenos": []
+  },
+  {
+    "id": "risotto-remolacha-brocoli",
+    "titulo": "Risotto Carmesí de Yamaní y Remolacha con Brócoli",
+    "categoria": "almuerzos",
+    "tiempo": "45 min",
+    "metodo": "Hervido de remolachas + Cocción por absorción",
+    "ingredientes": [
+      "1 taza de arroz mochi integral, yamaní o quinoa",
+      "2 remolachas medianas en cubos pequeños",
+      "1 cebolla picada fina",
+      "1 tallo de puerro picado fino",
+      "1 litro de agua pura de filtro",
+      "1 taza de ramilletes de brócoli blanqueados al vapor",
+      "Sal marina a gusto",
+      "Pesto verde fresco o cucharada de aceite de oliva crudo para terminar"
+    ],
+    "pasos": [
+      "Hervir las remolachas en cubos en el litro de agua desde fría hasta que estén tiernas; mantener el caldo fucsia caliente a fuego mínimo.",
+      "En otra cacerola calentar 2 cucharadas de agua y saltear la cebolla y el puerro.",
+      "Incorporar el arroz yamaní o quinoa.",
+      "Ir vertiendo de a cucharones el caldo caliente con los cubos de remolacha, revolviendo periódicamente.",
+      "Cocinar a fuego lento hasta que el grano esté tierno, cremoso y de color púrpura intenso.",
+      "Servir en plato hondo con los brócolis blanqueados crujientes al costado y un hilo de pesto verde fresco."
+    ],
+    "tip": "Las betalaínas de la remolacha tiñen y enriquecen el cereal con fitonutrientes que apoyan la función desintoxicante de la bilis.",
+    "alergenos": []
+  },
+  {
+    "id": "ensalada-quinoa-habas-brocoli",
+    "titulo": "Ensalada Tibia de Quinoa con Habas y Brócoli",
+    "categoria": "almuerzos",
+    "tiempo": "25 min",
+    "metodo": "Vapor + Hervido de granos + Ensamble",
+    "ingredientes": [
+      "1 taza de quinoa cocida tibia (blanca, roja o tricolor)",
+      "1 taza de habas cocidas al vapor y peladas de su hollejo",
+      "1 taza de arbolitos de brócoli cocidos al vapor al dente (4 min)",
+      "1/2 palta madura cortada en dados",
+      "1 puñado de hojas frescas de albahaca picadas",
+      "Aliño de cajú con ajo o pesto casero de cilantro",
+      "Sal marina y jugo de limón a gusto"
+    ],
+    "pasos": [
+      "Cocer la quinoa lavada en el doble de agua durante 15 minutos; reservar tibia.",
+      "Cocinar las habas al vapor durante 5 a 6 minutos, enfriar y retirar la piel exterior hollejo para dejar el grano tierno y verde brillante.",
+      "Cocinar el brócoli al vapor 4 minutos conservando su color vivo y textura crocante.",
+      "En una ensaladera integrar la quinoa tibia, las habas peladas, el brócoli y los dados de palta.",
+      "Espolvorear con la albahaca picada y aderezar generosamente con el aliño de cajú o pesto de cilantro."
+    ],
+    "tip": "Retirar el hollejo fibroso de las habas elimina antinutrientes y flatulencias, transformándolas en una proteína sumamente ligera.",
+    "alergenos": [
+      "frutos_secos",
+      "citricos"
+    ]
+  },
+  {
+    "id": "guiso-mung-calabaza",
+    "titulo": "Guiso Reconfortante de Porotos Mung y Calabaza al Curry",
+    "categoria": "almuerzos",
+    "tiempo": "40 min + remojo",
+    "metodo": "Cocción lenta en olla tapada",
+    "ingredientes": [
+      "1 taza de porotos mung remojados previamente 8 horas y escurridos",
+      "2 tazas de calabaza o zapallo anco en cubos medianos",
+      "1 tallo de puerro picado fino",
+      "3 varas de apio frescas picadas",
+      "1 zanahoria cortada en rodajas",
+      "1 diente de ajo machacado",
+      "1 cucharadita de curry en polvo o cúrcuma pura",
+      "Agua caliente de filtro para cubrir",
+      "Sal marina a gusto (incorporar al final de la cocción)",
+      "Para acompañar: Salsa Criolla con Tutti y verduras verdes al vapor"
+    ],
+    "pasos": [
+      "En cacerola de fondo grueso calentar 2 cucharadas de agua y rehogar el puerro, el apio, la zanahoria y el ajo machacado.",
+      "Añadir el curry o cúrcuma removiendo para activar las especias aromáticas.",
+      "Sumar la calabaza trozada y los porotos mung remojados.",
+      "Cubrir con agua hirviendo sobrepasando 3 cm los ingredientes.",
+      "Tapar y cocinar a fuego lento durante 30 a 35 minutos hasta que los porotos y la calabaza comiencen a desarmarse en un caldo espeso.",
+      "Salpimentar al final para no endurecer las legumbres.",
+      "Servir caliente coronado con la salsa Criolla con Tutti y hojas verdes al vapor al costado."
+    ],
+    "tip": "La combinación de poroto mung con calabaza y especias calientes tonifica la energía digestiva sin generar sobrecarga hepática.",
+    "alergenos": [
+      "apio"
+    ]
+  },
+  {
+    "id": "papa-burguers-horno",
+    "titulo": "Papa Burguers Doradas al Horno con Zucchini",
+    "categoria": "almuerzos",
+    "tiempo": "35 min",
+    "metodo": "Vapor + Horno sobre papel manteca",
+    "ingredientes": [
+      "2 papas medianas cocidas al vapor y peladas",
+      "2 zanahorias medianas cocidas al vapor",
+      "1 zucchini crudo rallado (bien exprimido con lienzo para retirar todo el líquido)",
+      "1 cucharadita de ajo en polvo o ajo fresco picado finísimo",
+      "2 cucharadas soperas de cebolla deshidratada en escamas",
+      "Sal marina y pimienta negra molida a gusto",
+      "Acompañamiento: brócolis blanqueados, ensalada de rúcula y pesto de cilantro o mostaza Dijón"
+    ],
+    "pasos": [
+      "Cocer las papas y zanahorias al vapor hasta ablandar; dejar enfriar.",
+      "Rallar el zucchini y estrujarlo fuertemente dentro de un lienzo limpio para escurrir todo su jugo.",
+      "Pisar las papas y zanahorias en un bowl hasta formar un puré uniforme.",
+      "Incorporar el zucchini bien seco, el ajo, la cebolla deshidratada, sal y pimienta negra.",
+      "Amasar con las manos para unir la preparación (rinde 8 medallones).",
+      "Dar forma a las hamburguesas y disponerlas en asadera con papel manteca sin nada de aceite.",
+      "Hornear a 200°C durante 15 minutos; voltear con cuidado y hornear 10 minutos del otro lado hasta que doren.",
+      "Servir calientes con pesto de cilantro o mostaza y crucíferas al vapor."
+    ],
+    "tip": "Exprimir rigurosamente el jugo del zucchini es el paso crucial que permite la cohesión del medallón sin harinas ni huevo.",
+    "alergenos": []
+  },
+  {
+    "id": "papa-horno-alino-caju",
+    "titulo": "Papa Asada Rellena con Aliño de Cajú y Mostaza",
+    "categoria": "almuerzos",
+    "tiempo": "45 min",
+    "metodo": "Horno en seco con piel",
+    "ingredientes": [
+      "1 papa grande entera con su piel cepillada y limpia",
+      "3 cucharadas soperas de aliño emulsionado de cajú (cajú, mostaza de Dijón, verdeo fino, albahaca o perejil)",
+      "1 pizca de sal marina",
+      "Ensalada fresca de acompañamiento: hojas verdes variadas, zanahoria rallada y rabanitos en láminas"
+    ],
+    "pasos": [
+      "Lavar y secar muy bien la papa entera con su cáscara.",
+      "Pinchar la superficie en varios puntos con la punta de un tenedor.",
+      "Llevar al horno a 200°C directo sobre la rejilla o en asadera seca durante 40 a 45 minutos hasta que la piel quede crujiente y el centro blando.",
+      "Retirar, hacer un corte longitudinal al medio y presionar los extremos hacia adentro para abrir el centro humeante.",
+      "Espolvorear con sal marina y rellenar con las 3 cucharadas colmadas de aliño de cajú cremoso.",
+      "Servir caliente junto a la ensalada fresca crujiente."
+    ],
+    "tip": "Consumir la papa asada entera con su piel conserva su potasio y aporta almidón resistente benéfico para la microbiota colónica.",
+    "alergenos": [
+      "frutos_secos",
+      "citricos"
+    ]
+  },
+  {
+    "id": "arroz-coliflor-salteado",
+    "titulo": "Salteado de Falso Arroz de Coliflor con Habas y Zanahoria",
+    "categoria": "almuerzos",
+    "tiempo": "15 min",
+    "metodo": "Rallado + Salteado en agua al wok",
+    "ingredientes": [
+      "1/2 cabeza de coliflor fresca limpia (incluyendo la parte tierna del tronco)",
+      "1 zanahoria cocida al vapor cortada en rodajas diagonales",
+      "1/2 taza de habas cocidas al vapor y peladas (o arvejas / chauchas)",
+      "1 diente de ajo picado muy fino",
+      "3 cucharadas soperas de agua caliente de filtro",
+      "Sal marina y gotas de salsa Shoyu MOA al apagar el fuego"
+    ],
+    "pasos": [
+      "Rallar la coliflor cruda con la parte media del rallador manual o pulsar en procesadora hasta obtener granos del tamaño de arroz.",
+      "Calentar las 3 cucharadas de agua en una sartén grande o wok a fuego medio-alto.",
+      "Añadir el ajo picado y volcar el falso arroz de coliflor.",
+      "Saltear continuamente durante 4 a 5 minutos para que el vapor lo cocine manteniéndolo suelto y al dente.",
+      "Sumar las rodajas de zanahoria al vapor y las habas peladas.",
+      "Salar, rociar con unas gotas de salsa Shoyu MOA, saltear 1 minuto más y retirar del fuego."
+    ],
+    "tip": "Excelente plato bajo en densidad de carbohidratos para cenas depurativas; promueve el metabolismo hepático de estrógenos.",
+    "alergenos": [
+      "soja"
+    ]
+  },
+  {
+    "id": "salteado-hongos-brotes-mung",
+    "titulo": "Salteado de Puerros, Setas y Brotes de Mung al Shoyu",
+    "categoria": "almuerzos",
+    "tiempo": "12 min",
+    "metodo": "Salteado al vapor sin materia grasa",
+    "ingredientes": [
+      "2 tallos de puerro en rodajas finas",
+      "1 diente de ajo fileteado",
+      "200 g de champiñones o portobellos frescos en láminas",
+      "1 taza colmada de brotes frescos de poroto mung (brotes de soja tradicionales)",
+      "2 cucharadas soperas de agua caliente",
+      "1 cucharada sopera de salsa de soja natural fermentada (Shoyu MOA)"
+    ],
+    "pasos": [
+      "Calentar un wok o sartén amplia con las 2 cucharadas de agua a fuego fuerte.",
+      "Añadir el puerro y el ajo salteando rápidamente durante 2 minutos.",
+      "Incorporar los hongos laminados y saltear durante 3 minutos dejando que liberen su propio jugo.",
+      "Agregar los brotes frescos de mung y bañar con la cucharada de salsa Shoyu MOA.",
+      "Saltear únicamente durante 1 minuto más para que tomen temperatura sin perder su textura crujiente y viva.",
+      "Servir inmediatamente como guarnición caliente o sobre una base de arroz integral."
+    ],
+    "tip": "Los brotes frescos concentran energía vital de crecimiento que descongestiona el estancamiento biliar en primavera.",
+    "alergenos": [
+      "soja"
+    ]
+  },
+  {
+    "id": "ensalada-repollo-jengibre-macerada",
+    "titulo": "Ensalada Digestiva de Repollo Colorado y Jengibre Macerado",
+    "categoria": "almuerzos",
+    "tiempo": "35 min",
+    "metodo": "Maceración con masaje manual",
+    "ingredientes": [
+      "2 tazas de repollo colorado cortado en juliana muy fina",
+      "1 manzana verde en láminas finas o rallada gruesa",
+      "Jugo exprimido con los dedos de 1 cucharada de jengibre fresco rallado",
+      "Jugo de 1 limón o 2 cucharadas de vinagre de sidra de manzana crudo",
+      "1/2 cucharadita de sal marina fina",
+      "1 cucharada sopera de aceite de oliva extra virgen o aceite de lino en crudo"
+    ],
+    "pasos": [
+      "Cortar el repollo colorado en tiras ultrafinas con cuchillo afilado.",
+      "Colocar en un bowl con la sal marina, el jugo de limón (o vinagre) y el jugo exprimido de la raíz de jengibre.",
+      "Amasar y frotar el repollo con los puños limpios durante 2 minutos hasta que afloje su rigidez y desprenda jugo violeta.",
+      "Dejar macerar a temperatura ambiente durante al menos 30 minutos.",
+      "Incorporar la manzana verde cortada y el aceite de oliva o de lino en crudo.",
+      "Integrar y servir junto a una porción de cereal caliente y verduras al vapor."
+    ],
+    "tip": "El masaje mecánico con sal marina y ácido cítrico predigiere la celulosa vegetal, previniendo gases y distensión.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "coleslaw-detox-macerado",
+    "titulo": "Coleslaw Detox Bicolor Macerado al Dijón",
+    "categoria": "almuerzos",
+    "tiempo": "25 min",
+    "metodo": "Maceración con prensado",
+    "ingredientes": [
+      "1 taza de repollo blanco en tiras finas",
+      "1 taza de repollo morado en tiras finas",
+      "1 zanahoria grande rallada fina",
+      "Jugo recién exprimido de 1 limón o 2 cdas de vinagre de sidra de manzana crudo",
+      "1 cucharadita de mostaza de Dijón antigua",
+      "1 cucharada sopera de aceite de oliva extra virgen o aceite de lino crudo",
+      "1/2 cucharadita de sal marina fina",
+      "Opcional: Aliño de cajú con mostaza y verdeo"
+    ],
+    "pasos": [
+      "Colocar las tiras de repollo blanco, repollo morado y zanahoria rallada en un recipiente espacioso.",
+      "Espolvorear con la sal marina y rociar con el jugo de limón o vinagre de manzana.",
+      "Masajear los vegetales con las manos durante 2 minutos para quebrar la fibra.",
+      "Dejar reposar 15 a 20 minutos para que complete la maceración enzimática.",
+      "Mezclar el aceite de oliva con la mostaza de Dijón y verter sobre los vegetales.",
+      "Revolver con pinzas y servir fresco junto a cereales o legumbres."
+    ],
+    "tip": "La combinación de repollo blanco y morado aporta sulforafanos y flavonoides que activan las enzimas de detoxificación de fase II hepática.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "trio-verduras-vapor-semillas",
+    "titulo": "Trío Vital de Verduras al Vapor con Rawmesan",
+    "categoria": "almuerzos",
+    "tiempo": "12 min",
+    "metodo": "Cocción al vapor cronometrada",
+    "ingredientes": [
+      "Elegir 3 vegetales de estación: puerro en diagonales, zanahoria en láminas, cuñas de hinojo, espinaca tierna, ramilletes de coliflor, repollitos de Bruselas, brócoli, puntas de espárragos, chauchas o habas peladas",
+      "2 cucharadas soperas de Mix Rawmesan de semillas",
+      "1 cucharada sopera de aceite de oliva extra virgen crudo",
+      "1 pizca de sal marina"
+    ],
+    "pasos": [
+      "Llenar la base de la vaporiera con agua limpia y llevar a hervor tapada.",
+      "Cortar los vegetales elegidos en trozos uniformes.",
+      "Disponer primero en la canasta los vegetales más firmes (zanahoria, hinojo, coliflor) y a los 4 minutos sumar los más delicados (brócoli, espárragos, espinaca).",
+      "Cocinar entre 5 y 8 minutos en total hasta que conserven un color brillante y textura crujiente al dente.",
+      "Servir en el plato, rociar con el aceite de oliva virgen extra en crudo, sal marina y espolvorear copiosamente con el Mix Rawmesan."
+    ],
+    "tip": "La cocción corta al vapor retiene los minerales solubles y glucosinolatos protectores del hígado sin oxidar la clorofila.",
+    "alergenos": []
+  },
+  {
+    "id": "zanahorias-a-la-india",
+    "titulo": "Zanahorias Especiadas a la India al Comino y Cúrcuma",
+    "categoria": "almuerzos",
+    "tiempo": "15 min",
+    "metodo": "Salteado en agua tapado",
+    "ingredientes": [
+      "2 zanahorias grandes peladas y cortadas en láminas diagonales al bies",
+      "1 a 2 dientes de ajo machacados",
+      "1 cucharadita de cúrcuma en polvo pura",
+      "1/2 cucharadita de comino molido",
+      "1 cucharadita de pimentón dulce",
+      "2 cucharadas de jugo de limón recién exprimido",
+      "1/4 vaso de agua tibia",
+      "Sal marina a gusto",
+      "Guarnición recomendada: ensalada de brócoli o espárragos, rúcula, rabanitos y verdeo, con bowl de arroz yamaní"
+    ],
+    "pasos": [
+      "Calentar una sartén con tapa con 2 cucharadas de agua pura.",
+      "Agregar el ajo machacado, la cúrcuma, el comino molido, el pimentón y el jugo de limón.",
+      "Saltear las especias durante 1 minuto a fuego medio para liberar sus aromas.",
+      "Incorporar las láminas de zanahoria mezclando para que se tiñan de dorado.",
+      "Añadir el cuarto de vaso de agua, tapar herméticamente y cocinar a fuego mínimo durante 8 a 10 minutos hasta que estén tiernas pero firmes.",
+      "Servir calientes con su propio fondo especiado junto a cereales y hojas verdes."
+    ],
+    "tip": "Las especias cálidas estimulan el fuego digestivo (Agni) sin agredir la mucosa ni requerir grasas cocidas.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "tabule-quinoa-coliflor",
+    "titulo": "Tabulé Fresco de Quinoa o Arroz de Coliflor y Hierbas",
+    "categoria": "almuerzos",
+    "tiempo": "15 min",
+    "metodo": "Picado en crudo + Mezcla aromática",
+    "ingredientes": [
+      "1,5 tazas de quinoa cocida fría o falso arroz de coliflor crudo",
+      "1 atado grande de perejil fresco picado muy chiquito",
+      "1/2 taza de hojas de menta fresca picadas finas",
+      "2 tallos de cebolla de verdeo picada chiquita",
+      "1 morrón verde o rojo picado en cubitos diminutos",
+      "1 tomate perita maduro sin semillas picado chiquito",
+      "Jugo recién exprimido de 2 limones",
+      "2 cucharadas soperas de aceite de oliva extra virgen en crudo",
+      "Sal marina fina y pimienta negra a gusto"
+    ],
+    "pasos": [
+      "Si se usa coliflor, rallarla cruda finita; si se utiliza quinoa, asegurarse de que esté fría y desgranada.",
+      "Picar a cuchillo el perejil y la menta en hebras diminutas.",
+      "Cortar el verdeo, el morrón y el tomate en concassé pequeño.",
+      "Unir todos los ingredientes en un bowl amplio.",
+      "Aderezar con el jugo de limón, el aceite de oliva en crudo, la sal marina y la pimienta.",
+      "Mezclar bien y dejar reposar 10 minutos para amalgamar los jugos antes de servir."
+    ],
+    "tip": "El shock de clorofila viva del perejil y la menta oxigena los tejidos y limpia residuos aromáticos de desintoxicación.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "zucchinis-a-la-menta",
+    "titulo": "Carpaccio de Zucchinis Marinados a la Menta y Lima",
+    "categoria": "almuerzos",
+    "tiempo": "15 min + marinado",
+    "metodo": "Laminado crudo + Marinado frío",
+    "ingredientes": [
+      "1 zucchini mediano firme y muy fresco",
+      "Jugo recién exprimido de 2 limones o limas",
+      "1 puñado generoso de hojas frescas de menta picadas",
+      "1 diente de ajo picado fino",
+      "Pimienta negra recién molida",
+      "1/2 cucharadita de sal marina fina",
+      "1 cucharada sopera de aceite de oliva extra virgen en crudo"
+    ],
+    "pasos": [
+      "Lavar y laminar el zucchini longitudinalmente en cintas muy finas con mandolina.",
+      "En un cuenco mezclar el jugo cítrico, el ajo, la menta fresca picada, la sal y la pimienta.",
+      "En una fuente honda acomodar los zucchinis formando una torre o capas, bañando cada capa con el aliño cítrico.",
+      "Dejar marinar en la heladera durante 1 a 3 horas hasta que las láminas adquieran textura tierna y translúcida.",
+      "Rociar con el hilo de oliva virgen extra antes de servir."
+    ],
+    "tip": "Plato de entrada fresco que drena calor acumulado en el estómago y prepara las enzimas para el almuerzo.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "colchon-de-arvejas",
+    "titulo": "Colchón Tierno de Arvejas y Cebolla al Vapor",
+    "categoria": "almuerzos",
+    "tiempo": "20 min",
+    "metodo": "Cocción tapada al vapor con hojas",
+    "ingredientes": [
+      "300 g de arvejas tiernas (frescas o congeladas)",
+      "1 cebolla grande cortada en pluma muy fina",
+      "2 cucharadas soperas de agua",
+      "1 cucharadita de aceite de oliva extra virgen",
+      "Sal marina a gusto",
+      "2 a 3 hojas grandes y limpias de lechuga o espinaca fresca"
+    ],
+    "pasos": [
+      "En una cacerola de fondo grueso colocar las 2 cucharadas de agua y la cucharadita de aceite de oliva.",
+      "Distribuir la cebolla cortada en pluma en la base y espolvorear con sal marina.",
+      "Volcar encima las arvejas emparejando la superficie.",
+      "Cubrir toda la preparación con las hojas de lechuga o espinaca húmedas (esto genera una trampa de vapor hermética).",
+      "Tapar la olla y cocinar a fuego mínimo pelusa (o con difusor) durante 15 a 18 minutos sin destapar.",
+      "Al retirar, las arvejas estarán dulces y esmeraldas, y la cebolla caramelizada en su jugo.",
+      "Servir caliente retirando las hojas de lechuga o incorporándolas si son de espinaca."
+    ],
+    "tip": "El sellado con hojas húmedas cocina las legumbres en su propia agua de vegetación conservando su dulzor biológico.",
+    "alergenos": []
+  },
+  {
+    "id": "sopa-fria-pepino-cilantro",
+    "titulo": "Sopa Fría Refrescante de Pepino, Palta y Cilantro",
+    "categoria": "sopas",
+    "tiempo": "10 min",
+    "metodo": "Procesado en frío",
+    "ingredientes": [
+      "1 palta madura pelada",
+      "1 pepino mediano pelado y sin semillas",
+      "Jugo recién exprimido de 1 limón",
+      "1/2 taza de agua pura de filtro fría",
+      "1/2 cucharadita de sal marina fina",
+      "1 puñado de hojas de cilantro fresco para servir"
+    ],
+    "pasos": [
+      "Cortar la palta y el pepino sin semillas en trozos medianos.",
+      "Colocar en la licuadora con el jugo de limón, el medio vaso de agua fría y la sal marina.",
+      "Licuar a potencia máxima durante 1 minuto hasta obtener una crema fría lisa y aterciopelada.",
+      "Servir inmediatamente en cuenco hondo decorando con abundante cilantro fresco picado por encima."
+    ],
+    "tip": "Excelente regulador térmico para días templados; hidrata los tejidos sin someter las vitaminas al calor.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "sopa-fria-apio-palta",
+    "titulo": "Sopa Fría Alcalinizante de Apio y Palta",
+    "categoria": "sopas",
+    "tiempo": "10 min",
+    "metodo": "Procesado en frío",
+    "ingredientes": [
+      "1 palta madura",
+      "4 ramas de apio fresco lavadas y trozadas",
+      "Ralladura y jugo recién exprimido de 1 limón",
+      "1 cucharadita de comino en polvo",
+      "1 diente de ajo fresco",
+      "1 cucharada sopera de aceite de oliva extra virgen en crudo",
+      "1 puñado de hojas tiernas de rúcula u otra hoja verde",
+      "1 cucharadita de sal marina fina",
+      "500 ml de agua fresca de filtro"
+    ],
+    "pasos": [
+      "Trozar el apio y extraer la pulpa de la palta.",
+      "Colocar en la licuadora el apio, la palta, el agua fresca, el jugo y la ralladura de limón.",
+      "Sumar el ajo, el comino, el aceite de oliva, la rúcula lavada y la sal marina.",
+      "Licuar a máxima velocidad durante 2 minutos hasta emulsionar en una crema pálida sedosa.",
+      "Servir fría en platos hondos con pimienta negra recién molida opcional."
+    ],
+    "tip": "El apio aporta sodio orgánico biodisponible que alcaliniza la matriz celular y estimula el drenaje de los riñones.",
+    "alergenos": [
+      "apio",
+      "citricos"
+    ]
+  },
+  {
+    "id": "gazpacho-verde",
+    "titulo": "Gazpacho Verde Vivo de Pepino, Tomate y Finas Hierbas",
+    "categoria": "sopas",
+    "tiempo": "10 min",
+    "metodo": "Licuado en frío",
+    "ingredientes": [
+      "1 tomate redondo maduro pelado",
+      "2 pepinos pelados a medias (dejando tiras de piel para sumar clorofila)",
+      "1/4 de cebolla blanca o morada",
+      "1 trozo pequeño de morrón verde o rojo",
+      "1/2 diente de ajo fresco",
+      "1 cucharadita de aceite de oliva extra virgen",
+      "Sal marina y pimienta negra a gusto",
+      "Hierbas frescas al gusto: orégano, albahaca, cilantro o perejil",
+      "Agua fría de filtro (cantidad necesaria)"
+    ],
+    "pasos": [
+      "Trocear el tomate, los pepinos parcialmente pelados, la cebolla y el morrón.",
+      "Poner en la licuadora con el medio ajo, la sal marina y las hierbas frescas seleccionadas.",
+      "Añadir el aceite de oliva virgen extra y un chorrito de agua fría si se desea más líquido.",
+      "Licuar a velocidad media hasta conformar una sopa ligera y homogénea.",
+      "Servir en cuencos fríos decorando con cubitos pequeños de pepino crudo."
+    ],
+    "tip": "Conservar parte de la cáscara del pepino aporta clorofila y flavonoides amargos que activan las enzimas estomacales.",
+    "alergenos": []
+  },
+  {
+    "id": "sopa-kale-brocoli-castanas",
+    "titulo": "Crema Clorofílica de Kale y Brócoli con Castañas de Cajú",
+    "categoria": "sopas",
+    "tiempo": "30 min",
+    "metodo": "Salteado en agua + Hervido suave + Licuado cremoso",
+    "ingredientes": [
+      "3 dientes de ajo picados",
+      "1 cebolla mediana picada",
+      "2 tazas de arbolitos de brócoli fresco",
+      "2 tazas de hojas de kale picadas finas (sin las nervaduras centrales duras)",
+      "2 puñados de castañas de cajú crudas (remojadas previamente)",
+      "Agua caliente para cubrir 5 cm por encima de las verduras",
+      "Sal marina, pimienta negra, nuez moscada y tomillo seco a gusto",
+      "1 chorrito de aceite de oliva extra virgen en crudo para servir"
+    ],
+    "pasos": [
+      "Saltear en cacerola con 2 cucharadas de agua caliente los ajos y la cebolla picada con sal marina.",
+      "Sumar el brócoli, el kale desvenado, pimienta, nuez moscada y tomillo.",
+      "Cubrir con agua caliente superando 5 cm los vegetales.",
+      "Cocinar a hervor medio durante 20 minutos hasta que el brócoli esté dócil.",
+      "Verter la preparación en la licuadora junto con las castañas de cajú remojadas y escurridas.",
+      "Licuar a potencia máxima durante 2 minutos hasta conformar una crema verde esmeralda sumamente sedosa.",
+      "Servir caliente terminando con un chorrito de aceite de oliva crudo."
+    ],
+    "tip": "Las castañas de cajú emulsionan la sopa dando cremosidad exquisita sin necesidad de recurrir a productos lácteos.",
+    "alergenos": [
+      "frutos_secos"
+    ]
+  },
+  {
+    "id": "borsch-depurativo-caju",
+    "titulo": "Borsch Depurativo de Remolachas con Queso de Cajú Fermentado",
+    "categoria": "sopas",
+    "tiempo": "1 h 15 min",
+    "metodo": "Hervido prolongado de raíces",
+    "ingredientes": [
+      "1 kg de remolachas frescas enteras bien lavadas",
+      "1 cebolla mediana entera cortada a la mitad (con su cáscara limpia)",
+      "2 litros de agua pura de filtro",
+      "Jugo recién exprimido de 1/2 limón",
+      "1 cucharadita de azúcar mascabo o miel (equilibra acidez)",
+      "Pimienta blanca molida y sal marina a gusto",
+      "Para coronar: 1 cucharada sopera de untable de cajú fermentado probiótico por plato"
+    ],
+    "pasos": [
+      "Lavar las remolachas con cepillo bajo agua limpia.",
+      "Ponerlas enteras con piel en una olla grande con los 2 litros de agua, la cebolla cortada a la mitad y sal marina.",
+      "Hervir tapado a fuego suave durante 1 hora completa.",
+      "Retirar y descartar las mitades de cebolla.",
+      "Retirar las remolachas, dejarlas entibiar, retirarles la piel con las manos y rallarlas gruesas.",
+      "Devolver las remolachas ralladas a la olla con su caldo concentrado.",
+      "Agregar pimienta blanca, azúcar mascabo y el jugo de limón; hervir 10 minutos más.",
+      "Servir tibia o fría coronando cada plato con una cucharada de queso de cajú fermentado en el centro."
+    ],
+    "tip": "Hervir la cebolla con su cáscara extrae quercetina cardioprotectora, y la remolacha tonifica intensamente la sangre.",
+    "alergenos": [
+      "frutos_secos",
+      "citricos"
+    ]
+  },
+  {
+    "id": "sopa-crema-coliflor-caju",
+    "titulo": "Sopa Crema de Coliflor y Cajú a la Cúrcuma",
+    "categoria": "sopas",
+    "tiempo": "25 min",
+    "metodo": "Salteado en agua + Hervido + Licuado",
+    "ingredientes": [
+      "1 cabeza de coliflor entera trozada (incluyendo el centro tierno del tronco)",
+      "1 diente de ajo picado",
+      "1 cebolla picada",
+      "1 tallo de puerro picado",
+      "1 cucharadita de cúrcuma en polvo pura",
+      "1 puñado de castañas de cajú crudas remojadas",
+      "Agua hirviendo justa para cubrir las verduras",
+      "Sal marina a gusto",
+      "Opcional para servir: ralladura de piel de naranja limpia y hojas de cilantro fresco"
+    ],
+    "pasos": [
+      "Saltear en cacerola con 2 cucharadas de agua caliente el ajo, la cebolla y el puerro.",
+      "Incorporar la coliflor trozada (ramilletes y tallo picado), sal marina y cúrcuma.",
+      "Cubrir al ras con agua hirviendo, tapar y cocinar a fuego suave durante 15 minutos.",
+      "Retirar y volcar en la licuadora con el puñado de castañas de cajú remojadas y escurridas.",
+      "Licuar a potencia máxima durante 2 minutos hasta lograr una textura aterciopelada dorada.",
+      "Servir caliente espolvoreando con ralladura de naranja y cilantro fresco."
+    ],
+    "tip": "El tallo de coliflor contiene gran riqueza en prebióticos y fibra soluble; sumarlo previene el desperdicio y enriquece la crema.",
+    "alergenos": [
+      "frutos_secos"
+    ]
+  },
+  {
+    "id": "sopa-zanahoria-jengibre-curcuma",
+    "titulo": "Sopa Antiinflamatoria de Zanahoria, Apio y Jengibre",
+    "categoria": "sopas",
+    "tiempo": "25 min",
+    "metodo": "Salteado en agua + Hervido suave + Licuado",
+    "ingredientes": [
+      "4 a 5 zanahorias grandes cortadas en rodajas",
+      "1 tallo de puerro picado",
+      "3 varas de apio frescas picadas",
+      "1 diente de ajo machacado",
+      "1 cucharada sopera colmada de jengibre fresco rallado fino",
+      "1 cucharadita de cúrcuma en polvo pura",
+      "Agua caliente de filtro para cubrir apenas las verduras",
+      "Sal marina a gusto",
+      "Para terminar: hierbas frescas picadas (cilantro, albahaca, menta o verdeo)"
+    ],
+    "pasos": [
+      "En cacerola con 2 cucharadas de agua saltear el puerro, el apio, el ajo y el jengibre durante 2 minutos.",
+      "Añadir la cúrcuma y sal marina removiendo para activar aromas.",
+      "Sumar las zanahorias cortadas y cubrir al ras con agua hirviendo.",
+      "Cocinar tapado a fuego suave durante 18 minutos hasta que la zanahoria esté muy tierna.",
+      "Pasar a la licuadora y triturar hasta obtener una crema sedosa de color naranja brillante.",
+      "Servir caliente con una lluvia de hierbas frescas picadas en el momento."
+    ],
+    "tip": "El jengibre con la cúrcuma dinamiza la circulación de los fluidos orgánicos y dispersa la frialdad interna.",
+    "alergenos": [
+      "apio"
+    ]
+  },
+  {
+    "id": "sopa-berro-leche-caju",
+    "titulo": "Sopa Tónica de Berro en Leche de Cajú Suave",
+    "categoria": "sopas",
+    "tiempo": "15 min",
+    "metodo": "Cocción corta + Licuado cremoso",
+    "ingredientes": [
+      "1 atado grande de berro fresco (sin los tallos leñosos gruesos)",
+      "1 tallo de puerro picado fino",
+      "1 diente de ajo machacado",
+      "1 taza de leche vegetal de cajú casera",
+      "1 taza de agua limpia de filtro",
+      "2 cucharadas de agua caliente para el sofrito",
+      "Sal marina y pimienta negra a gusto"
+    ],
+    "pasos": [
+      "Saltear en cacerola con 2 cucharadas de agua caliente el puerro y el ajo picado hasta transparentar.",
+      "Sumar el berro limpio y remover solo 1 minuto para que baje su volumen por calor.",
+      "Verter la leche de cajú y el agua en partes iguales cubriendo los vegetales.",
+      "Salpimentar y dejar que rompa un hervor suave durante no más de 3 minutos para resguardar la clorofila.",
+      "Licuar a máxima potencia y servir caliente o tibia."
+    ],
+    "tip": "El berro es uno de los tónicos de primavera más valorados para desobstruir el hígado y aliviar las vías respiratorias.",
+    "alergenos": [
+      "frutos_secos"
+    ]
+  },
+  {
+    "id": "sopa-apio-eneldo-curry",
+    "titulo": "Sopa Purificante de Apio y Eneldo al Curry Suave",
+    "categoria": "sopas",
+    "tiempo": "25 min",
+    "metodo": "Salteado suave + Hervido + Licuado",
+    "ingredientes": [
+      "1 cabeza entera de apio (usar tallos limpios sin hojas)",
+      "1 papa mediana en trozos chicos",
+      "1 cebolla picada fina",
+      "1 cucharadita de curry en polvo o masala suave",
+      "1 cucharadita de aceite de oliva extra virgen y 2 cdas de agua",
+      "1/4 taza de hojas frescas de eneldo picado",
+      "Agua o caldo détox caliente (para cubrir 2 cm por encima)",
+      "Sal marina a gusto",
+      "Opcional cremosidad: 1 puñado de castañas de cajú o 1 cda de untable de cajú"
+    ],
+    "pasos": [
+      "Saltear la cebolla picada con las 2 cucharadas de agua y la cucharadita de aceite de oliva.",
+      "Añadir el curry o masala y la sal marina revolviendo unos segundos.",
+      "Incorporar los tallos de apio trozados y los cubitos de papa.",
+      "Cubrir con agua o caldo détox caliente 2 cm por encima; hervir 18 minutos hasta tiernizar la papa.",
+      "Retirar del fuego y volcar en la licuadora con el eneldo fresco (y castañas si se usan).",
+      "Licuar a potencia máxima hasta que el eneldo perfume la crema verde clara.",
+      "Servir caliente en plato hondo."
+    ],
+    "tip": "El eneldo mitiga espasmos cólicos y equilibra la intensa nota vegetal del apio, logrando un caldo de gran armonía.",
+    "alergenos": [
+      "apio"
+    ]
+  },
+  {
+    "id": "sopa-crema-porotos-mung",
+    "titulo": "Sopa Crema Proteica de Porotos Mung al Puerro",
+    "categoria": "sopas",
+    "tiempo": "35 min + remojo",
+    "metodo": "Hervido de legumbres + Licuado sedoso",
+    "ingredientes": [
+      "1 taza de porotos mung previamente remojados 8 horas y escurridos",
+      "1 tallo de puerro picado",
+      "2 varas de apio picadas",
+      "1 cebolla mediana picada",
+      "1 diente de ajo machacado",
+      "1 litro de agua caliente de filtro",
+      "1 puñado generoso de cilantro fresco picado",
+      "Sal marina a gusto",
+      "2 cucharadas de agua caliente para el salteado"
+    ],
+    "pasos": [
+      "En cacerola amplia saltear en 2 cucharadas de agua caliente el ajo, puerro, cebolla y apio.",
+      "Incorporar los porotos mung escurridos y cubrir con el litro de agua caliente.",
+      "Cocinar tapado a fuego suave durante 25 a 30 minutos hasta que los porotos estén deshechos y tiernos.",
+      "Añadir la sal marina y las hojas de cilantro fresco.",
+      "Licuar todo el contenido en caliente hasta emulsionar en una sopa crema aterciopelada y homogénea.",
+      "Servir humeante acompañada con semillas tostadas o unas gotas de limón."
+    ],
+    "tip": "Reconstituyente proteico ideal para la noche; nutre profundamente sin provocar fermentaciones pesadas en el colon.",
+    "alergenos": [
+      "apio"
+    ]
+  },
+  {
+    "id": "caldo-de-miso",
+    "titulo": "Caldo Restaurador de Miso Vivo",
+    "categoria": "caldos",
+    "tiempo": "3 min",
+    "metodo": "Disolución en agua tibia sin hervir",
+    "ingredientes": [
+      "1 cucharadita de pasta de miso orgánico no pasteurizado (miso de arroz o cebada)",
+      "1 taza grande (250 ml) de agua caliente de filtro (a 60-70°C, nunca hirviendo)",
+      "Opcional: hebras de alga wakame hidratadas o cebolla de verdeo cruda picada finita"
+    ],
+    "pasos": [
+      "Calentar el agua de filtro apagando el fuego antes de que rompa hervor para preservar los microorganismos vivos.",
+      "Poner la cucharadita de pasta de miso en un cuenco o taza.",
+      "Agregar unas cucharadas de agua tibia y disolver con cuchara hasta deshacer todo grumo.",
+      "Completar la taza con el resto del agua tibia.",
+      "Sumar si se desea unas hebras de alga wakame o cebolla de verdeo picada.",
+      "Beber tibio a sorbos lentos antes de las comidas o como colación depurativa."
+    ],
+    "tip": "El miso no pasteurizado contiene enzimas digestivas activas que regeneran la flora y mitigan la fatiga estomacal.",
+    "alergenos": [
+      "soja"
+    ]
+  },
+  {
+    "id": "pudding-chia-compota",
+    "titulo": "Pudding de Chía en Leche de Almendras con Compota de Manzana",
+    "categoria": "desayunos",
+    "tiempo": "5 min prep + reposo nocturno",
+    "metodo": "Hidratación en frío + Ensamble",
+    "ingredientes": [
+      "3 cucharadas soperas de semillas de chía enteras (o ligeramente molidas)",
+      "1 taza (250 ml) de leche vegetal de almendras casera",
+      "1/2 cucharadita de extracto natural de vainilla (marca El Castillo)",
+      "1/2 taza de compota o nituke de manzana tibio (o frutillas y kiwi)",
+      "1 cucharada de almendras tostadas picadas o nueces picadas para decorar"
+    ],
+    "pasos": [
+      "Colocar en un frasco de vidrio la taza de leche de almendras, las semillas de chía y la vainilla natural.",
+      "Agitar muy enérgicamente durante 1 minuto para dispersar las semillas y evitar que se peguen en el fondo.",
+      "Refrigerar durante toda la noche (mínimo 6 horas) hasta que forme un gel espeso tipo pudín.",
+      "Servir por la mañana en un vaso o bowl coronado con una capa generosa de compota tibia de manzana.",
+      "Terminar con las almendras tostadas picadas por encima para aportar crocancia."
+    ],
+    "tip": "Acompañar con compota tibia templa la naturaleza fría de la chía, siendo perfecto para personas friolentas.",
+    "alergenos": [
+      "frutos_secos"
+    ]
+  },
+  {
+    "id": "licuado-rojo-pasion",
+    "titulo": "Licuado Rojo Pasión Hepático",
+    "categoria": "desayunos",
+    "tiempo": "5 min",
+    "metodo": "Licuado en crudo",
+    "ingredientes": [
+      "Jugo recién exprimido de 1 pomelo rosado (o pomelo en trozos con su parte blanca para mayor acción reductora)",
+      "1 puñado generoso de frutillas agroecológicas limpias",
+      "Ralladura de 1/2 naranja limpia",
+      "1 rodaja fina de jengibre fresco",
+      "5 hojas de menta fresca",
+      "Acompañamiento clínico: 6 almendras crudas o nueces activadas"
+    ],
+    "pasos": [
+      "Exprimir el pomelo rosado (o retirarle la cáscara externa conservando el albedo blanco si se busca efecto metabólico intenso).",
+      "Poner en la licuadora el pomelo, las frutillas, la ralladura de naranja, el jengibre y las hojas de menta.",
+      "Licuar a potencia máxima durante 1 minuto hasta integrar completamente.",
+      "Servir de inmediato y masticar las 6 almendras al beberlo para moderar el índice glucémico."
+    ],
+    "tip": "El albedo blanco del pomelo es rico en naringenina, un flavonoide que estimula los citocromos hepáticos y regula la glucemia.",
+    "alergenos": [
+      "citricos"
+    ]
+  },
+  {
+    "id": "licuado-verde-depurativo",
+    "titulo": "Jugo Verde Depurativo de Espinaca, Apio y Menta",
+    "categoria": "desayunos",
+    "tiempo": "7 min",
+    "metodo": "Extractora o licuado con filtrado en tela",
+    "ingredientes": [
+      "2 ramas de apio fresco con sus hojas",
+      "1 puñado grande de hojas de espinaca fresca bien lavadas",
+      "1 puñado de hojas frescas de menta",
+      "1 trozo de 2 cm de raíz de jengibre fresco",
+      "Jugo recién exprimido de 1/2 limón",
+      "1/2 vaso de agua de filtro (si se elabora en licuadora)",
+      "Acompañamiento clínico: 6 almendras o nueces"
+    ],
+    "pasos": [
+      "Si se usa extractora lenta o centrífuga, pasar el apio, espinaca, menta y jengibre; incorporar el jugo de limón al final.",
+      "Si se realiza en licuadora, colocar todos los ingredientes con el medio vaso de agua y licuar a velocidad máxima.",
+      "Colar el licuado a través de una bolsa de tela para leches vegetales exprimiendo con las manos para extraer el zumo puro sin fibra.",
+      "Beber fresco en el momento acompañado de las 6 almendras o nueces masticadas despacio."
+    ],
+    "tip": "Filtrar en bolsa permite la absorción instantánea de clorofila y minerales alcalinos sin fatigar la motilidad estomacal.",
+    "alergenos": [
+      "apio",
+      "citricos"
+    ]
+  },
+  {
+    "id": "crema-tibia-mijo-canela",
+    "titulo": "Crema Tibia Reconfortante de Mijo con Canela",
+    "categoria": "desayunos",
+    "tiempo": "30 min",
+    "metodo": "Hervido suave prolongado",
+    "ingredientes": [
+      "1/2 taza de mijo pelado orgánico bien lavado",
+      "2 tazas de agua pura o leche de almendras casera",
+      "1 rama de canela entera o 1 cdita de canela pura en polvo",
+      "1 manzana roja o pera rallada",
+      "1 pizca de sal marina",
+      "1 cucharadita de semillas de lino molidas o nueces picadas para decorar"
+    ],
+    "pasos": [
+      "Lavar el mijo exhaustivamente en colador de malla fina con agua tibia hasta que el agua salga clara.",
+      "Poner en una cacerola con el agua o leche vegetal, la manzana rallada, la canela y la pizca de sal.",
+      "Llevar a ebullición, bajar el fuego al mínimo y tapar.",
+      "Cocinar durante 20 a 25 minutos revolviendo ocasionalmente hasta que el grano se abra y forme una crema espesa.",
+      "Servir caliente en un tazón espolvoreando con canela molida y semillas de lino molidas."
+    ],
+    "tip": "El mijo es el cereal rey para fortalecer el Bazo y calentar el Estómago; ideal para cortar la ansiedad de dulces matutina.",
+    "alergenos": []
+  },
+  {
+    "id": "manzanas-asadas-canela",
+    "titulo": "Manzanas Asadas al Horno con Canela y Frutos Secos",
+    "categoria": "desayunos",
+    "tiempo": "35 min",
+    "metodo": "Horno en seco",
+    "ingredientes": [
+      "2 manzanas rojas o verdes agroecológicas",
+      "1 cucharadita colmada de canela pura de Ceilán",
+      "2 cucharadas soperas de agua de filtro",
+      "1 cucharada sopera de nueces o almendras tostadas picadas",
+      "Opcional: 1 pizca de nuez moscada o 2 clavos de olor"
+    ],
+    "pasos": [
+      "Lavar las manzanas y extraer el corazón con descorazonador cuidando de no perforar la base.",
+      "Efectuar un corte circular superficial en la piel alrededor de la manzana para evitar que reviente.",
+      "Acomodar las manzanas en una fuente para horno pequeña.",
+      "Rellenar la cavidad central con la canela en polvo y los frutos secos picados.",
+      "Verter las 2 cucharadas de agua en el fondo de la fuente.",
+      "Hornear a 180°C durante 30 a 35 minutos hasta que la pulpa esté blanda y caramelizada.",
+      "Servir tibias salseadas con su propio almíbar natural."
+    ],
+    "tip": "El calor del horno concentra la pectina de la manzana transformándola en un prebiótico protector de la mucosa intestinal.",
+    "alergenos": [
+      "frutos_secos"
+    ]
+  },
+  {
+    "id": "bastones-crocantes-dips",
+    "titulo": "Bastones Crocantes de Huerto con Dips Variados",
+    "categoria": "desayunos",
+    "tiempo": "10 min",
+    "metodo": "Corte crudo al bies",
+    "ingredientes": [
+      "2 ramas de apio tierno limpias",
+      "1 bulbo de hinojo mediano",
+      "2 zanahorias dulces peladas",
+      "1 pepino firme con piel parcial",
+      "Cuencos pequeños con dips a elección: Mayonesa de Zanahoria, Hummus de Mung, Babaganoush o Pasta de Remolacha y Aduki"
+    ],
+    "pasos": [
+      "Lavar minuciosamente los vegetales bajo agua fría.",
+      "Cortar el apio, hinojo, zanahoria y pepino en bastones uniformes de unos 7 a 8 cm de longitud.",
+      "Disponer los bastones en un plato o vaso amplio rodeando los cuencos de los untables elegidos.",
+      "Untar cada bastón en el dip deseado masticando pausadamente."
+    ],
+    "tip": "Aporta masticación mecánica estimulante y abundante fibra vegetal fresca sin aportar calorías vacías ni gluten.",
+    "alergenos": [
+      "apio"
+    ]
+  },
+  {
+    "id": "jugo-amo-mi-higado",
+    "titulo": "Jugo Détox Amo a mi Hígado",
+    "categoria": "desayunos",
+    "tiempo": "5 min",
+    "metodo": "Juguera / Extractora centrífuga",
+    "ingredientes": [
+      "1 remolacha cruda mediana pelada",
+      "2 zanahorias medianas limpias",
+      "4 varas de apio frescas",
+      "1 trocito de raíz de jengibre fresca (1 a 2 cm)",
+      "Acompañamiento clínico: 6 almendras crudas o nueces activadas"
+    ],
+    "pasos": [
+      "Lavar y trozar los vegetales en piezas aptas para el orificio de la máquina.",
+      "Pasar en orden la remolacha, zanahorias, apio y jengibre por la juguera extractora.",
+      "Mezclar con cuchara el zumo obtenido y beber inmediatamente para prevenir la degradación vitamínica.",
+      "Masticar despacio 6 frutos secos junto a la ingesta del zumo."
+    ],
+    "tip": "Sinergia de fitonutrientes diseñada específicamente para apoyar las fases I y II de desintoxicación hepática.",
+    "alergenos": [
+      "apio"
+    ]
+  },
+  {
+    "id": "compota-manzana-clavo-canela",
+    "titulo": "Compota Tradicional de Manzanas al Clavo y Canela",
+    "categoria": "desayunos",
+    "tiempo": "25 min",
+    "metodo": "Hervido suave prolongado",
+    "ingredientes": [
+      "3 manzanas rojas o verdes peladas y cortadas en cuartos",
+      "Agua pura de filtro suficiente para cubrir con holgura la fruta",
+      "1 rama de canela entera",
+      "2 clavos de olor aromáticos",
+      "Opcional: 1 puñado de frutos rojos (frutillas o arándanos) en los minutos finales",
+      "Para acompañar: almendras tostadas picadas o semillas de lino molidas"
+    ],
+    "pasos": [
+      "Colocar los trozos de manzana en cacerola junto a la canela en rama y los clavos de olor.",
+      "Cubrir con agua fría de filtro superando 2 cm las manzanas.",
+      "Cocinar a hervor suave tapado durante 20 a 25 minutos; cuanto más tiempo hierva a fuego mínimo más azúcares naturales liberará sin necesidad de miel.",
+      "Retirar los clavos y la canela.",
+      "Servir tibia con su caldo dulce espolvoreando con almendras picadas o lino molido."
+    ],
+    "tip": "El clavo y la canela calientan el centro digestivo tonificando el Bazo y neutralizando la frialdad estomacal.",
+    "alergenos": []
+  },
+  {
+    "id": "hot-cakes-avena-coco",
+    "titulo": "Hot Cakes Sin Aceite de Avena y Coco",
+    "categoria": "desayunos",
+    "tiempo": "15 min + remojo previo",
+    "metodo": "Sartén antiadherente sin materia grasa",
+    "ingredientes": [
+      "1 taza de avena arrollada (remojada la noche anterior en 1,5 tazas de agua)",
+      "3 cucharadas soperas de coco rallado fino",
+      "1/2 cucharadita de bicarbonato de sodio",
+      "Para servir: rodajas de banana, frutillas frescas o nituke de manzana, con escamas de coco y nueces picadas"
+    ],
+    "pasos": [
+      "Dejar en remojo la avena con la taza y media de agua limpia durante toda la noche.",
+      "Al día siguiente verter la avena con su líquido en la licuadora junto al coco rallado y el bicarbonato.",
+      "Licuar 1 minuto hasta formar una masa espesa y homogénea.",
+      "Calentar una sartén con revestimiento cerámico o antiadherente impecable a fuego medio (sin aceite).",
+      "Volcar una porción con cucharón dándole forma redondeada.",
+      "Cocinar hasta que la superficie forme burbujas y seque la capa superior; girar con espátula y dorar 1 minuto del otro lado.",
+      "Servir tibios con fruta fresca o nituke de manzana y nueces picadas."
+    ],
+    "tip": "El remojo nocturno inactiva el ácido fítico de la avena permitiendo lograr hot cakes esponjosos sin harinas refinadas ni grasas añadidas.",
+    "alergenos": [
+      "gluten"
+    ]
+  },
+  {
+    "id": "infusion-quelante-ortiga-diente-leon",
+    "titulo": "Infusión Quelante Depurativa de Ortiga y Diente de León",
+    "categoria": "infusiones",
+    "tiempo": "10 min",
+    "metodo": "Infusión tapada",
+    "ingredientes": [
+      "2 cucharaditas de hojas secas de ortiga pura (Urtica dioica)",
+      "2 cucharaditas de hojas o raíz de diente de león (Taraxacum officinale)",
+      "500 ml de agua pura hirviendo"
+    ],
+    "pasos": [
+      "Calentar el agua de filtro hasta alcanzar punto de ebullición.",
+      "Apagar el fuego y colocar las hierbas secas en una tetera o termo de vidrio limpio.",
+      "Volcar el agua hirviendo y tapar al instante para retener los aceites esenciales volátiles.",
+      "Dejar reposar durante 10 minutos exactos.",
+      "Colar y tomar 2 tazas al día preferentemente entre comidas principales durante todo el protocolo detox.",
+      "No endulzar con ningún tipo de azúcar ni miel."
+    ],
+    "tip": "La ortiga remineraliza y quelata toxinas en tejidos profundos, mientras el diente de león descongestiona hígado y riñones.",
+    "alergenos": []
+  },
+  {
+    "id": "mate-medicinal-hierbas",
+    "titulo": "Mate 100% Medicinal de Hierbas Depurativas",
+    "categoria": "infusiones",
+    "tiempo": "5 min",
+    "metodo": "Cebado tradicional con bombilla",
+    "ingredientes": [
+      "Mezcla en partes iguales de hierbas secas: menta, cola de caballo, ortiga, manzanilla, llantén, diente de león y lavanda",
+      "Cáscaras secas o frescas de cítricos limpios (limón, naranja o mandarina)",
+      "Hojas de cedrón",
+      "Opcional si se busca dulzor: 2 o 3 hojas secas de estevia natural entera",
+      "Agua caliente en termo a 75-80°C (sin hervir)"
+    ],
+    "pasos": [
+      "Llenar el mate hasta 3/4 de su capacidad únicamente con la mezcla de yuyos medicinales y las cáscaras de cítricos picadas (sin yerba mate tradicional).",
+      "Tapar la boca del mate con la palma de la mano, invertir y sacudir suavemente para acomodar las hierbas a 45 grados.",
+      "Echar un chorro de agua tibia en el hueco formado y dejar reposar 1 minuto para hidratar las hojas.",
+      "Introducir la bombilla tapando la boquilla superior con el dedo pulgar.",
+      "Cebar continuamente con el agua del termo caliente a lo largo del día.",
+      "Tomar a gusto para calmar el hábito de bombillear sin incorporar cafeína ni irritar el estómago."
+    ],
+    "tip": "Permite conservar el ritual social del mate eliminando el síndrome de abstinencia y aportando principios botánicos hepatoprotectores.",
+    "alergenos": []
+  },
+  {
+    "id": "infusion-digestiva-albahaca-jengibre",
+    "titulo": "Infusión Cálida de Albahaca y Jengibre Fresco",
+    "categoria": "infusiones",
+    "tiempo": "10 min",
+    "metodo": "Decocción corta + Infusión tapada",
+    "ingredientes": [
+      "1 cucharada sopera de raíz de jengibre fresco machacado o en rodajas",
+      "1 puñado generoso de hojas frescas de albahaca (o 1 cda de albahaca seca)",
+      "1 litro de agua pura de filtro"
+    ],
+    "pasos": [
+      "Colocar el litro de agua con el jengibre machacado en una cacerolita y llevar a hervor durante 3 minutos.",
+      "Apagar el fuego, sumar las hojas de albahaca fresca y tapar el recipiente de inmediato.",
+      "Dejar infusionar durante 7 minutos tapado.",
+      "Colar y traspasar a un termo para beber tibio a lo largo del día entre comidas sin endulzar."
+    ],
+    "tip": "De naturaleza cálida, dispersa el frío interno, corta náuseas de desintoxicación y estimula los jugos digestivos.",
+    "alergenos": []
+  },
+  {
+    "id": "infusion-calmante-triple-flor",
+    "titulo": "Infusión Serena de Manzanilla, Caléndula y Lavanda",
+    "categoria": "infusiones",
+    "tiempo": "8 min",
+    "metodo": "Infusión floral tapada",
+    "ingredientes": [
+      "1 cucharada sopera de flores secas de manzanilla",
+      "1 cucharada sopera de flores secas de caléndula medicinal",
+      "1 cucharada sopera de flores secas de lavanda",
+      "1 litro de agua hirviendo"
+    ],
+    "pasos": [
+      "Hervir el agua de filtro y retirar del fuego.",
+      "Poner las tres flores medicinales en una tetera o termo.",
+      "Verter el agua hirviendo y tapar rápidamente para atrapar los aceites volátiles.",
+      "Dejar reposar de 8 a 10 minutos.",
+      "Colar y beber una taza tibia a media tarde o antes de dormir para inducir relajación muscular y descanso profundo."
+    ],
+    "tip": "La caléndula cicatriza la mucosa gastrointestinal inflamada mientras la manzanilla y lavanda modulan el sistema nervioso entérico.",
+    "alergenos": []
+  }
+]

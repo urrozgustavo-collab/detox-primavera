@@ -1,7 +1,7 @@
 # 🌿 Detox Primavera — Estado del Proyecto & Guía de Continuidad
 
-> **Última actualización:** 27 de septiembre de 2026  
-> **Versión Actual:** `v1.2.1` *(SemVer: 1 Major, 2 Minor, 1 Patch)*  
+> **Última actualización:** 29 de septiembre de 2026  
+> **Versión Actual:** `v1.4.0` *(SemVer: 1 Major, 4 Minor, 0 Patch)*  
 > **Líder Operativa:** Blair Vance (COO)  
 > **Repositorio GitHub:** [`urrozgustavo-collab/detox-primavera`](https://github.com/urrozgustavo-collab/detox-primavera)  
 > **Enlace de Producción (Webapp PWA):** [https://urrozgustavo-collab.github.io/detox-primavera/](https://urrozgustavo-collab.github.io/detox-primavera/)
@@ -134,7 +134,24 @@ A continuación se consolidan los requerimientos estratégicos y funcionales sol
 
 ---
 
-## 6. Historial de Versiones (SemVer 2.0.0)
+- **`v1.4.0` (28/09/2026) — Módulo 2: Catálogo Culinario Exhaustivo:**
+  - **Expansión a 73 Recetas Oficiales:** Integración del 100% de las recetas de la guía de Isabel Caparra y del documento preparatorio (de 11 iniciales a 73 preparaciones completas).
+  - **10 Categorías Clínicas:** Clasificación estructurada en Almuerzos/Cenas (17), Sopas Clínicas (10), Dips/Untables (10), Desayunos/Meriendas (10), Aliños/Condimentos (8), Panificados (5), Fermentos/Pickles (5), Infusiones/Fitoterapia (4), Caldos (2) y Leches Vegetales (2).
+  - **Filtros Ergonómicos en Interfaz:** Navegación por selector segmentado en `recetas.html` con etiquetas claras y descriptivas para las 10 categorías.
+  - **Integración con Algoritmo de Rotación:** Distribución equilibrada de sopas, aliños e infusiones en los 4 momentos del día en `dia.js`.
+  - **Alérgenos y Modo Cocina:** Cada receta cuenta con tiempos, métodos de cocción, ingredientes con cantidades exactas, pasos secuenciales, tips clínicos de Isa Caparra y alérgenos mapeados.
+
+- **`v1.3.0` (28/09/2026) — Módulo 1: Tracker, Múltiples Comidas, Alergias & Rotación:**
+  - **Múltiples Alimentos por Sección:** La estructura de comidas ahora admite listas completas de preparaciones por momento (desayuno, almuerzo, merienda, cena), con distinción entre recetas oficiales y comidas libres manuales, checkboxes individuales y eliminación.
+  - **Buscador con Autocompletado Culinario:** Búsqueda reactiva por nombre e ingredientes con desplegable flotante, detección en tiempo real de alérgenos y registro rápido de comidas manuales.
+  - **Perfil de Alergias e Intolerancias:** Selector ergonómico con alérgenos predeterminados (frutos secos, semillas, algas, gluten, soja, cítricos, apio, etc.) y campo libre. Exclusión automática de recetas comprometidas en las sugerencias y sincronización en la nube.
+  - **Algoritmo de Rotación Nutricional:** Motor de sugerencias que prioriza recetas nunca probadas en el reto (`🌱 Aún no probada`) o consumidas hace más tiempo (`🔄 Rotación recomendada`), dinamizando la variedad en fases avanzadas.
+  - **Historial Global Culinario:** Nueva subvista en Bitácora con balance de recetas oficiales probadas vs pendientes, cobertura porcentual de la guía y línea de tiempo detallada de ingestas.
+  - **Bitácora — Deselección Ergonómica:** Corrección que permite desactivar tanto el nivel de energía (1-5) como el estado de digestión y asimilación tocando nuevamente sobre la opción ya activa (retorno a estado neutral).
+  - *Backlog Pendiente:* Propagar el perfil de Alergias e Intolerancias a los módulos restantes (Módulo 2: Recetas y Heladera con badges de advertencia, Módulo 3: Lista de Compras, Módulo 4: Semáforo Nutricional).
+
+- **`v1.2.1` (27/09/2026):**
+  - **Arquitectura Modular Desacoplada:** División física del código en snippets HTML y composables JS bajo `app/modules/` para habilitar trabajo concurrente con subagentes sin conflictos.
 
 - **`v1.2.0` (27/09/2026):**
   - **Heladera Inteligente ("¿Qué cocino con lo que tengo?"):** Catálogo de 54 ingredientes clasificados clínicamente, taps rápidos de insumos frecuentes, buscador y selector por categorías.

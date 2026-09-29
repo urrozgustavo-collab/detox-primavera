@@ -202,14 +202,32 @@
                   <p class="text-[10px] text-stone-500 dark:text-stone-400">Tu código personal:</p>
                   <p class="text-lg font-mono font-bold tracking-wider text-stone-900 dark:text-stone-100">{{ syncKey }}</p>
                 </div>
-                <button 
-                  @click="copySyncLink()"
-                  class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold rounded-lg shadow-2xs transition flex items-center gap-1 text-xs">
-                  <span>📋</span>
-                  <span>Copiar Link</span>
-                </button>
+                <div class="flex items-center gap-1.5">
+                  <button 
+                    @click="copySyncLink()"
+                    title="Copiar enlace web de vinculación"
+                    class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold rounded-lg shadow-2xs transition flex items-center gap-1 text-xs">
+                    <span>📋</span>
+                    <span>Copiar Link</span>
+                  </button>
+                  <button 
+                    @click="shareViaWhatsApp()"
+                    title="Enviar enlace por WhatsApp"
+                    class="px-2.5 py-1.5 bg-emerald-700/90 hover:bg-emerald-800 active:scale-95 text-white font-semibold rounded-lg shadow-2xs transition flex items-center gap-1 text-xs">
+                    <span>💬</span>
+                    <span class="hidden sm:inline">WhatsApp</span>
+                  </button>
+                </div>
               </div>
             </div>
+
+            <!-- Botón directo WhatsApp -->
+            <button 
+              @click="shareViaWhatsApp()"
+              class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-medium rounded-xl transition flex items-center justify-center gap-2 text-xs shadow-xs">
+              <span class="text-base">💬</span>
+              <span>Enviar enlace por WhatsApp a mi celular o a Jime</span>
+            </button>
 
             <!-- Paso a paso para vincular Celular / Otra PC -->
             <div class="space-y-2.5">
@@ -222,20 +240,30 @@
                 <p class="text-[11px] text-stone-600 dark:text-stone-300 font-medium">
                   📸 Escaneá con la cámara de tu celular:
                 </p>
-                <div class="flex justify-center p-2 bg-white rounded-lg inline-block mx-auto border border-stone-200">
-                  <img :src="qrCodeUrl" alt="Código QR de vinculación" class="w-36 h-36 rounded-md">
+                <div class="flex justify-center p-2.5 bg-white rounded-xl inline-block mx-auto border border-stone-200 shadow-2xs">
+                  <img :src="qrCodeUrl" alt="Código QR de vinculación" class="w-40 h-40 rounded-md object-contain">
                 </div>
-                <p class="text-[10px] text-stone-400">Al abrir el link escaneado, tu celular queda vinculado para siempre.</p>
+                <p class="text-[10px] text-stone-500 dark:text-stone-400">
+                  Al escanearlo, tu celular abrirá la aplicación web oficial y se vinculará de inmediato.
+                </p>
+                <div class="pt-0.5">
+                  <span class="text-[9px] font-mono text-stone-400 dark:text-stone-500 break-all select-all">
+                    {{ syncShareUrl }}
+                  </span>
+                </div>
               </div>
 
               <!-- Opción Código manual -->
-              <div class="p-3 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700/60 space-y-1">
+              <div class="p-3 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700/60 space-y-1.5">
                 <p class="text-[11px] text-stone-600 dark:text-stone-300 font-medium">
                   💻 O ingresá este código en otra compu:
                 </p>
                 <div class="flex items-center justify-between bg-white dark:bg-stone-900 p-2 rounded-lg border border-stone-200 dark:border-stone-700">
-                  <code class="font-mono font-bold text-emerald-600 dark:text-emerald-400">{{ syncKey }}</code>
-                  <button @click="copySyncLink()" class="text-xs text-stone-500 hover:text-stone-800 dark:hover:text-stone-200">Copiar</button>
+                  <code class="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">{{ syncKey }}</code>
+                  <div class="flex items-center gap-1">
+                    <button @click="copySyncCode()" class="px-2 py-1 text-xs bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 rounded font-medium transition active:scale-95">Copiar código</button>
+                    <button @click="copySyncLink()" class="px-2 py-1 text-xs bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 rounded font-medium transition active:scale-95">Copiar link</button>
+                  </div>
                 </div>
               </div>
 
