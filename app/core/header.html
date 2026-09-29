@@ -1,5 +1,6 @@
-<!-- Topbar Header (Compacto y nativo) -->
-    <header class="sticky top-0 z-30 bg-white/90 dark:bg-stone-900/90 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800 pt-safe transition-colors w-full">
+<!-- Topbar Header & Navegación Desktop Unificada (Sticky Coordinado) -->
+<div class="sticky top-0 z-30 w-full">
+  <header class="bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800 pt-safe w-full">
       <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
         
         <!-- Logo & Titulo -->
@@ -78,7 +79,7 @@
     </header>
 
     <!-- Barra de Navegación Desktop (Oculta en Celular) -->
-    <nav class="hidden md:block bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 sticky top-[57px] z-20 transition-colors">
+    <nav class="hidden md:block bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800 w-full">
       <div class="max-w-6xl mx-auto px-4 flex gap-1 sm:gap-2 overflow-x-auto no-scrollbar py-1">
         <button 
           @click="activeTab = 'dia'"
@@ -132,3 +133,4 @@
         </button>
       </div>
     </nav>
+  </div>

@@ -1,7 +1,7 @@
 # 🌿 Detox Primavera — Estado del Proyecto & Guía de Continuidad
 
 > **Última actualización:** 29 de septiembre de 2026  
-> **Versión Actual:** `v1.4.1` *(SemVer: 1 Major, 4 Minor, 1 Patch)*  
+> **Versión Actual:** `v1.4.2` *(SemVer: 1 Major, 4 Minor, 2 Patch)*  
 > **Líder Operativa:** Blair Vance (COO)  
 > **Repositorio GitHub:** [`urrozgustavo-collab/detox-primavera`](https://github.com/urrozgustavo-collab/detox-primavera)  
 > **Enlace de Producción (Webapp PWA):** [https://urrozgustavo-collab.github.io/detox-primavera/](https://urrozgustavo-collab.github.io/detox-primavera/)
@@ -132,7 +132,11 @@ A continuación se consolidan los requerimientos estratégicos y funcionales sol
    - Matriz clínica de activación para 11 insumos críticos (Almendras, Castañas de cajú, Porotos mung, Arroz yamaní, Quinoa, Lino, Chía, Sésamo, Kéfir, Chucrut y Masa madre).
    - Indicador visual de alerta de agua: cuándo es obligatorio **descartar el agua** (para eliminar antinutrientes y fitatos) vs. cuándo está terminantemente prohibido descartarla (como en el mucílago protector de lino y chía).
 
----
+- **`v1.4.2` (29/09/2026) — Shell & Core: Corrección Integral de Modo Claro en Versión Web (Escritorio):**
+  - **Eliminación de Stuck Paint por Transición en `body`:** Se removió la clase `transition-colors duration-200` en la etiqueta `<body>` y contenedores clave, erradicando el bug de Chromium donde la interpolación de color se congelaba en el color oscuro (`stone-950`), dejando un fondo negro con recuadros blancos.
+  - **Header & Navbar Desktop Unificados:** Se agrupó el topbar `<header>` y la barra de navegación de pestañas `<nav class="hidden md:block">` dentro de un único contenedor sticky coordinado (`sticky top-0 z-30`), eliminando el valor rígido `top-[57px]` que provocaba solapamientos y desincronizaciones de blur al scrollear en escritorio.
+  - **Sincronización Reactiva Inmediata de Tema:** Se añadió `{ immediate: true }` al watcher de `isDarkMode` en `core.js` para asegurar que las clases en `<html>` y el estado reactivo de Vue coincidan desde el instante de montaje.
+  - **Inicialización Robusta en `<head>`:** Sincronización del script temprano de prevención FOUC tanto con `localStorage` como con `document.cookie` y fallback explícito para evitar split-brain entre el tema del sistema operativo y las preferencias del usuario.
 
 - **`v1.4.1` (29/09/2026) — Corrección Integral de Desbordes Horizontales Móviles y Visibilidad del Pie de Página:**
   - **Blindaje de Ancho en Contenedores (`min-w-0` & `max-w-100%`):** Se blindó la etiqueta `<main>` y cada una de las 6 secciones con clases de contención responsiva (`w-full min-w-0 max-w-full`) y en `styles.css` para evitar que elementos hijos con anchos intrínsecos desborden el layout flex y corten el margen derecho en pantallas táctiles de celulares.

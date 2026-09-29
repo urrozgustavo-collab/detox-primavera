@@ -56,7 +56,7 @@ function useCoreModule({ ref, computed, watch, onMounted, data }) {
       if (val) document.documentElement.classList.add('dark');
       else document.documentElement.classList.remove('dark');
     }
-  });
+  }, { immediate: true });
 
   // Notificaciones Toast
   const toastMessage = ref('');

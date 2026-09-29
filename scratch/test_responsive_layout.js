@@ -24,10 +24,10 @@ console.log('  ✓ <main> correctly configured with w-full min-w-0.');
 if (!compiledIndex.includes('pb-28 md:pb-8') || !compiledIndex.includes('pb-safe')) {
   throw new Error('❌ <footer> missing bottom clearance (pb-28 md:pb-8 pb-safe) for mobile nav');
 }
-if (!compiledIndex.includes('v1.4.1')) {
-  throw new Error('❌ <footer> version not bumped to v1.4.1');
+if (!compiledIndex.includes('v1.4.2')) {
+  throw new Error('❌ <footer> version not bumped to v1.4.2');
 }
-console.log('  ✓ <footer> bottom clearance (pb-28 pb-safe) & version v1.4.1 confirmed.');
+console.log('  ✓ <footer> bottom clearance (pb-28 pb-safe) & version v1.4.2 confirmed.');
 
 // 4. Verify Dia Carousel containment
 if (!compiledIndex.includes('min-w-0 max-w-full overflow-hidden')) {

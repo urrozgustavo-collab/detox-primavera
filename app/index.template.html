@@ -22,7 +22,13 @@
   <!-- Early Dark Mode init to prevent FOUC -->
   <script>
     try {
-      if (localStorage.getItem('detox_dark_mode') === 'true' || (!('detox_dark_mode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      var savedTheme = null;
+      try { savedTheme = localStorage.getItem('detox_dark_mode'); } catch(e) {}
+      if (savedTheme === null && typeof document !== 'undefined' && document.cookie) {
+        var m = document.cookie.match(/(?:^|;\s*)detox_dark_mode=([^;]*)/);
+        if (m) savedTheme = decodeURIComponent(m[1]);
+      }
+      if (savedTheme === 'true' || (savedTheme === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
@@ -30,6 +36,8 @@
     } catch (e) {
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
       }
     }
   </script>
@@ -84,7 +92,7 @@
   <script src="detox-data.js"></script>
   <script src="fridge-engine.js"></script>
 </head>
-<body class="bg-warmcream text-stone-800 dark:bg-stone-950 dark:text-stone-100 min-h-screen transition-colors duration-200 overflow-x-hidden w-full">
+<body class="bg-warmcream text-stone-800 dark:bg-stone-950 dark:text-stone-100 min-h-screen overflow-x-hidden w-full">
   <div id="app" v-cloak class="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
     
     <!-- Topbar Header -->
