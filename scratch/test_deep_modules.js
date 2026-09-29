@@ -219,5 +219,44 @@ if (!instance.shoppingChecked.value['v1']) {
 }
 console.log('  ✓ toggleShopping updated reactive state.');
 
+// 8. Test Bitácora Energy and Digestion Toggle-off
+console.log('\n🔍 Testing Bitácora Energy & Digestion Deselection...');
+instance.setJournalEnergy(4);
+if (instance.currentDayJournal.value.energy !== 4) {
+  throw new Error(`Expected energy to be 4, got: ${instance.currentDayJournal.value.energy}`);
+}
+instance.setJournalEnergy(4);
+if (instance.currentDayJournal.value.energy !== null) {
+  throw new Error(`Expected energy to be null after toggle-off, got: ${instance.currentDayJournal.value.energy}`);
+}
+console.log('  ✓ setJournalEnergy correctly toggles selection off to null.');
+
+instance.setJournalDigestion('liviana');
+if (instance.currentDayJournal.value.digestion !== 'liviana') {
+  throw new Error(`Expected digestion to be 'liviana', got: ${instance.currentDayJournal.value.digestion}`);
+}
+instance.setJournalDigestion('liviana');
+if (instance.currentDayJournal.value.digestion !== null) {
+  throw new Error(`Expected digestion to be null after toggle-off, got: ${instance.currentDayJournal.value.digestion}`);
+}
+console.log('  ✓ setJournalDigestion correctly toggles selection off to null.');
+
+// 9. Test Core QR & Sync Share URL Resolution
+console.log('\n🔍 Testing Core QR & Sync Share URL Resolution...');
+instance.syncKey.value = 'GUS-TEST';
+const shareUrl = instance.syncShareUrl.value;
+console.log(`  ✓ syncShareUrl resolved in local context: ${shareUrl}`);
+if (!shareUrl.startsWith('https://urrozgustavo-collab.github.io/detox-primavera/?sync=GUS-TEST')) {
+  throw new Error(`Expected shareUrl to point to production GitHub Pages, got: ${shareUrl}`);
+}
+
+const qrUrl = instance.qrCodeUrl.value;
+console.log(`  ✓ qrCodeUrl generated: ${qrUrl}`);
+if (!qrUrl.includes('api.qrserver.com') || !qrUrl.includes(encodeURIComponent(shareUrl))) {
+  throw new Error(`Expected qrCodeUrl to properly encode production shareUrl, got: ${qrUrl}`);
+}
+
+console.log('  ✓ Core QR and Sync Share URL verified successfully.');
+
 console.log('\n🎉 ALL DEEP INTEGRATION TESTS PASSED WITH 100% SUCCESS!');
 process.exit(0);

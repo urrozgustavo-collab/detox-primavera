@@ -19,6 +19,15 @@ function useDiaModule({ ref, computed, watch, data, safeStorage, pushToCloud, tr
     return isValidDateString(saved) ? saved : null;
   };
 
+  const normalizeText = (str) => {
+    if (!str || typeof str !== 'string') return '';
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  };
+
   const selectedDay = ref(parseInt(safeStorage.get('detox_selected_day') || '1', 10));
   const startMode = ref(safeStorage.get('detox_start_mode') || 'monodieta3');
   const startDate = ref(getInitialStartDate());
@@ -28,11 +37,24 @@ function useDiaModule({ ref, computed, watch, data, safeStorage, pushToCloud, tr
   const unlockedBadges = ref(JSON.parse(safeStorage.get('detox_unlocked_badges') || '[]'));
   const xp = ref(parseInt(safeStorage.get('detox_xp') || '0', 10));
 
-  // Bitácora y Comidas
+  // Bitácora, Comidas e Ingestas
   const dailyJournal = ref(JSON.parse(safeStorage.get('detox_daily_journal') || '{}'));
   const dailyMeals = ref(JSON.parse(safeStorage.get('detox_daily_meals') || '{}'));
   const journalView = ref('dia');
   const showExportModal = ref(false);
+
+  // Perfil de Alergias e Intolerancias
+  const userAllergies = ref(JSON.parse(safeStorage.get('detox_user_allergies') || '[]'));
+  const showAllergySelector = ref(false);
+  const customAllergyInput = ref('');
+
+  // Buscador reactivo por slot de comida
+  const mealSearchQueries = ref({
+    desayuno: '',
+    almuerzo: '',
+    merienda: '',
+    cena: ''
+  });
 
   // Watchers de persistencia y nube
   watch(selectedDay, (val) => {
@@ -66,6 +88,10 @@ function useDiaModule({ ref, computed, watch, data, safeStorage, pushToCloud, tr
   }, { deep: true });
   watch(dailyMeals, (val) => {
     safeStorage.set('detox_daily_meals', JSON.stringify(val));
+    pushToCloud();
+  }, { deep: true });
+  watch(userAllergies, (val) => {
+    safeStorage.set('detox_user_allergies', JSON.stringify(val));
     pushToCloud();
   }, { deep: true });
 
@@ -224,10 +250,16 @@ function useDiaModule({ ref, computed, watch, data, safeStorage, pushToCloud, tr
         completedMissions.value = {};
         xp.value = 0;
         unlockedBadges.value = [];
+        dailyJournal.value = {};
+        dailyMeals.value = {};
+        userAllergies.value = [];
         safeStorage.remove('detox_completed_missions');
         safeStorage.remove('detox_streak');
         safeStorage.remove('detox_xp');
         safeStorage.remove('detox_unlocked_badges');
+        safeStorage.remove('detox_daily_journal');
+        safeStorage.remove('detox_daily_meals');
+        safeStorage.remove('detox_user_allergies');
         await pushToCloud(true);
         triggerToast('🔄 Reto reiniciado por completo a foja cero.');
       } else {
@@ -253,6 +285,9 @@ function useDiaModule({ ref, computed, watch, data, safeStorage, pushToCloud, tr
     }
   };
 
+  // ==========================================
+  // BITÁCORA CLÍNICA
+  // ==========================================
   const currentDayJournal = computed(() => {
     const dayKey = `dia_${selectedDay.value}`;
     return dailyJournal.value[dayKey] || { energy: null, digestion: null, symptoms: [], notes: '' };
@@ -261,12 +296,34 @@ function useDiaModule({ ref, computed, watch, data, safeStorage, pushToCloud, tr
   const updateCurrentJournal = (patch) => {
     const dayKey = `dia_${selectedDay.value}`;
     const current = dailyJournal.value[dayKey] || { energy: null, digestion: null, symptoms: [], notes: '' };
+    
+    // Si se pasa el mismo nivel de energía o digestión que ya estaba activo (deshacer acción), devolver a null
+    let finalPatch = { ...patch };
+    if ('energy' in patch && patch.energy !== null && current.energy !== null && (current.energy === patch.energy || Number(current.energy) === Number(patch.energy))) {
+      finalPatch.energy = null;
+    }
+    if ('digestion' in patch && patch.digestion !== null && current.digestion !== null && current.digestion === patch.digestion) {
+      finalPatch.digestion = null;
+    }
+
     dailyJournal.value = {
       ...dailyJournal.value,
-      [dayKey]: { ...current, ...patch, updatedAt: Date.now() }
+      [dayKey]: { ...current, ...finalPatch, updatedAt: Date.now() }
     };
     safeStorage.set('detox_daily_journal', JSON.stringify(dailyJournal.value));
     pushToCloud();
+  };
+
+  const setJournalEnergy = (lvlId) => {
+    const current = currentDayJournal.value.energy;
+    const next = (current === lvlId || Number(current) === Number(lvlId)) ? null : lvlId;
+    updateCurrentJournal({ energy: next });
+  };
+
+  const setJournalDigestion = (digId) => {
+    const current = currentDayJournal.value.digestion;
+    const next = (current === digId) ? null : digId;
+    updateCurrentJournal({ digestion: next });
   };
 
   const toggleJournalSymptom = (sym) => {
@@ -285,50 +342,603 @@ function useDiaModule({ ref, computed, watch, data, safeStorage, pushToCloud, tr
     updateCurrentJournal({ symptoms: next });
   };
 
+  // ==========================================
+  // PERFIL DE ALERGIAS E INTOLERANCIAS
+  // ==========================================
+  const defaultAllergies = [
+    'Frutos secos',
+    'Semillas',
+    'Algas',
+    'Gluten / Trigo',
+    'Soja / Shoyu',
+    'Cítricos',
+    'Apio',
+    'Sésamo',
+    'Frutillas',
+    'Legumbres'
+  ];
+
+  const ALLERGEN_KEYWORDS = {
+    'frutos secos': ['frutos secos', 'fruto seco', 'almendra', 'almendras', 'caju', 'castana', 'castanas', 'nuez', 'nueces', 'avellana', 'avellanas', 'pistacho', 'pistachos'],
+    'semillas': ['semilla', 'semillas', 'lino', 'sesamo', 'chia', 'girasol', 'zapallo', 'amapola'],
+    'algas': ['alga', 'algas', 'kombu', 'nori', 'wakame', 'cochayuyo', 'espirulina', 'agar'],
+    'gluten / trigo': ['gluten', 'trigo', 'centeno', 'cebada', 'avena', 'harina de trigo', 'harina de centeno'],
+    'gluten/trigo': ['gluten', 'trigo', 'centeno', 'cebada', 'avena', 'harina de trigo', 'harina de centeno'],
+    'gluten': ['gluten', 'trigo', 'centeno', 'cebada', 'avena'],
+    'trigo': ['trigo', 'harina de trigo'],
+    'soja / shoyu': ['soja', 'shoyu', 'tamari', 'tofu', 'miso', 'edamame', 'salsa shoyu'],
+    'soja/shoyu': ['soja', 'shoyu', 'tamari', 'tofu', 'miso', 'edamame', 'salsa shoyu'],
+    'soja': ['soja', 'shoyu', 'tamari', 'tofu', 'miso', 'edamame'],
+    'shoyu': ['shoyu', 'tamari', 'salsa shoyu'],
+    'citricos': ['citrico', 'citricos', 'limon', 'limones', 'naranja', 'naranjas', 'mandarina', 'mandarinas', 'pomelo', 'pomelos', 'lima'],
+    'apio': ['apio', 'pencas de apio'],
+    'sesamo': ['sesamo', 'tahini', 'tahin'],
+    'legumbres': ['legumbre', 'legumbres', 'mung', 'aduki', 'lenteja', 'lentejas', 'garbanzo', 'garbanzos', 'poroto', 'porotos'],
+    'frutillas': ['frutilla', 'frutillas', 'fresa', 'fresas']
+  };
+
+  const getRecipeAllergens = (recipe, allergies) => {
+    if (!recipe || !allergies || !allergies.length) return [];
+    const allergenList = Array.isArray(allergies) ? allergies : [];
+    if (allergenList.length === 0) return [];
+
+    const texts = [
+      normalizeText(recipe.titulo),
+      ...(recipe.ingredientes || []).map(normalizeText),
+      normalizeText(recipe.tip || '')
+    ];
+
+    const detected = [];
+
+    for (const allergy of allergenList) {
+      const normAllergy = normalizeText(allergy);
+      if (!normAllergy) continue;
+
+      let keywords = ALLERGEN_KEYWORDS[normAllergy];
+      if (!keywords) {
+        for (const [key, list] of Object.entries(ALLERGEN_KEYWORDS)) {
+          if (normAllergy.includes(key) || key.includes(normAllergy)) {
+            keywords = list;
+            break;
+          }
+        }
+      }
+      if (!keywords) {
+        keywords = [normAllergy];
+      }
+
+      const found = keywords.some(kw => {
+        const normKw = normalizeText(kw);
+        return texts.some(t => t.includes(normKw));
+      });
+
+      if (found) {
+        detected.push(allergy);
+      }
+    }
+
+    return detected;
+  };
+
+  const isRecipeAllergic = (recipe, allergies) => {
+    return getRecipeAllergens(recipe, allergies).length > 0;
+  };
+
+  const toggleAllergy = (allergyName) => {
+    if (!allergyName || typeof allergyName !== 'string') return;
+    const name = allergyName.trim();
+    if (!name) return;
+    const idx = userAllergies.value.findIndex(a => normalizeText(a) === normalizeText(name));
+    if (idx >= 0) {
+      userAllergies.value = userAllergies.value.filter((_, i) => i !== idx);
+      triggerToast(`🌿 Alérgeno removido: ${name}`);
+    } else {
+      userAllergies.value = [...userAllergies.value, name];
+      triggerToast(`⚠️ Alérgeno registrado: ${name}`);
+    }
+  };
+
+  const addAllergy = (allergyName) => {
+    if (!allergyName || typeof allergyName !== 'string') return;
+    const name = allergyName.trim();
+    if (!name) return;
+    const exists = userAllergies.value.some(a => normalizeText(a) === normalizeText(name));
+    if (!exists) {
+      userAllergies.value = [...userAllergies.value, name];
+      triggerToast(`⚠️ Alérgeno registrado: ${name}`);
+    }
+  };
+
+  const removeAllergy = (allergyName) => {
+    if (!allergyName || typeof allergyName !== 'string') return;
+    const name = allergyName.trim();
+    userAllergies.value = userAllergies.value.filter(a => normalizeText(a) !== normalizeText(name));
+    triggerToast(`🌿 Alérgeno removido: ${name}`);
+  };
+
+  // ==========================================
+  // NORMALIZACIÓN & COMIDAS E INGESTAS
+  // ==========================================
+  const normalizeSlot = (rawSlot) => {
+    if (!rawSlot) {
+      return { text: '', done: false, items: [] };
+    }
+    if (Array.isArray(rawSlot)) {
+      const items = rawSlot.map((item, idx) => ({
+        id: item.id || `meal_${Date.now()}_${idx}`,
+        name: item.name || item.text || '',
+        isRecipe: item.isRecipe !== undefined ? !!item.isRecipe : !!item.recipeId,
+        recipeId: item.recipeId || null,
+        done: !!item.done,
+        timestamp: item.timestamp || Date.now()
+      }));
+      const text = items.map(i => i.name).filter(Boolean).join(', ');
+      const done = items.length > 0 && items.every(i => i.done);
+      return { text, done, items };
+    }
+
+    let items = Array.isArray(rawSlot.items) ? rawSlot.items.map((item, idx) => ({
+      id: item.id || `meal_${Date.now()}_${idx}`,
+      name: item.name || item.text || '',
+      isRecipe: item.isRecipe !== undefined ? !!item.isRecipe : !!item.recipeId,
+      recipeId: item.recipeId || null,
+      done: !!item.done,
+      timestamp: item.timestamp || Date.now()
+    })) : [];
+
+    // Retrocompatibilidad 100% con entradas previas { text, done }
+    if (items.length === 0 && rawSlot.text && typeof rawSlot.text === 'string' && rawSlot.text.trim()) {
+      items.push({
+        id: 'legacy_' + Math.random().toString(36).slice(2, 8),
+        name: rawSlot.text.trim(),
+        isRecipe: false,
+        recipeId: null,
+        done: !!rawSlot.done,
+        timestamp: Date.now()
+      });
+    }
+
+    const text = items.length > 0 
+      ? items.map(i => i.name).filter(Boolean).join(', ') 
+      : (rawSlot.text || '');
+    const done = items.length > 0 
+      ? items.every(i => i.done) 
+      : !!rawSlot.done;
+
+    return {
+      ...rawSlot,
+      text,
+      done,
+      items
+    };
+  };
+
   const currentDayMeals = computed(() => {
     const dayKey = `dia_${selectedDay.value}`;
-    return dailyMeals.value[dayKey] || {
-      desayuno: { text: '', done: false },
-      almuerzo: { text: '', done: false },
-      merienda: { text: '', done: false },
-      cena: { text: '', done: false }
+    const dayData = dailyMeals.value[dayKey] || {};
+    return {
+      desayuno: normalizeSlot(dayData.desayuno),
+      almuerzo: normalizeSlot(dayData.almuerzo),
+      merienda: normalizeSlot(dayData.merienda),
+      cena: normalizeSlot(dayData.cena)
     };
   });
 
   const updateMealSlot = (slotId, patch) => {
     const dayKey = `dia_${selectedDay.value}`;
     const currentDay = dailyMeals.value[dayKey] || {};
-    const currentSlot = currentDay[slotId] || { text: '', done: false };
+    const currentSlot = normalizeSlot(currentDay[slotId]);
+    
+    let updatedSlot = { ...currentSlot, ...patch };
+
+    // Si se pasa 'done' booleano y el slot tiene items, actualizar todos los items
+    if (patch.done !== undefined && Array.isArray(currentSlot.items) && currentSlot.items.length > 0) {
+      updatedSlot.items = currentSlot.items.map(i => ({ ...i, done: !!patch.done }));
+    }
+
+    // Si se pasa 'text' y no había items, registrar como item de texto libre
+    if (patch.text !== undefined) {
+      const trimmed = patch.text.trim();
+      if ((!updatedSlot.items || updatedSlot.items.length === 0) && trimmed) {
+        updatedSlot.items = [{
+          id: 'legacy_' + Math.random().toString(36).slice(2, 8),
+          name: trimmed,
+          isRecipe: false,
+          recipeId: null,
+          done: !!updatedSlot.done,
+          timestamp: Date.now()
+        }];
+      }
+    }
+
     dailyMeals.value = {
       ...dailyMeals.value,
       [dayKey]: {
         ...currentDay,
-        [slotId]: { ...currentSlot, ...patch }
+        [slotId]: updatedSlot
       }
     };
     safeStorage.set('detox_daily_meals', JSON.stringify(dailyMeals.value));
     pushToCloud();
   };
 
+  const addMealItem = (slotId, { name, recipeId = null, isRecipe = false, done = false }) => {
+    if (!name || typeof name !== 'string' || !name.trim()) return;
+    const dayKey = `dia_${selectedDay.value}`;
+    const currentDay = dailyMeals.value[dayKey] || {};
+    const currentSlot = normalizeSlot(currentDay[slotId]);
+
+    const newItem = {
+      id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      name: name.trim(),
+      isRecipe: isRecipe !== undefined ? !!isRecipe : !!recipeId,
+      recipeId: recipeId || null,
+      done: !!done,
+      timestamp: Date.now()
+    };
+
+    const nextItems = [...currentSlot.items, newItem];
+    const nextText = nextItems.map(i => i.name).filter(Boolean).join(', ');
+    const nextDone = nextItems.length > 0 && nextItems.every(i => i.done);
+
+    dailyMeals.value = {
+      ...dailyMeals.value,
+      [dayKey]: {
+        ...currentDay,
+        [slotId]: {
+          ...currentSlot,
+          text: nextText,
+          done: nextDone,
+          items: nextItems
+        }
+      }
+    };
+    safeStorage.set('detox_daily_meals', JSON.stringify(dailyMeals.value));
+    pushToCloud();
+  };
+
+  const removeMealItem = (slotId, itemId) => {
+    const dayKey = `dia_${selectedDay.value}`;
+    const currentDay = dailyMeals.value[dayKey] || {};
+    const currentSlot = normalizeSlot(currentDay[slotId]);
+
+    const nextItems = currentSlot.items.filter(i => i.id !== itemId);
+    const nextText = nextItems.map(i => i.name).filter(Boolean).join(', ');
+    const nextDone = nextItems.length > 0 && nextItems.every(i => i.done);
+
+    dailyMeals.value = {
+      ...dailyMeals.value,
+      [dayKey]: {
+        ...currentDay,
+        [slotId]: {
+          ...currentSlot,
+          text: nextText,
+          done: nextDone,
+          items: nextItems
+        }
+      }
+    };
+    safeStorage.set('detox_daily_meals', JSON.stringify(dailyMeals.value));
+    pushToCloud();
+  };
+
+  const toggleMealItemDone = (slotId, itemId) => {
+    const dayKey = `dia_${selectedDay.value}`;
+    const currentDay = dailyMeals.value[dayKey] || {};
+    const currentSlot = normalizeSlot(currentDay[slotId]);
+
+    const nextItems = currentSlot.items.map(item => {
+      if (item.id === itemId) {
+        return { ...item, done: !item.done };
+      }
+      return item;
+    });
+    const nextText = nextItems.map(i => i.name).filter(Boolean).join(', ');
+    const nextDone = nextItems.length > 0 && nextItems.every(i => i.done);
+
+    dailyMeals.value = {
+      ...dailyMeals.value,
+      [dayKey]: {
+        ...currentDay,
+        [slotId]: {
+          ...currentSlot,
+          text: nextText,
+          done: nextDone,
+          items: nextItems
+        }
+      }
+    };
+    safeStorage.set('detox_daily_meals', JSON.stringify(dailyMeals.value));
+    pushToCloud();
+  };
+
+  const toggleSlotAllDone = (slotId) => {
+    const dayKey = `dia_${selectedDay.value}`;
+    const currentDay = dailyMeals.value[dayKey] || {};
+    const currentSlot = normalizeSlot(currentDay[slotId]);
+
+    if (!currentSlot.items || currentSlot.items.length === 0) {
+      const nextDone = !currentSlot.done;
+      dailyMeals.value = {
+        ...dailyMeals.value,
+        [dayKey]: {
+          ...currentDay,
+          [slotId]: {
+            ...currentSlot,
+            done: nextDone
+          }
+        }
+      };
+    } else {
+      const allDone = currentSlot.items.every(i => i.done);
+      const targetDone = !allDone;
+      const nextItems = currentSlot.items.map(i => ({ ...i, done: targetDone }));
+      dailyMeals.value = {
+        ...dailyMeals.value,
+        [dayKey]: {
+          ...currentDay,
+          [slotId]: {
+            ...currentSlot,
+            done: targetDone,
+            items: nextItems
+          }
+        }
+      };
+    }
+    safeStorage.set('detox_daily_meals', JSON.stringify(dailyMeals.value));
+    pushToCloud();
+  };
+
+  // ==========================================
+  // BUSCADOR REACTIVO POR SLOT
+  // ==========================================
+  const getMealSearchResults = (slotId) => {
+    if (!data.recipes) return [];
+    const query = mealSearchQueries.value?.[slotId] || '';
+    const q = normalizeText(query);
+    if (!q) return [];
+
+    return data.recipes
+      .filter(r => {
+        const normTitle = normalizeText(r.titulo);
+        const normIngs = (r.ingredientes || []).map(normalizeText);
+        const normCat = normalizeText(r.categoria || '');
+        return normTitle.includes(q) || normIngs.some(i => i.includes(q)) || normCat.includes(q);
+      })
+      .map(r => {
+        const detected = getRecipeAllergens(r, userAllergies.value);
+        return {
+          ...r,
+          hasAllergen: detected.length > 0,
+          isAllergic: detected.length > 0,
+          detectedAllergens: detected
+        };
+      });
+  };
+
+  // ==========================================
+  // SUGERENCIAS INTELIGENTES CON ROTACIÓN
+  // ==========================================
   const getMealSuggestions = (slotId) => {
     if (!data.recipes) return [];
-    if (selectedDay.value <= 3 && startMode.value === 'monodieta3') {
-      return data.recipes.filter(r => r.id === 'r1' || r.id === 'r2' || r.id === 'r5');
+
+    // 1. Excluir recetas con alérgenos del usuario
+    const safeRecipes = data.recipes.filter(r => !isRecipeAllergic(r, userAllergies.value));
+    if (safeRecipes.length === 0) return [];
+
+    // 2. Mapear frecuencia de consumo y último día consumido en el reto
+    const usage = {};
+    for (let d = 1; d <= 21; d++) {
+      const dayKey = `dia_${d}`;
+      const dayMeals = dailyMeals.value[dayKey];
+      if (dayMeals) {
+        ['desayuno', 'almuerzo', 'merienda', 'cena'].forEach(slot => {
+          const s = normalizeSlot(dayMeals[slot]);
+          s.items.forEach(it => {
+            if (it.done) {
+              const matchedRecipe = safeRecipes.find(r => 
+                (it.recipeId && r.id === it.recipeId) || 
+                (normalizeText(it.name) === normalizeText(r.titulo))
+              );
+              if (matchedRecipe) {
+                const rid = matchedRecipe.id;
+                if (!usage[rid]) usage[rid] = { count: 0, lastDay: 0 };
+                usage[rid].count++;
+                if (d > usage[rid].lastDay) usage[rid].lastDay = d;
+              }
+            }
+          });
+        });
+      }
     }
-    if (slotId === 'desayuno') {
-      return data.recipes.filter(r => r.categoria === 'Desayunos' || r.id === 'r1' || r.id === 'r4').slice(0, 3);
+
+    // 3. Filtrar según fase del reto y momento del día
+    let monodietDays = 3;
+    if (startMode.value === 'monodieta2') monodietDays = 2;
+    if (startMode.value === 'monodieta1') monodietDays = 1;
+    if (startMode.value === 'directo') monodietDays = 0;
+
+    let candidates = [];
+
+    if (selectedDay.value <= monodietDays && monodietDays > 0) {
+      // Fase de Monodieta
+      candidates = safeRecipes.filter(r => 
+        r.id === 'nituke-manzana' || 
+        r.id === 'caldo-detox' || 
+        r.id === 'galletas-yamani' || 
+        r.categoria === 'desayunos' || 
+        r.categoria === 'caldos'
+      );
+    } else {
+      // Menú Depurativo General
+      if (slotId === 'desayuno') {
+        candidates = safeRecipes.filter(r => 
+          r.categoria === 'desayunos' || 
+          r.categoria === 'leches' || 
+          r.categoria === 'panificados' || 
+          r.categoria === 'dips' ||
+          r.categoria === 'infusiones'
+        );
+      } else if (slotId === 'almuerzo') {
+        candidates = safeRecipes.filter(r => 
+          r.categoria === 'almuerzos' || 
+          r.categoria === 'sopas' || 
+          r.categoria === 'caldos' || 
+          r.categoria === 'dips' || 
+          r.categoria === 'alinos' || 
+          r.categoria === 'panificados' || 
+          r.categoria === 'fermentos'
+        );
+      } else if (slotId === 'merienda') {
+        candidates = safeRecipes.filter(r => 
+          r.categoria === 'desayunos' || 
+          r.categoria === 'leches' || 
+          r.categoria === 'dips' || 
+          r.categoria === 'panificados' ||
+          r.categoria === 'infusiones'
+        );
+      } else if (slotId === 'cena') {
+        candidates = safeRecipes.filter(r => 
+          r.categoria === 'sopas' || 
+          r.categoria === 'caldos' || 
+          r.categoria === 'almuerzos' || 
+          r.categoria === 'dips' || 
+          r.categoria === 'alinos' || 
+          r.categoria === 'fermentos'
+        );
+      }
     }
-    if (slotId === 'almuerzo') {
-      return data.recipes.filter(r => r.categoria === 'Almuerzos y Cenas').slice(0, 3);
+
+    // Si la categoría específica tiene pocas opciones aptas, rellenar con otras recetas seguras
+    if (candidates.length < 3) {
+      const candidateIds = new Set(candidates.map(c => c.id));
+      const remaining = safeRecipes.filter(r => !candidateIds.has(r.id));
+      candidates = [...candidates, ...remaining];
     }
-    if (slotId === 'merienda') {
-      return data.recipes.filter(r => r.categoria === 'Desayunos' || r.categoria === 'Dips y Aderezos').slice(0, 3);
-    }
-    if (slotId === 'cena') {
-      return data.recipes.filter(r => r.categoria === 'Caldos y Sopas' || r.categoria === 'Almuerzos y Cenas').slice(2, 5);
-    }
-    return data.recipes.slice(0, 3);
+
+    // 4. Algoritmo de rotación nutricional:
+    // Prioriza recetas NO consumidas aún (count === 0) con badge '🌱 Aún no probada'
+    // Prioriza recetas con menor consumo y consumidas hace más tiempo con badge '🔄 Rotación recomendada'
+    const scored = candidates.map(recipe => {
+      const u = usage[recipe.id] || { count: 0, lastDay: 0 };
+      const count = u.count;
+      const lastDay = u.lastDay;
+      let badge = '🌱 Aún no probada';
+      if (count === 1) {
+        badge = '🔄 Rotación recomendada';
+      } else if (count > 1) {
+        badge = `🔄 Probada ${count} veces`;
+      }
+      return {
+        ...recipe,
+        consumedCount: count,
+        lastConsumedDay: lastDay || null,
+        badge
+      };
+    });
+
+    scored.sort((a, b) => {
+      if (a.consumedCount !== b.consumedCount) {
+        return a.consumedCount - b.consumedCount;
+      }
+      return a.lastConsumedDay - b.lastConsumedDay;
+    });
+
+    return scored.slice(0, 4);
   };
+
+  // ==========================================
+  // HISTORIAL GLOBAL & ESTADÍSTICAS
+  // ==========================================
+  const consumedMealsHistory = computed(() => {
+    const history = [];
+    const slotLabels = {
+      desayuno: { label: 'Desayuno', icon: '🌅' },
+      almuerzo: { label: 'Almuerzo', icon: '☀️' },
+      merienda: { label: 'Merienda', icon: '🍵' },
+      cena: { label: 'Cena', icon: '🌙' }
+    };
+
+    for (let d = 1; d <= 21; d++) {
+      const dayKey = `dia_${d}`;
+      const dayMeals = dailyMeals.value[dayKey];
+      if (!dayMeals) continue;
+
+      ['desayuno', 'almuerzo', 'merienda', 'cena'].forEach(slotId => {
+        const slot = normalizeSlot(dayMeals[slotId]);
+        slot.items.forEach(item => {
+          if (item.done) {
+            history.push({
+              day: d,
+              dayKey,
+              slotId,
+              slotLabel: slotLabels[slotId]?.label || slotId,
+              slotIcon: slotLabels[slotId]?.icon || '🍽️',
+              itemId: item.id,
+              name: item.name,
+              isRecipe: !!item.isRecipe,
+              recipeId: item.recipeId || null,
+              timestamp: item.timestamp || Date.now()
+            });
+          }
+        });
+      });
+    }
+
+    const slotOrder = { desayuno: 1, almuerzo: 2, merienda: 3, cena: 4 };
+    history.sort((a, b) => {
+      if (a.day !== b.day) return a.day - b.day;
+      if (slotOrder[a.slotId] !== slotOrder[b.slotId]) return (slotOrder[a.slotId] || 0) - (slotOrder[b.slotId] || 0);
+      return (a.timestamp || 0) - (b.timestamp || 0);
+    });
+
+    return history;
+  });
+
+  const recipeStats = computed(() => {
+    const allRecipes = data.recipes || [];
+    const total = allRecipes.length;
+    if (total === 0) {
+      return {
+        totalRecipes: 0,
+        preparedCount: 0,
+        neverPreparedCount: 0,
+        coveragePercent: 0,
+        preparedRecipes: [],
+        neverPreparedRecipes: [],
+        uniqueRecipesPrepared: 0
+      };
+    }
+
+    const preparedSet = new Set();
+    const history = consumedMealsHistory.value;
+
+    history.forEach(item => {
+      const matched = allRecipes.find(r => 
+        (item.recipeId && r.id === item.recipeId) ||
+        (normalizeText(item.name) === normalizeText(r.titulo))
+      );
+      if (matched) {
+        preparedSet.add(matched.id);
+      }
+    });
+
+    const preparedRecipes = allRecipes.filter(r => preparedSet.has(r.id));
+    const neverPreparedRecipes = allRecipes.filter(r => !preparedSet.has(r.id));
+    const preparedCount = preparedRecipes.length;
+    const neverPreparedCount = neverPreparedRecipes.length;
+    const coveragePercent = Math.round((preparedCount / total) * 100);
+
+    return {
+      totalRecipes: total,
+      preparedCount,
+      neverPreparedCount,
+      coveragePercent,
+      preparedRecipes,
+      neverPreparedRecipes,
+      uniqueRecipesPrepared: preparedCount
+    };
+  });
 
   const currentWeekDays = computed(() => {
     const currentDay = selectedDay.value || 1;
@@ -493,6 +1103,17 @@ function useDiaModule({ ref, computed, watch, data, safeStorage, pushToCloud, tr
     report += `Día actual del reto: Día ${selectedDay.value} de 21\n`;
     report += `Inicio: ${challengeInfo.value.formattedStartDate || 'No fijada'}\n`;
     report += `Puntos acumulados: ${xp.value} XP | Racha: ${streakDays.value} días\n`;
+    
+    // Alergias e intolerancias declaradas
+    if (userAllergies.value && userAllergies.value.length > 0) {
+      report += `⚠️ Alergias e Intolerancias declaradas: ${userAllergies.value.join(', ')}\n`;
+    } else {
+      report += `⚠️ Alergias e Intolerancias declaradas: Ninguna registrada\n`;
+    }
+
+    // Cobertura de recetas
+    const stats = recipeStats.value;
+    report += `📊 Cobertura de recetas de la guía: ${stats.preparedCount} de ${stats.totalRecipes} (${stats.coveragePercent}%)\n`;
     report += `--------------------------------------------------\n\n`;
 
     let entriesFound = false;
@@ -504,7 +1125,7 @@ function useDiaModule({ ref, computed, watch, data, safeStorage, pushToCloud, tr
         entriesFound = true;
         report += `📅 DÍA ${d}:\n`;
         if (j) {
-          if (j.energy) {
+          if (j.energy !== null && j.energy !== undefined) {
             const eObj = data.journalOptions?.energyLevels?.find(x => x.id === Number(j.energy));
             report += `  • Nivel de energía: ${eObj ? eObj.icon + ' ' + eObj.label : j.energy + '/5'}\n`;
           }
@@ -520,14 +1141,29 @@ function useDiaModule({ ref, computed, watch, data, safeStorage, pushToCloud, tr
           }
         }
         if (m) {
-          const mealParts = [];
-          ['desayuno', 'almuerzo', 'merienda', 'cena'].forEach(slot => {
-            if (m[slot] && m[slot].text) {
-              mealParts.push(`${slot.toUpperCase()}: ${m[slot].text} ${m[slot].done ? '(✓)' : ''}`);
+          const mealLines = [];
+          const slotLabels = {
+            desayuno: 'Desayuno',
+            almuerzo: 'Almuerzo',
+            merienda: 'Merienda',
+            cena: 'Cena'
+          };
+          ['desayuno', 'almuerzo', 'merienda', 'cena'].forEach(slotId => {
+            const slotData = normalizeSlot(m[slotId]);
+            const label = slotLabels[slotId] || slotId.toUpperCase();
+            if (slotData.items && slotData.items.length > 0) {
+              const itemsStr = slotData.items.map(it => {
+                const check = it.done ? '[✓]' : '[ ]';
+                const tag = it.isRecipe ? ' (Receta)' : '';
+                return `${check} ${it.name}${tag}`;
+              }).join(' | ');
+              mealLines.push(`    - ${label}: ${itemsStr}`);
+            } else if (slotData.text && slotData.text.trim()) {
+              mealLines.push(`    - ${label}: ${slotData.done ? '[✓]' : '[ ]'} ${slotData.text.trim()}`);
             }
           });
-          if (mealParts.length > 0) {
-            report += `  • Comidas: ${mealParts.join(' | ')}\n`;
+          if (mealLines.length > 0) {
+            report += `  • Comidas e Ingestas:\n${mealLines.join('\n')}\n`;
           }
         }
         report += `\n`;
@@ -586,10 +1222,30 @@ function useDiaModule({ ref, computed, watch, data, safeStorage, pushToCloud, tr
     copyQuote,
     currentDayJournal,
     updateCurrentJournal,
+    setJournalEnergy,
+    setJournalDigestion,
     toggleJournalSymptom,
+    normalizeSlot,
     currentDayMeals,
     updateMealSlot,
+    addMealItem,
+    removeMealItem,
+    toggleMealItemDone,
+    toggleSlotAllDone,
+    mealSearchQueries,
+    getMealSearchResults,
+    userAllergies,
+    showAllergySelector,
+    customAllergyInput,
+    defaultAllergies,
+    toggleAllergy,
+    addAllergy,
+    removeAllergy,
+    isRecipeAllergic,
+    getRecipeAllergens,
     getMealSuggestions,
+    consumedMealsHistory,
+    recipeStats,
     currentWeekDays,
     dayMissionsStatus,
     currentDayCompletionPercent,

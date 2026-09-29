@@ -71,6 +71,7 @@ const app = createApp({
         shoppingChecked: compras.shoppingChecked.value,
         dailyJournal: dia.dailyJournal.value,
         dailyMeals: dia.dailyMeals.value,
+        userAllergies: dia.userAllergies.value,
         fridgeSelected: heladera.fridgeSelected.value,
         weeklyPlan: batch.weeklyPlan.value,
         streakDays: dia.streakDays.value,
@@ -89,6 +90,7 @@ const app = createApp({
         if (cloudData.shoppingChecked !== undefined) compras.shoppingChecked.value = cloudData.shoppingChecked;
         if (cloudData.dailyJournal !== undefined) dia.dailyJournal.value = cloudData.dailyJournal;
         if (cloudData.dailyMeals !== undefined) dia.dailyMeals.value = cloudData.dailyMeals;
+        if (cloudData.userAllergies !== undefined) dia.userAllergies.value = cloudData.userAllergies;
         if (cloudData.fridgeSelected !== undefined) heladera.fridgeSelected.value = cloudData.fridgeSelected;
         if (cloudData.weeklyPlan !== undefined) batch.weeklyPlan.value = cloudData.weeklyPlan;
         if (cloudData.unlockedBadges !== undefined) dia.unlockedBadges.value = cloudData.unlockedBadges;
@@ -101,6 +103,7 @@ const app = createApp({
         safeStorage.set('detox_shopping_checked', JSON.stringify(compras.shoppingChecked.value));
         safeStorage.set('detox_daily_journal', JSON.stringify(dia.dailyJournal.value));
         safeStorage.set('detox_daily_meals', JSON.stringify(dia.dailyMeals.value));
+        safeStorage.set('detox_user_allergies', JSON.stringify(dia.userAllergies.value));
         safeStorage.set('detox_fridge_selected', JSON.stringify(heladera.fridgeSelected.value));
         safeStorage.set('detox_weekly_plan', JSON.stringify(batch.weeklyPlan.value));
         safeStorage.set('detox_unlocked_badges', JSON.stringify(dia.unlockedBadges.value));
@@ -189,6 +192,7 @@ const app = createApp({
         dia.unlockedBadges.value = [];
         dia.dailyJournal.value = {};
         dia.dailyMeals.value = {};
+        dia.userAllergies.value = [];
         heladera.fridgeSelected.value = [];
         batch.weeklyPlan.value = {};
         dia.xp.value = 0;
@@ -200,6 +204,7 @@ const app = createApp({
           'detox_unlocked_badges',
           'detox_daily_journal',
           'detox_daily_meals',
+          'detox_user_allergies',
           'detox_fridge_selected',
           'detox_weekly_plan',
           'detox_xp',
@@ -214,7 +219,13 @@ const app = createApp({
 
     onMounted(async () => {
       if (core.syncKey.value) {
-        await core.pullFromCloud();
+        if (core.isDirectUrlPairing) {
+          await core.pullFromCloud(true);
+          core.triggerToast(`📱 ¡Dispositivo vinculado con éxito a ${core.syncKey.value}!`);
+          core.fireConfetti();
+        } else {
+          await core.pullFromCloud();
+        }
       }
 
       if (dia.startDate.value && dia.challengeInfo.value.started) {

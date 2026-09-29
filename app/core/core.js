@@ -87,6 +87,9 @@ function useCoreModule({ ref, computed, watch, onMounted, data }) {
   // Sincronización en la Nube
   const KV_BUCKET = 'EE7impjfrWvHaAhuDDuBvU';
   const KV_BASE_URL = `https://kvdb.io/${KV_BUCKET}/`;
+  const PRODUCTION_URL = 'https://urrozgustavo-collab.github.io/detox-primavera/';
+
+  let isDirectUrlPairing = false;
 
   const getInitialSyncKey = () => {
     let key = null;
@@ -95,11 +98,13 @@ function useCoreModule({ ref, computed, watch, onMounted, data }) {
       const urlKey = urlParams.get('sync');
       if (urlKey && urlKey.trim()) {
         key = urlKey.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+        isDirectUrlPairing = true;
       }
       if (!key && window.location.hash) {
         const hashMatch = window.location.hash.match(/sync=([A-Z0-9_-]+)/i);
         if (hashMatch && hashMatch[1]) {
           key = hashMatch[1].trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+          isDirectUrlPairing = true;
         }
       }
       if (!key) {
@@ -285,25 +290,90 @@ function useCoreModule({ ref, computed, watch, onMounted, data }) {
   };
 
   const syncShareUrl = computed(() => {
-    if (!syncKey.value || typeof window === 'undefined') return '';
-    return `${window.location.origin}${window.location.pathname}?sync=${syncKey.value}`;
+    if (!syncKey.value) return '';
+    if (typeof window === 'undefined' || !window.location) {
+      return `${PRODUCTION_URL}?sync=${syncKey.value}`;
+    }
+
+    const protocol = window.location.protocol;
+    const hostname = window.location.hostname;
+    const origin = window.location.origin;
+
+    // Detectar si estamos en un entorno local (file://, localhost, 127.0.0.1, origin null)
+    // En cualquiera de estos casos, un celular externo jamás podrá abrir la ruta local de la PC.
+    // Apuntamos indefectiblemente a la PWA de producción en GitHub Pages:
+    const isLocal = protocol === 'file:' ||
+                    origin === 'null' ||
+                    !hostname ||
+                    hostname === 'localhost' ||
+                    hostname === '127.0.0.1';
+
+    if (isLocal) {
+      return `${PRODUCTION_URL}?sync=${syncKey.value}`;
+    }
+
+    // Si estamos en un servidor web real, normalizar la ruta base (remover index.html si está presente)
+    const base = `${origin}${window.location.pathname}`.replace(/\/index\.html$/i, '/');
+    const cleanBase = base.endsWith('/') ? base : `${base}/`;
+    return `${cleanBase}?sync=${syncKey.value}`;
   });
 
   const qrCodeUrl = computed(() => {
     if (!syncShareUrl.value) return '';
-    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=${encodeURIComponent(syncShareUrl.value)}`;
+    return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(syncShareUrl.value)}`;
   });
 
   const copySyncLink = () => {
     if (!syncShareUrl.value) return;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(syncShareUrl.value).then(() => {
-        triggerToast('📋 Enlace de sincronización copiado.');
+        triggerToast('📋 Enlace web de vinculación copiado.');
       });
     } else {
       triggerToast(`Enlace: ${syncShareUrl.value}`);
     }
   };
+
+  const copySyncCode = () => {
+    if (!syncKey.value) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(syncKey.value).then(() => {
+        triggerToast(`📋 Código copiado: ${syncKey.value}`);
+      });
+    } else {
+      triggerToast(`Código: ${syncKey.value}`);
+    }
+  };
+
+  const shareViaWhatsApp = () => {
+    if (!syncShareUrl.value) return;
+    const text = `🌿 ¡Hola! Acá tenés el enlace para vincularte a mi seguimiento del Detox de Primavera (Código: ${syncKey.value}):\n${syncShareUrl.value}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    if (typeof window !== 'undefined') {
+      window.open(url, '_blank');
+    }
+  };
+
+  const shareNative = async () => {
+    if (typeof navigator !== 'undefined' && navigator.share && syncShareUrl.value) {
+      try {
+        await navigator.share({
+          title: 'Detox de Primavera — Sincronización',
+          text: `Vinculate a mi seguimiento del Detox de Primavera con el código ${syncKey.value}`,
+          url: syncShareUrl.value
+        });
+      } catch (e) {}
+    } else {
+      copySyncLink();
+    }
+  };
+
+  watch(showSyncModal, (isOpen) => {
+    if (isOpen && syncKey.value) {
+      // Empuje preventivo de datos locales a la nube antes de escanear el QR
+      pushToCloud(true);
+    }
+  });
 
   return {
     isDarkMode,
@@ -314,6 +384,7 @@ function useCoreModule({ ref, computed, watch, onMounted, data }) {
     fireConfetti,
     globalSearchOpen,
     globalSearchQuery,
+    isDirectUrlPairing,
     syncKey,
     syncStatus,
     lastSyncTime,
@@ -328,6 +399,9 @@ function useCoreModule({ ref, computed, watch, onMounted, data }) {
     pullFromCloud,
     pushToCloud,
     copySyncLink,
+    copySyncCode,
+    shareViaWhatsApp,
+    shareNative,
     recordMutation,
     registerSyncHandlers
   };
