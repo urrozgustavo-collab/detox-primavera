@@ -91,13 +91,13 @@
     <!-- INCLUDE: app/core/header.html -->
 
     <!-- Main Content Area -->
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 pt-5 pb-24 sm:pb-28">
+    <main class="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-5 pb-8 sm:pb-12 min-w-0">
 
       <!-- PESTAÑA 1: MI DIA & TRACKER 21 DIAS -->
       <!-- INCLUDE: app/modules/dia/dia.html -->
 
       <!-- PESTAÑA 2: RECETARIO & COCINA INTELIGENTE -->
-      <section v-show="activeTab === 'recetas'" class="space-y-6">
+      <section v-show="activeTab === 'recetas'" class="w-full min-w-0 max-w-full space-y-6">
         <!-- INCLUDE: app/modules/recetas/recetas.html -->
         <!-- INCLUDE: app/modules/heladera/heladera.html -->
         <!-- INCLUDE: app/modules/batch/batch.html -->

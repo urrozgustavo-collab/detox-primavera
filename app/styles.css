@@ -47,6 +47,13 @@ body {
   min-width: 0;
 }
 
+/* Blindaje responsivo para prevenir desbordes horizontales en contenedores flex */
+main, section {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 /* Safe areas para celulares modernos */
 .pb-safe {
   padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);

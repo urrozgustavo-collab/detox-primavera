@@ -1,7 +1,7 @@
 # 🌿 Detox Primavera — Estado del Proyecto & Guía de Continuidad
 
 > **Última actualización:** 29 de septiembre de 2026  
-> **Versión Actual:** `v1.4.0` *(SemVer: 1 Major, 4 Minor, 0 Patch)*  
+> **Versión Actual:** `v1.4.1` *(SemVer: 1 Major, 4 Minor, 1 Patch)*  
 > **Líder Operativa:** Blair Vance (COO)  
 > **Repositorio GitHub:** [`urrozgustavo-collab/detox-primavera`](https://github.com/urrozgustavo-collab/detox-primavera)  
 > **Enlace de Producción (Webapp PWA):** [https://urrozgustavo-collab.github.io/detox-primavera/](https://urrozgustavo-collab.github.io/detox-primavera/)
@@ -133,6 +133,13 @@ A continuación se consolidan los requerimientos estratégicos y funcionales sol
    - Indicador visual de alerta de agua: cuándo es obligatorio **descartar el agua** (para eliminar antinutrientes y fitatos) vs. cuándo está terminantemente prohibido descartarla (como en el mucílago protector de lino y chía).
 
 ---
+
+- **`v1.4.1` (29/09/2026) — Corrección Integral de Desbordes Horizontales Móviles y Visibilidad del Pie de Página:**
+  - **Blindaje de Ancho en Contenedores (`min-w-0` & `max-w-100%`):** Se blindó la etiqueta `<main>` y cada una de las 6 secciones con clases de contención responsiva (`w-full min-w-0 max-w-full`) y en `styles.css` para evitar que elementos hijos con anchos intrínsecos desborden el layout flex y corten el margen derecho en pantallas táctiles de celulares.
+  - **Contención del Carrusel de Días (Mi Día):** El carrusel de 22 botones diarios se encapsuló en un contenedor estricto con `overflow-hidden`, asegurando que el scroll horizontal táctil se mantenga confinado dentro de la tarjeta sin ensanchar el viewport general ni desbordar las tarjetas de hábitos y comidas.
+  - **Grilla Táctil 2x2 en Switcher de Cocina (Recetas):** El menú segmentado de 4 botones (`Recetario`, `Mi Heladera`, `Batch Cooking`, `Remojos`) se rediseñó de una fila rígida con `min-w-[130px]` a una grilla ergonómica 2x2 en celulares y flex horizontal en escritorio, eliminando desbordes forzados en pantallas estrechas.
+  - **Adaptación Responsiva en Compras y Herbolario:** Los filtros por comercio y la cabecera de llamadas de Google Meet se adaptaron para saltar de línea limpiamente en pantallas angostas.
+  - **Visibilidad Completa del Pie de Página (Footer):** Se incorporó un margen inferior generoso (`pb-28 md:pb-8 pb-safe`) en el pie de página para compensar la barra de navegación inferior fija de celulares (`z-40`, ~90px). Esto permite desplazarse de manera natural hasta el fondo de la pantalla y visualizar la versión del sistema (`v1.4.1`) y el botón de reinicio sin que el scroll rebote ni quede tapado por la botonera.
 
 - **`v1.4.0` (28/09/2026) — Módulo 2: Catálogo Culinario Exhaustivo:**
   - **Expansión a 73 Recetas Oficiales:** Integración del 100% de las recetas de la guía de Isabel Caparra y del documento preparatorio (de 11 iniciales a 73 preparaciones completas).

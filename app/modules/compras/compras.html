@@ -1,13 +1,13 @@
 <!-- ========================================== -->
       <!-- PESTANA 3: LISTA DE COMPRAS INTERACTIVA    -->
       <!-- ========================================== -->
-      <section v-show="activeTab === 'compras'" class="space-y-6">
+      <section v-show="activeTab === 'compras'" class="w-full min-w-0 max-w-full space-y-6">
         
         <!-- Header con Contadores y Boton WhatsApp -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
-          <div class="flex items-center justify-between flex-wrap gap-4">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full overflow-hidden">
+          <div class="flex items-center justify-between flex-wrap gap-3">
             <div>
-              <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <h2 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                 <span>Lista de Compras — Detox de Primavera</span>
                 <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold">
                   {{ shoppingStats.percent }}% comprado
@@ -22,7 +22,7 @@
             <div class="flex items-center gap-2">
               <button 
                 @click="copyShoppingList" 
-                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-2 transition">
+                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-2 transition active:scale-95">
                 <span>💬</span> Copiar pendientes a WhatsApp
               </button>
             </div>
@@ -36,19 +36,21 @@
           </div>
 
           <!-- Filtros por Comercio / Lugar de Compra -->
-          <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-stone-100 dark:border-stone-800 text-xs">
-            <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-1">
-              <button 
-                v-for="cat in ['todas', 'Verdulería', 'Dietética', 'Herboristería', 'Panadería', 'Farmacia', 'Pescadería']" 
-                :key="cat"
-                @click="shoppingFilterCategory = cat"
-                :class="shoppingFilterCategory === cat ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
-                class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">
-                {{ cat === 'todas' ? 'Todos los comercios' : cat }}
-              </button>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-stone-100 dark:border-stone-800 text-xs">
+            <div class="w-full sm:w-auto overflow-x-auto no-scrollbar py-1 min-w-0">
+              <div class="flex gap-1.5">
+                <button 
+                  v-for="cat in ['todas', 'Verdulería', 'Dietética', 'Herboristería', 'Panadería', 'Farmacia', 'Pescadería']" 
+                  :key="cat"
+                  @click="shoppingFilterCategory = cat"
+                  :class="shoppingFilterCategory === cat ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
+                  class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">
+                  {{ cat === 'todas' ? 'Todos los comercios' : cat }}
+                </button>
+              </div>
             </div>
 
-            <label class="flex items-center gap-2 text-stone-600 dark:text-stone-400 cursor-pointer select-none">
+            <label class="flex items-center gap-2 text-stone-600 dark:text-stone-400 cursor-pointer select-none whitespace-nowrap">
               <input type="checkbox" v-model="shoppingOnlyPending" class="rounded text-emerald-600 focus:ring-emerald-500">
               <span>Ocultar ya comprados</span>
             </label>

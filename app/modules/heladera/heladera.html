@@ -1,13 +1,13 @@
 <!-- ========================================== -->
         <!-- SUBVISTA 2: HELADERA INTELIGENTE           -->
         <!-- ========================================== -->
-        <div v-show="recipeSubView === 'heladera'" class="space-y-6">
+        <div v-show="recipeSubView === 'heladera'" class="space-y-6 min-w-0 max-w-full">
           
           <!-- Banner Explicativo & Acciones Rápidas -->
-          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full overflow-hidden">
             <div class="flex items-start justify-between flex-wrap gap-3">
               <div>
-                <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                   <span>🧊 Heladera & Despensa Inteligente</span>
                   <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
                     {{ fridgeSelected.length }} seleccionados
@@ -66,13 +66,14 @@
                   <span class="absolute left-2.5 top-2 text-stone-400 text-xs">🔍</span>
                 </div>
                 
-                <div class="flex gap-1 overflow-x-auto no-scrollbar text-xs">
-                  <button 
-                    v-for="c in ['todas', 'granos', 'legumbres', 'verduras', 'frutas', 'semillas_frutos', 'condimentos']" 
-                    :key="c"
-                    @click="fridgeFilterCategory = c"
-                    class="px-2.5 py-1 rounded-lg capitalize whitespace-nowrap text-[11px] font-medium transition"
-                    :class="fridgeFilterCategory === c ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'">
+                <div class="w-full sm:w-auto overflow-x-auto no-scrollbar py-1">
+                  <div class="flex gap-1 text-xs">
+                    <button 
+                      v-for="c in ['todas', 'granos', 'legumbres', 'verduras', 'frutas', 'semillas_frutos', 'condimentos']" 
+                      :key="c"
+                      @click="fridgeFilterCategory = c"
+                      class="px-2.5 py-1 rounded-lg capitalize whitespace-nowrap text-[11px] font-medium transition"
+                      :class="fridgeFilterCategory === c ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'">
                     {{ c === 'todas' ? 'Todos' : c.replace('_', ' ') }}
                   </button>
                 </div>

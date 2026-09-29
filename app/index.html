@@ -225,13 +225,13 @@
 
 
     <!-- Main Content Area -->
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 pt-5 pb-24 sm:pb-28">
+    <main class="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-5 pb-8 sm:pb-12 min-w-0">
 
       <!-- PESTAÑA 1: MI DIA & TRACKER 21 DIAS -->
       <!-- ========================================== -->
       <!-- PESTANA 1: MI DIA & TRACKER 21 DIAS        -->
       <!-- ========================================== -->
-      <section v-show="activeTab === 'dia'" class="space-y-6">
+      <section v-show="activeTab === 'dia'" class="w-full min-w-0 max-w-full space-y-6">
         
         <!-- Tarjeta de Control & Estado de Inicio del Reto -->
         <div class="bg-gradient-to-r from-emerald-50 to-sage-50 dark:from-stone-900 dark:to-emerald-950/40 rounded-2xl p-4 sm:p-5 border border-emerald-200/80 dark:border-emerald-800/60 shadow-xs transition-all">
@@ -475,10 +475,10 @@
         </div>
 
         <!-- Selector Horizontal de Dias -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 overflow-hidden">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full overflow-hidden">
           <div class="flex items-center justify-between flex-wrap gap-2">
             <div>
-              <h2 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <h2 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                 <span>Línea de Tiempo del Detox</span>
                 <span class="text-xs px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 font-normal">
                   Progreso Global: {{ overallProgressPercent }}%
@@ -500,7 +500,8 @@
           </div>
 
           <!-- Carrusel de Botones de Días con Snap Táctil -->
-          <div class="flex gap-2 overflow-x-auto pb-2 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-1 px-1">
+          <div class="w-full min-w-0 max-w-full overflow-hidden">
+            <div class="flex gap-2 overflow-x-auto pb-2 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-1 px-1">
             <!-- Día 0: Preparación -->
             <button 
               @click="selectedDay = 0"
@@ -535,6 +536,7 @@
                     class="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-stone-900">
               </span>
             </button>
+          </div>
           </div>
         </div>
 
@@ -576,10 +578,10 @@
         </div>
 
         <!-- Misiones Diarias del Día Seleccionado -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full">
           <div class="flex items-center justify-between flex-wrap gap-2">
             <div>
-              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                 <span>Misiones de Hábitos — Día {{ selectedDay }}</span>
                 <span class="text-xs font-medium px-2 py-0.5 rounded-full"
                       :class="isCurrentDayFullyCompleted ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'">
@@ -602,7 +604,7 @@
               v-for="m in data.gamification.dailyMissions" 
               :key="m.id"
               @click="toggleMission(m.id)"
-              class="flex items-start gap-3.5 p-3.5 rounded-xl border transition-all cursor-pointer select-none"
+              class="flex items-start gap-3 p-3 sm:p-3.5 rounded-xl border transition-all cursor-pointer select-none min-w-0"
               :class="isMissionDone(m.id) 
                       ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800 text-stone-800 dark:text-stone-100 shadow-2xs' 
                       : 'bg-stone-50/60 dark:bg-stone-800/40 border-stone-200/70 dark:border-stone-800 text-stone-600 dark:text-stone-300 hover:border-stone-300 dark:hover:border-stone-700'">
@@ -611,14 +613,14 @@
               <input 
                 type="checkbox" 
                 :checked="isMissionDone(m.id)" 
-                class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
+                class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer flex-shrink-0"
                 @click.stop="toggleMission(m.id)">
 
-              <div class="flex-1">
-                <p class="text-sm font-semibold" :class="isMissionDone(m.id) ? 'line-through opacity-75' : ''">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold break-words" :class="isMissionDone(m.id) ? 'line-through opacity-75' : ''">
                   {{ m.text }}
                 </p>
-                <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5 break-words">
                   💡 {{ m.tip }}
                 </p>
               </div>
@@ -768,10 +770,10 @@
         <!-- ========================================== -->
         <!-- SECCIÓN: REGISTRO DE COMIDAS DEL DÍA       -->
         <!-- ========================================== -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full">
           <div class="flex items-center justify-between flex-wrap gap-2">
             <div>
-              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                 <span>🍽️ Comidas e Ingestas — Día {{ selectedDay }}</span>
                 <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
                   {{ ['desayuno', 'almuerzo', 'merienda', 'cena'].filter(s => normalizeSlot(currentDayMeals[s]).items.some(i => i.done) || normalizeSlot(currentDayMeals[s]).done).length }} / 4 registradas
@@ -788,14 +790,14 @@
             <div 
               v-for="slot in data.journalOptions.mealSlots" 
               :key="slot.id"
-              class="p-4 rounded-xl border transition-all space-y-3"
+              class="p-3.5 sm:p-4 rounded-xl border transition-all space-y-3 min-w-0"
               :class="normalizeSlot(currentDayMeals[slot.id]).items.length > 0 && normalizeSlot(currentDayMeals[slot.id]).items.every(i => i.done)
                       ? 'bg-sage-50/50 dark:bg-sage-950/20 border-sage-300 dark:border-sage-800/80' 
                       : 'bg-stone-50/50 dark:bg-stone-800/30 border-stone-200/70 dark:border-stone-800'">
               
               <!-- Cabecera del Slot -->
-              <div class="flex items-center justify-between gap-2 pb-1 border-b border-stone-200/60 dark:border-stone-800">
-                <div class="flex items-center gap-2">
+              <div class="flex items-center justify-between flex-wrap gap-2 pb-1 border-b border-stone-200/60 dark:border-stone-800">
+                <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap min-w-0">
                   <span class="text-lg">{{ slot.icon }}</span>
                   <span class="text-xs font-bold uppercase tracking-wider text-stone-800 dark:text-stone-200">{{ slot.label }}</span>
                   <!-- Badge contador consumidos -->
@@ -1003,11 +1005,11 @@
         <!-- ========================================== -->
         <!-- SECCIÓN: BITÁCORA CLÍNICA & DIARIO          -->
         <!-- ========================================== -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-5">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-5 min-w-0 max-w-full">
           <!-- Cabecera con selector de vistas y botón de exportar -->
           <div class="flex items-center justify-between flex-wrap gap-3 pb-1 border-b border-stone-200/60 dark:border-stone-800">
             <div>
-              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                 <span>📓 Bitácora Clínica & Sensaciones</span>
                 <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
                   Registro del proceso
@@ -1018,9 +1020,9 @@
               </p>
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center flex-wrap gap-2">
               <!-- Selector de Vistas: Día / Semana / Comidas / Global -->
-              <div class="inline-flex p-1 bg-stone-100 dark:bg-stone-800 rounded-xl border border-stone-200/80 dark:border-stone-700 text-xs">
+              <div class="inline-flex p-1 bg-stone-100 dark:bg-stone-800 rounded-xl border border-stone-200/80 dark:border-stone-700 text-xs overflow-x-auto no-scrollbar max-w-full">
                 <button 
                   @click="journalView = 'dia'"
                   class="px-2.5 py-1 rounded-lg font-semibold transition"
@@ -1413,10 +1415,10 @@
         </div>
 
         <!-- Vitrina de Logros / Medallas Desbloqueables -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
-          <div class="flex items-center justify-between">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full">
+          <div class="flex items-center justify-between flex-wrap gap-2">
             <div>
-              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                 <span>🏆 Salón de Medallas & Logros</span>
                 <span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold">
                   {{ unlockedBadges.length }} / {{ data.gamification.badges.length }}
@@ -1460,18 +1462,18 @@
 
 
       <!-- PESTAÑA 2: RECETARIO & COCINA INTELIGENTE -->
-      <section v-show="activeTab === 'recetas'" class="space-y-6">
+      <section v-show="activeTab === 'recetas'" class="w-full min-w-0 max-w-full space-y-6">
         <!-- Segmented Switcher de Cocina Inteligente -->
-        <div class="flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-2xl mx-auto overflow-x-auto no-scrollbar">
+        <div class="grid grid-cols-2 sm:flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-2xl mx-auto gap-1">
           <button 
             @click="recipeSubView = 'catalogo'"
-            class="flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
             :class="recipeSubView === 'catalogo' ? 'bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
             <span>📖</span> <span>Recetario</span>
           </button>
           <button 
             @click="recipeSubView = 'heladera'"
-            class="flex-1 min-w-[130px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
             :class="recipeSubView === 'heladera' ? 'bg-white dark:bg-stone-900 shadow-xs text-sage-700 dark:text-sage-300 font-extrabold' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
             <span>🧊</span> <span>Mi Heladera</span>
             <span v-if="fridgeSelected.length > 0" class="text-[10px] px-1.5 py-0.2 rounded-full bg-sage-600 text-white font-mono">
@@ -1480,27 +1482,28 @@
           </button>
           <button 
             @click="recipeSubView = 'batch'"
-            class="flex-1 min-w-[130px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
             :class="recipeSubView === 'batch' ? 'bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
             <span>🍱</span> <span>Batch Cooking</span>
           </button>
           <button 
             @click="recipeSubView = 'remojos'"
-            class="flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
             :class="recipeSubView === 'remojos' ? 'bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
             <span>⏳</span> <span>Remojos</span>
           </button>
         </div>
 
-<!-- SUBVISTA 1: CATÁLOGO CLÁSICO DE RECETAS    -->
         <!-- ========================================== -->
-        <div v-show="recipeSubView === 'catalogo'" class="space-y-6">
+        <!-- SUBVISTA 1: CATÁLOGO CLÁSICO DE RECETAS    -->
+        <!-- ========================================== -->
+        <div v-show="recipeSubView === 'catalogo'" class="space-y-6 min-w-0 max-w-full">
           
           <!-- Header con Buscador y Filtros de Recetas -->
-          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full overflow-hidden">
             <div class="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <h2 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                   <span>Catálogo de Recetas & Cocina Limpia</span>
                   <span class="text-xs px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-900/60 text-sage-800 dark:text-sage-300 font-medium">
                     {{ filteredRecipes.length }} disponibles
@@ -1522,27 +1525,29 @@
             </div>
 
             <!-- Filtros de Categoría -->
-            <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
-              <button 
-                v-for="cat in [
-                  { id: 'todas', label: 'Todas las recetas' },
-                  { id: 'almuerzos', label: 'Platos & Guisos' },
-                  { id: 'sopas', label: 'Sopas Clínicas' },
-                  { id: 'caldos', label: 'Caldos' },
-                  { id: 'desayunos', label: 'Desayunos & Meriendas' },
-                  { id: 'dips', label: 'Dips & Untables' },
-                  { id: 'alinos', label: 'Aliños & Condimentos' },
-                  { id: 'panificados', label: 'Panificados' },
-                  { id: 'fermentos', label: 'Fermentos & Pickles' },
-                  { id: 'leches', label: 'Leches Vegetales' },
-                  { id: 'infusiones', label: 'Infusiones & Fitoterapia' }
-                ]"
-                :key="cat.id"
-                @click="recipeFilterCategory = cat.id"
-                :class="recipeFilterCategory === cat.id ? 'bg-sage-600 text-white font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
-                class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">
-                {{ cat.label }}
-              </button>
+            <div class="w-full min-w-0 max-w-full overflow-hidden">
+              <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
+                <button 
+                  v-for="cat in [
+                    { id: 'todas', label: 'Todas las recetas' },
+                    { id: 'almuerzos', label: 'Platos & Guisos' },
+                    { id: 'sopas', label: 'Sopas Clínicas' },
+                    { id: 'caldos', label: 'Caldos' },
+                    { id: 'desayunos', label: 'Desayunos & Meriendas' },
+                    { id: 'dips', label: 'Dips & Untables' },
+                    { id: 'alinos', label: 'Aliños & Condimentos' },
+                    { id: 'panificados', label: 'Panificados' },
+                    { id: 'fermentos', label: 'Fermentos & Pickles' },
+                    { id: 'leches', label: 'Leches Vegetales' },
+                    { id: 'infusiones', label: 'Infusiones & Fitoterapia' }
+                  ]"
+                  :key="cat.id"
+                  @click="recipeFilterCategory = cat.id"
+                  :class="recipeFilterCategory === cat.id ? 'bg-sage-600 text-white font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
+                  class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">
+                  {{ cat.label }}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1616,13 +1621,13 @@
         <!-- ========================================== -->
         <!-- SUBVISTA 2: HELADERA INTELIGENTE           -->
         <!-- ========================================== -->
-        <div v-show="recipeSubView === 'heladera'" class="space-y-6">
+        <div v-show="recipeSubView === 'heladera'" class="space-y-6 min-w-0 max-w-full">
           
           <!-- Banner Explicativo & Acciones Rápidas -->
-          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full overflow-hidden">
             <div class="flex items-start justify-between flex-wrap gap-3">
               <div>
-                <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                   <span>🧊 Heladera & Despensa Inteligente</span>
                   <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
                     {{ fridgeSelected.length }} seleccionados
@@ -1681,13 +1686,14 @@
                   <span class="absolute left-2.5 top-2 text-stone-400 text-xs">🔍</span>
                 </div>
                 
-                <div class="flex gap-1 overflow-x-auto no-scrollbar text-xs">
-                  <button 
-                    v-for="c in ['todas', 'granos', 'legumbres', 'verduras', 'frutas', 'semillas_frutos', 'condimentos']" 
-                    :key="c"
-                    @click="fridgeFilterCategory = c"
-                    class="px-2.5 py-1 rounded-lg capitalize whitespace-nowrap text-[11px] font-medium transition"
-                    :class="fridgeFilterCategory === c ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'">
+                <div class="w-full sm:w-auto overflow-x-auto no-scrollbar py-1">
+                  <div class="flex gap-1 text-xs">
+                    <button 
+                      v-for="c in ['todas', 'granos', 'legumbres', 'verduras', 'frutas', 'semillas_frutos', 'condimentos']" 
+                      :key="c"
+                      @click="fridgeFilterCategory = c"
+                      class="px-2.5 py-1 rounded-lg capitalize whitespace-nowrap text-[11px] font-medium transition"
+                      :class="fridgeFilterCategory === c ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'">
                     {{ c === 'todas' ? 'Todos' : c.replace('_', ' ') }}
                   </button>
                 </div>
@@ -1865,12 +1871,12 @@
         <!-- ========================================== -->
         <!-- SUBVISTA 3: BATCH COOKING & PLANIFICADOR   -->
         <!-- ========================================== -->
-        <div v-show="recipeSubView === 'batch'" class="space-y-6">
+        <div v-show="recipeSubView === 'batch'" class="space-y-6 min-w-0 max-w-full">
           
-          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-3">
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-3 min-w-0 max-w-full overflow-hidden">
             <div class="flex items-start justify-between flex-wrap gap-3">
               <div>
-                <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                   <span>🍱 Planificador Semanal & Batch Cooking</span>
                   <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
                     Ahorro estimado: ~{{ batchPlanResults.totalTiempoAhorradoMinutos }} min
@@ -1945,10 +1951,10 @@
         <!-- ========================================== -->
         <!-- SUBVISTA 4: GESTOR DE REMOJOS Y TIEMPOS    -->
         <!-- ========================================== -->
-        <div v-show="recipeSubView === 'remojos'" class="space-y-6">
+        <div v-show="recipeSubView === 'remojos'" class="space-y-6 min-w-0 max-w-full">
           
-          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-2">
-            <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-2 min-w-0 max-w-full overflow-hidden">
+            <h3 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
               <span>⏳ Gestor de Remojos, Activación & Tiempos Previos</span>
               <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
                 11 reglas bioquímicas
@@ -2027,13 +2033,13 @@
       <!-- ========================================== -->
       <!-- PESTANA 3: LISTA DE COMPRAS INTERACTIVA    -->
       <!-- ========================================== -->
-      <section v-show="activeTab === 'compras'" class="space-y-6">
+      <section v-show="activeTab === 'compras'" class="w-full min-w-0 max-w-full space-y-6">
         
         <!-- Header con Contadores y Boton WhatsApp -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
-          <div class="flex items-center justify-between flex-wrap gap-4">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full overflow-hidden">
+          <div class="flex items-center justify-between flex-wrap gap-3">
             <div>
-              <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <h2 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                 <span>Lista de Compras — Detox de Primavera</span>
                 <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold">
                   {{ shoppingStats.percent }}% comprado
@@ -2048,7 +2054,7 @@
             <div class="flex items-center gap-2">
               <button 
                 @click="copyShoppingList" 
-                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-2 transition">
+                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-2 transition active:scale-95">
                 <span>💬</span> Copiar pendientes a WhatsApp
               </button>
             </div>
@@ -2062,19 +2068,21 @@
           </div>
 
           <!-- Filtros por Comercio / Lugar de Compra -->
-          <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-stone-100 dark:border-stone-800 text-xs">
-            <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-1">
-              <button 
-                v-for="cat in ['todas', 'Verdulería', 'Dietética', 'Herboristería', 'Panadería', 'Farmacia', 'Pescadería']" 
-                :key="cat"
-                @click="shoppingFilterCategory = cat"
-                :class="shoppingFilterCategory === cat ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
-                class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">
-                {{ cat === 'todas' ? 'Todos los comercios' : cat }}
-              </button>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-stone-100 dark:border-stone-800 text-xs">
+            <div class="w-full sm:w-auto overflow-x-auto no-scrollbar py-1 min-w-0">
+              <div class="flex gap-1.5">
+                <button 
+                  v-for="cat in ['todas', 'Verdulería', 'Dietética', 'Herboristería', 'Panadería', 'Farmacia', 'Pescadería']" 
+                  :key="cat"
+                  @click="shoppingFilterCategory = cat"
+                  :class="shoppingFilterCategory === cat ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
+                  class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">
+                  {{ cat === 'todas' ? 'Todos los comercios' : cat }}
+                </button>
+              </div>
             </div>
 
-            <label class="flex items-center gap-2 text-stone-600 dark:text-stone-400 cursor-pointer select-none">
+            <label class="flex items-center gap-2 text-stone-600 dark:text-stone-400 cursor-pointer select-none whitespace-nowrap">
               <input type="checkbox" v-model="shoppingOnlyPending" class="rounded text-emerald-600 focus:ring-emerald-500">
               <span>Ocultar ya comprados</span>
             </label>
@@ -2131,7 +2139,7 @@
       <!-- ========================================== -->
       <!-- PESTANA 4: SEMAFORO ¿PUEDO COMER ESTO?     -->
       <!-- ========================================== -->
-      <section v-show="activeTab === 'semaforo'" class="space-y-6">
+      <section v-show="activeTab === 'semaforo'" class="w-full min-w-0 max-w-full space-y-6">
         
         <!-- Header con Buscador y Filtro Verde/Amarillo/Rojo -->
         <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
@@ -2221,7 +2229,7 @@
       <!-- ========================================== -->
       <!-- PESTANA 5: BOTIQUIN SOS / SINTOMAS         -->
       <!-- ========================================== -->
-      <section v-show="activeTab === 'sos'" class="space-y-5">
+      <section v-show="activeTab === 'sos'" class="w-full min-w-0 max-w-full space-y-5">
         
         <!-- Segmented Switch Móvil para SOS vs Taller (Oculto en desktop donde ya existen las pestañas dedicadas) -->
         <div class="md:hidden flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-md mx-auto mb-2">
@@ -2286,7 +2294,7 @@
       <!-- ========================================== -->
       <!-- PESTANA 6: HERBOLARIO & HUB DEL TALLER     -->
       <!-- ========================================== -->
-      <section v-show="activeTab === 'taller'" class="space-y-5">
+      <section v-show="activeTab === 'taller'" class="w-full min-w-0 max-w-full space-y-5">
         
         <!-- Segmented Switch Móvil para SOS vs Taller (Oculto en desktop donde ya existen las pestañas dedicadas) -->
         <div class="md:hidden flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-md mx-auto mb-2">
@@ -2299,13 +2307,13 @@
         </div>
         
         <!-- Enlaces a Encuentros en Vivo -->
-        <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-6 text-white shadow-md space-y-4">
+        <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-4 sm:p-6 text-white shadow-md space-y-4 min-w-0 max-w-full overflow-hidden">
           <div class="flex items-start justify-between flex-wrap gap-4">
             <div>
               <span class="text-xs uppercase font-extrabold tracking-wider px-2.5 py-0.5 rounded-full bg-white/20 text-white">
                 Encuentros en Vivo por Google Meet
               </span>
-              <h2 class="text-xl font-bold mt-2">Dudas, Consultas y Seguimiento en Directo</h2>
+              <h2 class="text-lg sm:text-xl font-bold mt-2">Dudas, Consultas y Seguimiento en Directo</h2>
               <p class="text-xs text-emerald-100 mt-1 max-w-xl">
                 Los encuentros en vivo no quedan grabados. Quienes no puedan asistir deben enviar sus dudas por el grupo de WhatsApp.
               </p>
@@ -2396,9 +2404,9 @@
 
     <!-- Footer -->
     <!-- Footer -->
-    <footer class="mt-auto border-t border-stone-200 dark:border-stone-800 py-6 text-center text-xs text-stone-500 dark:text-stone-400 bg-white/50 dark:bg-stone-900/50">
+    <footer class="mt-auto border-t border-stone-200 dark:border-stone-800 pt-6 pb-28 md:pb-8 text-center text-xs text-stone-500 dark:text-stone-400 bg-white/50 dark:bg-stone-900/50 pb-safe">
       <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p>Detox de Primavera • <span class="font-mono font-semibold text-sage-600 dark:text-sage-400">v1.4.0</span> • Material de referencia Septiembre 2026</p>
+        <p>Detox de Primavera • <span class="font-mono font-semibold text-sage-600 dark:text-sage-400">v1.4.1</span> • Material de referencia Septiembre 2026</p>
         <button @click="resetAllData" class="text-rose-500 hover:text-rose-700 text-xs font-medium underline">
           Reiniciar Progreso de la App
         </button>

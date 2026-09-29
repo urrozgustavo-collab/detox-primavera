@@ -1,14 +1,14 @@
 <!-- Segmented Switcher de Cocina Inteligente -->
-        <div class="flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-2xl mx-auto overflow-x-auto no-scrollbar">
+        <div class="grid grid-cols-2 sm:flex p-1 bg-stone-100 dark:bg-stone-800/80 rounded-2xl border border-stone-200/80 dark:border-stone-800 max-w-2xl mx-auto gap-1">
           <button 
             @click="recipeSubView = 'catalogo'"
-            class="flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
             :class="recipeSubView === 'catalogo' ? 'bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
             <span>📖</span> <span>Recetario</span>
           </button>
           <button 
             @click="recipeSubView = 'heladera'"
-            class="flex-1 min-w-[130px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
             :class="recipeSubView === 'heladera' ? 'bg-white dark:bg-stone-900 shadow-xs text-sage-700 dark:text-sage-300 font-extrabold' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
             <span>🧊</span> <span>Mi Heladera</span>
             <span v-if="fridgeSelected.length > 0" class="text-[10px] px-1.5 py-0.2 rounded-full bg-sage-600 text-white font-mono">
@@ -17,27 +17,28 @@
           </button>
           <button 
             @click="recipeSubView = 'batch'"
-            class="flex-1 min-w-[130px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
             :class="recipeSubView === 'batch' ? 'bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
             <span>🍱</span> <span>Batch Cooking</span>
           </button>
           <button 
             @click="recipeSubView = 'remojos'"
-            class="flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+            class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
             :class="recipeSubView === 'remojos' ? 'bg-white dark:bg-stone-900 shadow-xs text-stone-900 dark:text-stone-100' : 'text-stone-500 hover:text-stone-800 dark:hover:text-stone-200'">
             <span>⏳</span> <span>Remojos</span>
           </button>
         </div>
 
-<!-- SUBVISTA 1: CATÁLOGO CLÁSICO DE RECETAS    -->
         <!-- ========================================== -->
-        <div v-show="recipeSubView === 'catalogo'" class="space-y-6">
+        <!-- SUBVISTA 1: CATÁLOGO CLÁSICO DE RECETAS    -->
+        <!-- ========================================== -->
+        <div v-show="recipeSubView === 'catalogo'" class="space-y-6 min-w-0 max-w-full">
           
           <!-- Header con Buscador y Filtros de Recetas -->
-          <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+          <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full overflow-hidden">
             <div class="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <h2 class="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                   <span>Catálogo de Recetas & Cocina Limpia</span>
                   <span class="text-xs px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-900/60 text-sage-800 dark:text-sage-300 font-medium">
                     {{ filteredRecipes.length }} disponibles
@@ -59,27 +60,29 @@
             </div>
 
             <!-- Filtros de Categoría -->
-            <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
-              <button 
-                v-for="cat in [
-                  { id: 'todas', label: 'Todas las recetas' },
-                  { id: 'almuerzos', label: 'Platos & Guisos' },
-                  { id: 'sopas', label: 'Sopas Clínicas' },
-                  { id: 'caldos', label: 'Caldos' },
-                  { id: 'desayunos', label: 'Desayunos & Meriendas' },
-                  { id: 'dips', label: 'Dips & Untables' },
-                  { id: 'alinos', label: 'Aliños & Condimentos' },
-                  { id: 'panificados', label: 'Panificados' },
-                  { id: 'fermentos', label: 'Fermentos & Pickles' },
-                  { id: 'leches', label: 'Leches Vegetales' },
-                  { id: 'infusiones', label: 'Infusiones & Fitoterapia' }
-                ]"
-                :key="cat.id"
-                @click="recipeFilterCategory = cat.id"
-                :class="recipeFilterCategory === cat.id ? 'bg-sage-600 text-white font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
-                class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">
-                {{ cat.label }}
-              </button>
+            <div class="w-full min-w-0 max-w-full overflow-hidden">
+              <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
+                <button 
+                  v-for="cat in [
+                    { id: 'todas', label: 'Todas las recetas' },
+                    { id: 'almuerzos', label: 'Platos & Guisos' },
+                    { id: 'sopas', label: 'Sopas Clínicas' },
+                    { id: 'caldos', label: 'Caldos' },
+                    { id: 'desayunos', label: 'Desayunos & Meriendas' },
+                    { id: 'dips', label: 'Dips & Untables' },
+                    { id: 'alinos', label: 'Aliños & Condimentos' },
+                    { id: 'panificados', label: 'Panificados' },
+                    { id: 'fermentos', label: 'Fermentos & Pickles' },
+                    { id: 'leches', label: 'Leches Vegetales' },
+                    { id: 'infusiones', label: 'Infusiones & Fitoterapia' }
+                  ]"
+                  :key="cat.id"
+                  @click="recipeFilterCategory = cat.id"
+                  :class="recipeFilterCategory === cat.id ? 'bg-sage-600 text-white font-bold' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'"
+                  class="px-3 py-1.5 rounded-lg whitespace-nowrap transition">
+                  {{ cat.label }}
+                </button>
+              </div>
             </div>
           </div>
 

@@ -1,7 +1,7 @@
 <!-- ========================================== -->
       <!-- PESTANA 1: MI DIA & TRACKER 21 DIAS        -->
       <!-- ========================================== -->
-      <section v-show="activeTab === 'dia'" class="space-y-6">
+      <section v-show="activeTab === 'dia'" class="w-full min-w-0 max-w-full space-y-6">
         
         <!-- Tarjeta de Control & Estado de Inicio del Reto -->
         <div class="bg-gradient-to-r from-emerald-50 to-sage-50 dark:from-stone-900 dark:to-emerald-950/40 rounded-2xl p-4 sm:p-5 border border-emerald-200/80 dark:border-emerald-800/60 shadow-xs transition-all">
@@ -245,10 +245,10 @@
         </div>
 
         <!-- Selector Horizontal de Dias -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 overflow-hidden">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full overflow-hidden">
           <div class="flex items-center justify-between flex-wrap gap-2">
             <div>
-              <h2 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <h2 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                 <span>Línea de Tiempo del Detox</span>
                 <span class="text-xs px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 font-normal">
                   Progreso Global: {{ overallProgressPercent }}%
@@ -270,7 +270,8 @@
           </div>
 
           <!-- Carrusel de Botones de Días con Snap Táctil -->
-          <div class="flex gap-2 overflow-x-auto pb-2 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-1 px-1">
+          <div class="w-full min-w-0 max-w-full overflow-hidden">
+            <div class="flex gap-2 overflow-x-auto pb-2 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-1 px-1">
             <!-- Día 0: Preparación -->
             <button 
               @click="selectedDay = 0"
@@ -305,6 +306,7 @@
                     class="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-stone-900">
               </span>
             </button>
+          </div>
           </div>
         </div>
 
@@ -346,10 +348,10 @@
         </div>
 
         <!-- Misiones Diarias del Día Seleccionado -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full">
           <div class="flex items-center justify-between flex-wrap gap-2">
             <div>
-              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                 <span>Misiones de Hábitos — Día {{ selectedDay }}</span>
                 <span class="text-xs font-medium px-2 py-0.5 rounded-full"
                       :class="isCurrentDayFullyCompleted ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'">
@@ -372,7 +374,7 @@
               v-for="m in data.gamification.dailyMissions" 
               :key="m.id"
               @click="toggleMission(m.id)"
-              class="flex items-start gap-3.5 p-3.5 rounded-xl border transition-all cursor-pointer select-none"
+              class="flex items-start gap-3 p-3 sm:p-3.5 rounded-xl border transition-all cursor-pointer select-none min-w-0"
               :class="isMissionDone(m.id) 
                       ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800 text-stone-800 dark:text-stone-100 shadow-2xs' 
                       : 'bg-stone-50/60 dark:bg-stone-800/40 border-stone-200/70 dark:border-stone-800 text-stone-600 dark:text-stone-300 hover:border-stone-300 dark:hover:border-stone-700'">
@@ -381,14 +383,14 @@
               <input 
                 type="checkbox" 
                 :checked="isMissionDone(m.id)" 
-                class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
+                class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer flex-shrink-0"
                 @click.stop="toggleMission(m.id)">
 
-              <div class="flex-1">
-                <p class="text-sm font-semibold" :class="isMissionDone(m.id) ? 'line-through opacity-75' : ''">
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold break-words" :class="isMissionDone(m.id) ? 'line-through opacity-75' : ''">
                   {{ m.text }}
                 </p>
-                <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5 break-words">
                   💡 {{ m.tip }}
                 </p>
               </div>
@@ -538,10 +540,10 @@
         <!-- ========================================== -->
         <!-- SECCIÓN: REGISTRO DE COMIDAS DEL DÍA       -->
         <!-- ========================================== -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full">
           <div class="flex items-center justify-between flex-wrap gap-2">
             <div>
-              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                 <span>🍽️ Comidas e Ingestas — Día {{ selectedDay }}</span>
                 <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sage-100 dark:bg-sage-950 text-sage-800 dark:text-sage-300">
                   {{ ['desayuno', 'almuerzo', 'merienda', 'cena'].filter(s => normalizeSlot(currentDayMeals[s]).items.some(i => i.done) || normalizeSlot(currentDayMeals[s]).done).length }} / 4 registradas
@@ -558,14 +560,14 @@
             <div 
               v-for="slot in data.journalOptions.mealSlots" 
               :key="slot.id"
-              class="p-4 rounded-xl border transition-all space-y-3"
+              class="p-3.5 sm:p-4 rounded-xl border transition-all space-y-3 min-w-0"
               :class="normalizeSlot(currentDayMeals[slot.id]).items.length > 0 && normalizeSlot(currentDayMeals[slot.id]).items.every(i => i.done)
                       ? 'bg-sage-50/50 dark:bg-sage-950/20 border-sage-300 dark:border-sage-800/80' 
                       : 'bg-stone-50/50 dark:bg-stone-800/30 border-stone-200/70 dark:border-stone-800'">
               
               <!-- Cabecera del Slot -->
-              <div class="flex items-center justify-between gap-2 pb-1 border-b border-stone-200/60 dark:border-stone-800">
-                <div class="flex items-center gap-2">
+              <div class="flex items-center justify-between flex-wrap gap-2 pb-1 border-b border-stone-200/60 dark:border-stone-800">
+                <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap min-w-0">
                   <span class="text-lg">{{ slot.icon }}</span>
                   <span class="text-xs font-bold uppercase tracking-wider text-stone-800 dark:text-stone-200">{{ slot.label }}</span>
                   <!-- Badge contador consumidos -->
@@ -773,11 +775,11 @@
         <!-- ========================================== -->
         <!-- SECCIÓN: BITÁCORA CLÍNICA & DIARIO          -->
         <!-- ========================================== -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-5">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-5 min-w-0 max-w-full">
           <!-- Cabecera con selector de vistas y botón de exportar -->
           <div class="flex items-center justify-between flex-wrap gap-3 pb-1 border-b border-stone-200/60 dark:border-stone-800">
             <div>
-              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                 <span>📓 Bitácora Clínica & Sensaciones</span>
                 <span class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
                   Registro del proceso
@@ -788,9 +790,9 @@
               </p>
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center flex-wrap gap-2">
               <!-- Selector de Vistas: Día / Semana / Comidas / Global -->
-              <div class="inline-flex p-1 bg-stone-100 dark:bg-stone-800 rounded-xl border border-stone-200/80 dark:border-stone-700 text-xs">
+              <div class="inline-flex p-1 bg-stone-100 dark:bg-stone-800 rounded-xl border border-stone-200/80 dark:border-stone-700 text-xs overflow-x-auto no-scrollbar max-w-full">
                 <button 
                   @click="journalView = 'dia'"
                   class="px-2.5 py-1 rounded-lg font-semibold transition"
@@ -1183,10 +1185,10 @@
         </div>
 
         <!-- Vitrina de Logros / Medallas Desbloqueables -->
-        <div class="bg-white dark:bg-stone-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4">
-          <div class="flex items-center justify-between">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 sm:p-6 shadow-xs border border-stone-200/80 dark:border-stone-800 space-y-4 min-w-0 max-w-full">
+          <div class="flex items-center justify-between flex-wrap gap-2">
             <div>
-              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 flex items-center flex-wrap gap-2">
                 <span>🏆 Salón de Medallas & Logros</span>
                 <span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold">
                   {{ unlockedBadges.length }} / {{ data.gamification.badges.length }}
