@@ -32,19 +32,15 @@ Antes de proponer, estampar o modificar cualquier versión, el agente DEBE ejecu
 
 ---
 
-## 🛠️ Reglas Técnicas de Construcción y Empaquetado
+## 🛠️ Reglas Técnicas de Construcción y Empaquetado (desde v2.0.0)
 
-1. **Arquitectura Modular Desacoplada:**
-   - La lógica vive en `app/modules/<modulo>/` y `app/core/`.
-   - La base de datos vive en `app/detox-data.js` y motores en `app/fridge-engine.js`.
-2. **Bundling Determinista:**
-   - Tras modificar archivos fuente en `app/`, es mandatario ejecutar `python bundle.py`.
-   - Esto recompila `app/index.html` (dev) y genera los archivos producción: `Detox-Primavera-App.html` e `index.html`.
-3. **Suite de Verificación:**
-   - Ejecutar siempre:
-     * `node -c app/detox-data.js`
-     * `node scratch/test_deep_modules.js`
-     * `node scratch/test_recipes_catalog.js`
+1. **Fuente única en `v2/`** (la carpeta `app/` y `bundle.py` son la v1 histórica: NO se usan para construir):
+   - Contenido de la guía: `v2/src/data/*.js` (contrato en `rediseno-v2/ESPEC-V2.md` §2).
+   - Lógica y pantallas: `v2/src/app/*.js` (orden por prefijo numérico). Estética: `v2/src/styles/*.css`.
+2. **Construcción:** `python v2/build.py` genera `index.html`, `Detox-Primavera-App.html` (idénticos), `sw.js`, `manifest.webmanifest` e íconos. Nunca editar las salidas a mano.
+3. **Pruebas:** `node v2/tests/run.js` debe dar 0 con error antes de cualquier entrega.
+4. **Cero dependencias externas:** no agregar CDN, fuentes ni scripts remotos. Toda decisión nueva se anota en `rediseno-v2/DECISIONES.md`.
+5. **Datos del usuario:** nunca romper la migración ni el esquema `detox2_state` sin una migración `schema N→N+1` con tests.
 4. **Respeto Estricto a Git:**
    - Nunca descartar cambios ajenos del working tree.
    - Nunca hacer push a `origin/main` sin ratificación explícita de Gustavo.

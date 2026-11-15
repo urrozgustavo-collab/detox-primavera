@@ -1,0 +1,43 @@
+/* Tokens del «cuaderno botánico de primavera». Tema por data-theme en <html>; acento por data-program-theme. */
+:root {
+  --paper: #F6F1E7; --surface: #FFFDF8; --surface-2: #EFE8DA; --line: #DCD2C0; --line-strong: #C7BBA5;
+  --ink: #1E2A22; --ink-2: #44503F; --muted: #5C6858;
+  --accent: #3D6B4F; --accent-ink: #FFFFFF; --accent-soft: #DDE9DA; --accent-text: #2F5A40;
+  --bloom: #B85C7A; --bloom-soft: #F4E1E7; --bloom-text: #9A4462;
+  --pollen: #C98F1E; --pollen-soft: #F6E9C8; --pollen-text: #7A5410;
+  --clay: #A9563A; --clay-soft: #F3E0D6; --clay-text: #8E4429;
+  --ok: #3D7A4F; --warn: #B7791F; --danger: #B3412F;
+  --warn-soft: #F7EAD2; --warn-text: #7A4F0E; --danger-soft: #F6DEDA; --danger-text: #8F3123;
+  --shadow: 0 1px 2px rgba(60, 50, 30, .06), 0 4px 14px rgba(60, 50, 30, .05);
+  --shadow-pop: 0 10px 40px rgba(40, 35, 20, .18);
+  --scrim: rgba(30, 30, 20, .38);
+
+  --f-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", "Noto Serif", Georgia, serif;
+  --f-text: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  --fs-12: .75rem; --fs-14: .875rem; --fs-16: 1rem; --fs-17: 1.0625rem; --fs-18: 1.125rem; --fs-22: 1.375rem;
+  --fs-28: 1.75rem; --fs-36: 2.25rem; --fs-52: 3.25rem;
+  --r-card: 18px; --r-ctl: 12px; --r-pill: 999px;
+  --ease: cubic-bezier(.2, .7, .2, 1); --t-fast: 160ms; --t-med: 240ms;
+  --gutter: 16px; --rail: 232px; --maxw: 1080px;
+  --tabbar-h: 64px;
+  color-scheme: light;
+}
+:root[data-program-theme="otono"] { --accent: #9A5B2A; --accent-soft: #F1E2D2; --accent-text: #7D4719; }
+:root[data-program-theme="invierno"] { --accent: #3E5C76; --accent-soft: #DCE5EE; --accent-text: #304B62; }
+:root[data-program-theme="verano"] { --accent: #2F7A78; --accent-soft: #D7EBE9; --accent-text: #226361; }
+
+:root[data-theme="dark"] {
+  --paper: #111714; --surface: #19211C; --surface-2: #212B25; --line: #2E3A33; --line-strong: #3E4C43;
+  --ink: #ECE7DC; --ink-2: #C6C9BC; --muted: #9BA596;
+  --accent: #8FC19A; --accent-ink: #0F1A13; --accent-soft: #23362A; --accent-text: #A6D2B0;
+  --bloom: #E29AB2; --bloom-soft: #3A2630; --bloom-text: #F0B5C8;
+  --pollen: #E6B85C; --pollen-soft: #3A2F1A; --pollen-text: #F0CB80;
+  --clay: #E08A6E; --clay-soft: #3B2620; --clay-text: #EFA48B;
+  --ok: #8FC19A; --warn: #E6B85C; --danger: #EE8C7A;
+  --warn-soft: #3A2F1A; --warn-text: #F0CB80; --danger-soft: #3C2420; --danger-text: #F3A698;
+  --shadow: none; --shadow-pop: 0 10px 40px rgba(0, 0, 0, .5); --scrim: rgba(0, 0, 0, .6);
+  color-scheme: dark;
+}
+:root[data-theme="dark"][data-program-theme="otono"] { --accent: #E0A877; --accent-soft: #3A2A1C; --accent-text: #EBBB90; }
+:root[data-theme="dark"][data-program-theme="invierno"] { --accent: #9DBAD6; --accent-soft: #1F2C38; --accent-text: #B4CCE3; }
+:root[data-theme="dark"][data-program-theme="verano"] { --accent: #7FC7C3; --accent-soft: #1B3332; --accent-text: #9AD6D2; }

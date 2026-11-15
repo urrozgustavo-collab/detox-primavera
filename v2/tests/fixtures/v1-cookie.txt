@@ -1,0 +1,1 @@
+otra=1; detox_start_date=2026-11-01; detox_completed_missions=%7B%22day_3%22%3A%7B%22limon%22%3Atrue%7D%7D; detox_dark_mode=false; detox_user_allergies=%5B%22C%C3%ADtricos%22%5D

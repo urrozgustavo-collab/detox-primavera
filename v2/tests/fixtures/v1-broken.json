@@ -1,0 +1,8 @@
+{
+  "detox_start_date": "2026-02-31",
+  "detox_start_mode": "turbo",
+  "detox_completed_missions": "{\"day_1\":{\"limon\":true}",
+  "detox_daily_journal": "no es json",
+  "detox_daily_meals": "{\"dia_3\":{\"cena\":\"guiso\"}}",
+  "detox_user_allergies": "[\"Apio\"]"
+}

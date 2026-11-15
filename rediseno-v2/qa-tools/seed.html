@@ -1,0 +1,38 @@
+<!doctype html><meta charset="utf-8"><title>QA seed</title>
+<script>
+// Uso: /rediseno-v2/qa-tools/seed.html?fx=A[&off=6][&go=/index.html#/hoy]
+// Siembra datos v1 de prueba SIN cargar la app (así no se guarda detox2_state en pagehide).
+(function(){
+  var q=new URLSearchParams(location.search), fx=q.get('fx')||'G', off=+(q.get('off')||6);
+  function iso(d){var p=function(n){return String(n).padStart(2,'0')};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())}
+  var d=new Date(); d.setDate(d.getDate()-off); var start=iso(d);
+  Object.keys(localStorage).filter(function(k){return /^detox/.test(k)}).forEach(function(k){localStorage.removeItem(k)});
+  document.cookie.split(';').forEach(function(c){var n=c.split('=')[0].trim(); if(/^detox_/.test(n)) document.cookie=n+'=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/'});
+  var base={
+    detox_start_date:start, detox_selected_day:'5', detox_start_mode:'monodieta2',
+    detox_completed_missions:JSON.stringify({day_0:{limon:true},day_1:{limon:true,masticacion:true,infusion:true,no_estimulantes:true,hidratacion:true,plato_verde:true},day_2:{limon:true,plato_verde:false},day_99:{limon:true}}),
+    detox_xp:'430', detox_unlocked_badges:'["inicio"]',
+    detox_daily_journal:JSON.stringify({dia_1:{energy:'4',digestion:'optima',symptoms:['Sed intensa','Cefalea leve','Picazón rara'],notes:'Dormí bien',updatedAt:1790611200000},dia_2:{energy:9,digestion:'rara',symptoms:[],notes:''}}),
+    detox_daily_meals:JSON.stringify({dia_1:{desayuno:{text:'Nituke de manzana',done:true,items:[{id:'meal_1',name:'Nituke de manzana',isRecipe:true,recipeId:'nituke-manzana',done:true,timestamp:1790611200000},{id:'meal_2',text:'Té de jengibre',done:false}]},almuerzo:[{text:'Caldo Détox Alcalinizante',done:true},{name:'arroz',done:false}],cena:{text:'sopa de la abuela',done:false},merienda:{text:'',done:false}}}),
+    detox_user_allergies:'["Frutos secos","Gluten / Trigo","palta"]',
+    detox_shopping_checked:'{"v1":true,"v2":false,"d1":true}',
+    detox_fridge_selected:'["manzana","arroz_yamani","agua_filtro"]',
+    detox_weekly_plan:'{"1":{"almuerzo":"caldo-detox"}}',
+    detox_sync_key:'GUS-7Q4K', detox_dark_mode:'true', detox_active_tab:'recetas'
+  };
+  var data=null, cookie=false;
+  if(fx==='A') data=base;
+  else if(fx==='B'){ data=base; cookie=true; }
+  else if(fx==='C') data={detox_start_date:'2026-02-31',detox_start_mode:'turbo',detox_completed_missions:'{"day_1":{"limon":true}',detox_daily_journal:'no es json',detox_daily_meals:'{"dia_3":{"cena":"guiso"}}',detox_user_allergies:'["Apio"]'};
+  else if(fx==='D') data=Object.assign({},base,{detox_start_date:'no-es-fecha'});
+  else if(fx==='E') data=Object.assign({},base,{detox_start_date:(function(){var x=new Date();x.setDate(x.getDate()-40);return iso(x)})()});
+  else if(fx==='F') data=Object.assign({},base,{detox_start_date:(function(){var x=new Date();x.setDate(x.getDate()+4);return iso(x)})()});
+  else if(fx==='H') data=Object.assign({},base,{detox_start_mode:'directo',detox_user_allergies:'["frutos secos","  GLUTEN / trigo ","Cítricos","Apio","soja","Semillas","algo raro"]'});
+  if(data){
+    if(cookie){ Object.keys(data).forEach(function(k){document.cookie=k+'='+encodeURIComponent(data[k])+';path=/;max-age=86400'}); }
+    else Object.keys(data).forEach(function(k){localStorage.setItem(k,data[k])});
+  }
+  document.title='seed '+fx+' start='+start;
+  var go=q.get('go'); if(go) location.href=go;
+})();
+</script>

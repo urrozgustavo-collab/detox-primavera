@@ -1,8 +1,39 @@
 # 🌿 Detox Primavera — Estado del Proyecto & Guía de Continuidad
 
-> **Última actualización:** 29 de septiembre de 2026  
-> **Versión Actual:** `v1.4.2` *(SemVer: 1 Major, 4 Minor, 2 Patch)*  
-> **Líder Operativa:** Blair Vance (COO)  
+> **Última actualización:** 15 de noviembre de 2026  
+> **Versión Actual:** `v2.0.0` — reescritura completa (rama git `rediseno-v2`, sin publicar todavía)  
+> **Versión anterior publicada:** `v1.4.2` (rama `main`, GitHub Pages)  
+
+---
+
+## v2.0.0 — Qué cambió y cómo se trabaja ahora (15/11/2026)
+
+Reescritura total hecha por Claude (orquestador Opus 5.5 + sesiones de investigación, auditoría, datos, app y QA). Documentos de respaldo en `rediseno-v2/`:
+`ESPEC-V2.md` (contrato), `auditoria.md` (v1), `investigacion.md` (mercado), `DECISIONES.md` (cada decisión tomada), `QA.md` (pruebas y correcciones).
+
+**Qué es:** un único HTML autónomo (`index.html` = `Detox-Primavera-App.html`, ~550 KB), JavaScript propio, **sin ninguna dependencia externa** (sin Vue, Tailwind, fuentes ni íconos remotos). Funciona sin internet.
+
+**Funciones principales:** pantalla Hoy (día y fase, planta que crece, hábitos con «hoy no», agua, comidas con sugerencias que rotan y respetan alergias/fase, check-in de 10 segundos, «para mañana»), Cocina (105 recetas con ingredientes estructurados, escalado de porciones, modo cocina con temporizadores y pantalla siempre encendida, heladera sobre todas las recetas, plan semanal, batch cooking y remojos —arreglados—, métodos de cocción, recetas propias), Compras (desde el plan, por comercio, «ya tenés», compartir por WhatsApp), Guía (semáforo de 99 alimentos, SOS ampliado con escalera de constipación, herbario «Alimentos Medicina» con contraindicaciones según tus condiciones, info del taller), Progreso (constancia, racha con 2 días de gracia, logros medibles, gráficos, correlaciones honestas, diario, historial y comparación de ediciones, informe imprimible, reintroducción de alimentos), Programas (Detox de Primavera 21, Semana limpia 7, Reset 14, programas propios; repetir = nueva edición con historial), Ajustes (perfiles por persona, alergias/condiciones/constitución, tema, copia de seguridad, sincronización cifrada, recordatorios .ics para el calendario), búsqueda global.
+
+**Datos:** se guardan en el navegador bajo `detox2_state`. La primera vez migra **automáticamente y sin borrar nada** los datos de la v1 (`detox_*`). Copia de seguridad: Ajustes → Copia de seguridad (exportar/importar JSON).
+**Sincronización:** por persona, con código nuevo de 12 caracteres y cifrado de extremo a extremo (kvdb.io solo ve datos cifrados). Los códigos viejos `GUS-XXXX` siguen funcionando para traer los datos viejos; la app recomienda pasar a uno nuevo. Solo funciona desde la versión web (https).
+
+**Cómo se modifica:**
+```powershell
+python v2/build.py        # arma index.html, Detox-Primavera-App.html, sw.js, manifest e íconos
+node v2/tests/run.js      # pruebas (datos, lógica, migración, sync); deben dar 0 con error
+```
+Fuente: `v2/src/data/` (contenido de la guía), `v2/src/app/` (lógica y pantallas), `v2/src/styles/` (estética). La carpeta `app/` y `bundle.py` son la **v1 histórica** (no se usan para construir; `v2/tools/build-recipes.js` todavía lee `app/detox-data.js` como fuente de los textos de recetas).
+
+**Pendiente de decisión de Gustavo:** publicar la v2 en GitHub Pages (unir la rama `rediseno-v2` a `main` y subir). Hasta entonces la web sigue mostrando la v1.
+
+**Pendiente de confirmar con Isa:** cantidad de manzana del kimchi (la guía dice 3000 g; se usa 300 g con aviso).
+
+---
+
+## Historial v1 (referencia)
+
+> **Líder Operativa v1:** Blair Vance (COO)  
 > **Repositorio GitHub:** [`urrozgustavo-collab/detox-primavera`](https://github.com/urrozgustavo-collab/detox-primavera)  
 > **Enlace de Producción (Webapp PWA):** [https://urrozgustavo-collab.github.io/detox-primavera/](https://urrozgustavo-collab.github.io/detox-primavera/)
 

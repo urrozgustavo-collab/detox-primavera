@@ -1,0 +1,17 @@
+{
+  "detox_start_date": "2026-11-10",
+  "detox_selected_day": "5",
+  "detox_start_mode": "monodieta2",
+  "detox_completed_missions": "{\"day_0\":{\"limon\":true},\"day_1\":{\"limon\":true,\"masticacion\":true,\"infusion\":true,\"no_estimulantes\":true,\"hidratacion\":true,\"plato_verde\":true},\"day_2\":{\"limon\":true,\"plato_verde\":false},\"day_99\":{\"limon\":true}}",
+  "detox_xp": "430",
+  "detox_unlocked_badges": "[\"inicio\"]",
+  "detox_daily_journal": "{\"dia_1\":{\"energy\":\"4\",\"digestion\":\"optima\",\"symptoms\":[\"Sed intensa\",\"Cefalea leve\",\"Picazón rara\"],\"notes\":\"Dormí bien\",\"updatedAt\":1790611200000},\"dia_2\":{\"energy\":9,\"digestion\":\"rara\",\"symptoms\":[],\"notes\":\"\"}}",
+  "detox_daily_meals": "{\"dia_1\":{\"desayuno\":{\"text\":\"Nituke de manzana\",\"done\":true,\"items\":[{\"id\":\"meal_1\",\"name\":\"Nituke de manzana\",\"isRecipe\":true,\"recipeId\":\"nituke-manzana\",\"done\":true,\"timestamp\":1790611200000},{\"id\":\"meal_2\",\"text\":\"Té de jengibre\",\"done\":false}]},\"almuerzo\":[{\"text\":\"Caldo Détox Alcalinizante\",\"done\":true},{\"name\":\"arroz\",\"done\":false}],\"cena\":{\"text\":\"sopa de la abuela\",\"done\":false},\"merienda\":{\"text\":\"\",\"done\":false}}}",
+  "detox_user_allergies": "[\"Frutos secos\",\"Gluten / Trigo\",\"palta\"]",
+  "detox_shopping_checked": "{\"v1\":true,\"v2\":false,\"d1\":true}",
+  "detox_fridge_selected": "[\"manzana\",\"arroz_yamani\",\"agua_filtro\"]",
+  "detox_weekly_plan": "{\"1\":{\"almuerzo\":\"caldo-detox\"}}",
+  "detox_sync_key": "GUS-7Q4K",
+  "detox_dark_mode": "true",
+  "detox_active_tab": "recetas"
+}

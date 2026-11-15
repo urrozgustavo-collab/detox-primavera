@@ -1,5 +1,7 @@
-# Arquitectura Modular — Detox de Primavera WebApp
+# Arquitectura Modular — Detox de Primavera WebApp (v1, HISTÓRICA)
 
+> ⚠️ **Obsoleto desde v2.0.0 (15/11/2026).** La app ahora se construye desde `v2/` con `python v2/build.py`. Ver `ESTADO-DEL-PROYECTO.md` y `v2/README.md`. Este documento describe solo la v1 (`app/` + `bundle.py`).
+>
 > **Versión base:** v1.2.1  
 > **Patrón:** Componentes Modulares Desacoplados (Snippets HTML + Composables JS)  
 > **Compilador / Bundler:** `bundle.py`

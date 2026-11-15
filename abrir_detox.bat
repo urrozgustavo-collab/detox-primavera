@@ -6,8 +6,8 @@ echo ========================================================
 echo.
 REM Abre Chrome desactivando la aceleracion por hardware (evita la pantalla negra en remoto)
 if exist "C:\Program Files\Google\Chrome\Application\chrome.exe" (
-    start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-gpu "c:\Users\urroz\Proyectos\04_productividad_herramientas\salud-recetas\detox-primavera\app\index.html"
+    start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-gpu "c:\Users\urroz\Proyectos\04_productividad_herramientas\salud-recetas\detox-primavera\Detox-Primavera-App.html"
 ) else (
-    start "" "c:\Users\urroz\Proyectos\04_productividad_herramientas\salud-recetas\detox-primavera\app\index.html"
+    start "" "c:\Users\urroz\Proyectos\04_productividad_herramientas\salud-recetas\detox-primavera\Detox-Primavera-App.html"
 )
 exit
