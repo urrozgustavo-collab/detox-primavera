@@ -51,12 +51,14 @@
     var prev = A.ui.lastStage; A.ui.lastStage = stage;
     var grew = prev != null && stage > prev;
     var big = ctx.idx === 0 ? '<span class="num">Preparación</span>' : '<span class="num">Día ' + ctx.idx + '</span><small> de ' + ctx.clock.days + '</small>';
-    return '<section class="hero" aria-label="Resumen del día">' +
+    return '<section class="card hero-card" aria-label="Resumen del día">' +
+      '<div class="hero">' +
       '<div class="hero-txt"><p class="hero-date">' + esc(ctx.iso ? U.fmtDate(ctx.iso, 'long') : '') + (ctx.idx === ctx.todayIdx && ctx.clock.status === 'active' ? ' · hoy' : '') + '</p>' +
       '<h1 class="day-num">' + big + '</h1>' +
       '<p><span class="phase-chip ph-' + esc(ctx.row.phaseId) + '">' + I(ctx.row.phaseId === 'monodieta' ? 'hoja' : ctx.row.phaseId === 'previa' ? 'amanecer' : 'planta', 'sm') + esc(ctx.phase.name) + '</span></p>' +
       (ctx.phase.desc ? '<p class="hero-desc' + (A.ui.descOpen ? ' open' : '') + '" data-action="toggleDesc" title="Tocá para ver todo">' + esc(ctx.phase.desc) + '</p>' : '') + '</div>' +
-      '<div class="hero-plant' + (grew ? ' grew' : '') + '">' + K.plant(stage, 132) + '<span class="meta">' + esc(K.STAGE_NAMES[stage]) + '</span></div></section>';
+      '<div class="hero-plant' + (grew ? ' grew' : '') + '">' + K.plant(stage, 128) + '<span class="meta">' + esc(K.STAGE_NAMES[stage]) + '</span></div>' +
+      '</div></section>';
   }
 
   function dayStrip(ctx) {
@@ -72,9 +74,9 @@
     var r = ctx.row, s = ctx.sum;
     var cons = s.constancy == null ? '—' : Math.round(s.constancy * 100) + ' %';
     return '<section class="card ring-card" aria-label="Avance del día">' + K.ring(r.total ? r.done / r.total : 0, 112, '<span><b>' + r.done + '</b><small>de ' + r.total + '</small></span>', r.done + ' de ' + r.total + ' hábitos hechos') +
-      '<div class="ring-stats"><div><b class="num">' + cons + '</b><span>constancia</span></div>' +
-      '<div><b class="num">' + s.streak + '</b><span>' + (s.streak === 1 ? 'día de racha' : 'días de racha') + (s.bestStreak > s.streak ? ' · mejor ' + s.bestStreak : '') + '</span></div>' +
-      '<div><b class="num">' + s.points + '</b><span>puntos</span></div></div>' +
+      '<div class="ring-stats"><div class="ring-stat"><b class="num">' + cons + '</b><span>constancia</span></div>' +
+      '<div class="ring-stat"><b class="num">' + s.streak + '</b><span>' + (s.streak === 1 ? 'día de racha' : 'días de racha') + (s.bestStreak > s.streak ? ' · mejor ' + s.bestStreak : '') + '</span></div>' +
+      '<div class="ring-stat"><b class="num">' + s.points + '</b><span>puntos</span></div></div>' +
       (r.complete ? '<p class="done-line">' + I('flor', 'sm') + ' Día completo. Bien ahí.</p>' : (2 - s.graceUsed > 0 && ctx.clock.status === 'active' ? '<p class="meta grace-line">' + I('hoja', 'sm') + ' Te quedan ' + U.plural(2 - s.graceUsed, 'día') + ' de gracia: si un día no llegás, la racha no se corta.</p>' : '')) +
       '</section>';
   }
@@ -106,12 +108,14 @@
     var dis = ctx.editable ? '' : ' disabled';
     return '<section class="card water" aria-labelledby="h-agua"><div class="card-h"><h2 id="h-agua">Agua</h2><button class="btn ghost sm" data-action="waterGoal">Meta: ' + (goal / 1000).toString().replace('.', ',') + ' l</button></div>' +
       '<div class="row">' + glass + '<div class="grow"><p class="water-num"><b class="num">' + total + '</b> <span class="meta">de ' + goal + ' ml</span></p>' +
+      '<div class="bar-h mb-s" style="margin-bottom:10px"><i style="width:' + Math.round(ratio * 100) + '%"></i></div>' +
       '<div class="btn-row"><button class="btn sm" data-action="water" data-ml="250"' + dis + '>' + I('mas', 'sm') + '250 ml</button><button class="btn sm" data-action="water" data-ml="500"' + dis + '>' + I('mas', 'sm') + '500 ml</button>' +
       (ctx.row.day && ctx.row.day.water.length && ctx.editable ? '<button class="btn ghost sm" data-action="waterUndo" aria-label="Deshacer el último vaso">' + I('deshacer', 'sm') + 'Deshacer</button>' : '') + '</div></div></div>' +
       '<p class="sr-only" aria-live="polite">' + total + ' mililitros de ' + goal + '</p></section>';
   }
 
   /* ---------- comidas ---------- */
+  var SLOT_ICON = { desayuno: 'amanecer', almuerzo: 'sol', merienda: 'taza', cena: 'luna' };
   function mealsCard(ctx) {
     var slots = L.slots();
     var planDay = ctx.iso && ctx.p.plan[ctx.iso];
@@ -129,10 +133,10 @@
       var sug = '';
       if (!items.length && !fromPlan.length && ctx.editable) {
         sug = L.suggest({ profile: ctx.p, editionId: ctx.ed.id, program: ctx.prog, phaseId: ctx.row.phaseId, slot: s.id, dayIdx: ctx.idx, dateISO: ctx.iso, n: 2 }).map(function (x) {
-          return '<button class="chip soft sug" data-action="mealAddRecipe" data-slot="' + s.id + '" data-r="' + esc(x.recipe.id) + '">' + I('mas', 'sm') + esc(x.recipe.title) + ' <span class="meta">· ' + esc(x.reason) + '</span></button>';
+          return '<button class="chip soft sug" data-action="mealAddRecipe" data-slot="' + s.id + '" data-r="' + esc(x.recipe.id) + '">' + I('mas', 'sm') + '<span class="sug-title">' + esc(x.recipe.title) + '</span> <span class="meta">· ' + esc(x.reason) + '</span></button>';
         }).join('');
       }
-      return '<div class="slot"><div class="slot-h"><h3>' + esc(s.label) + '</h3>' + (ctx.editable ? '<button class="btn ghost sm" data-action="mealAddSheet" data-slot="' + s.id + '">' + I('mas', 'sm') + 'Agregar</button>' : '') + '</div>' +
+      return '<div class="slot"><div class="slot-h"><h3>' + I(SLOT_ICON[s.id] || 'bowl', 'sm') + ' ' + esc(s.label) + '</h3>' + (ctx.editable ? '<button class="btn ghost sm" data-action="mealAddSheet" data-slot="' + s.id + '">' + I('mas', 'sm') + 'Agregar</button>' : '') + '</div>' +
         (list ? '<ul class="list meals">' + list + '</ul>' : '') + (planChips || sug ? '<div class="chips">' + planChips + sug + '</div>' : (!list ? '<p class="meta">Sin registrar.</p>' : '')) + '</div>';
     }).join('');
     return '<section class="card" aria-labelledby="h-comidas"><div class="card-h"><h2 id="h-comidas">Comidas</h2><a class="btn ghost sm" href="#/cocina/plan">Plan</a></div>' + body + '</section>';

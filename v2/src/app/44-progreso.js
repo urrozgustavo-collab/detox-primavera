@@ -87,17 +87,17 @@
     var p = A.P(), ed = A.ED();
     if (!ed || !U.isValidISO(ed.startDate)) return K.empty('El diario está vacío', 'Empezá un programa en Hoy.', '<a class="btn primary" href="#/hoy">Ir a Hoy</a>');
     var s = A.sum(), v = A.ui.jv || 'dia';
-    var h = ['<div class="seg" role="group" aria-label="Vista del diario">' + [['dia', 'Día'], ['semana', 'Semana'], ['todo', 'Todo']].map(function (x) { return '<button data-action="jv" data-v="' + x[0] + '" aria-pressed="' + (v === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>'];
     var rows = s.days.filter(function (r) { return !r.future || L.dayHasData(r.day); });
+    var h = ['<section class="toolbar-card"><div class="seg" role="group" aria-label="Vista del diario">' + [['dia', 'Día'], ['semana', 'Semana'], ['todo', 'Todo']].map(function (x) { return '<button data-action="jv" data-v="' + x[0] + '" aria-pressed="' + (v === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>'];
     if (v === 'dia') {
       var sel = A.ui.jday != null ? A.ui.jday : (s.clock.status === 'active' ? s.clock.idx : rows.length ? rows[rows.length - 1].idx : 0);
       var r = s.days[sel] || s.days[0];
-      h.push('<div class="chips scroll mt">' + rows.map(function (x) { return '<button class="chip' + (x.idx === r.idx ? ' on' : '') + '" data-action="jday" data-i="' + x.idx + '" aria-pressed="' + (x.idx === r.idx) + '">' + (x.idx === 0 ? 'Prep.' : 'Día ' + x.idx) + '</button>'; }).join('') + '</div>');
+      h.push('<div class="chips scroll mt-s">' + rows.map(function (x) { return '<button class="chip' + (x.idx === r.idx ? ' on' : '') + '" data-action="jday" data-i="' + x.idx + '" aria-pressed="' + (x.idx === r.idx) + '">' + (x.idx === 0 ? 'Prep.' : 'Día ' + x.idx) + '</button>'; }).join('') + '</div></section>');
       h.push('<section class="card mt">' + dayBlock(s, r, p) + '</section>');
     } else if (v === 'semana') {
       var wk = A.ui.jweek || Math.max(1, Math.ceil((s.clock.status === 'active' ? s.clock.idx : 1) / 7));
       var weeks = Math.ceil(s.clock.days / 7);
-      h.push('<div class="chips mt">' + Array.from({ length: weeks }, function (_, i) { return '<button class="chip' + (wk === i + 1 ? ' on' : '') + '" data-action="jweek" data-w="' + (i + 1) + '" aria-pressed="' + (wk === i + 1) + '">Semana ' + (i + 1) + '</button>'; }).join('') + '</div>');
+      h.push('<div class="chips mt-s">' + Array.from({ length: weeks }, function (_, i) { return '<button class="chip' + (wk === i + 1 ? ' on' : '') + '" data-action="jweek" data-w="' + (i + 1) + '" aria-pressed="' + (wk === i + 1) + '">Semana ' + (i + 1) + '</button>'; }).join('') + '</div></section>');
       var from = (wk - 1) * 7 + 1, to = Math.min(s.clock.days, wk * 7);
       h.push('<div class="card mt table-wrap"><table class="cmp-table"><thead><tr><th>Día</th><th>Hábitos</th><th>Energía</th><th>Ánimo</th><th>Digestión</th><th>Síntomas</th><th>Comidas</th><th>Nota</th></tr></thead><tbody>' +
         s.days.slice(from, to + 1).map(function (r) {
@@ -106,6 +106,7 @@
           return '<tr><td><a href="#/hoy/' + r.iso + '">' + r.idx + '</a><br><span class="meta">' + esc(U.fmtDate(r.iso, 'day')) + '</span></td><td class="n">' + r.done + '/' + r.total + '</td><td class="n">' + (c.energy || '—') + '</td><td class="n">' + (c.mood || '—') + '</td><td>' + esc(((U.arr(L.tx().digestionStates).filter(function (x) { return x.id === c.digestion; })[0]) || {}).label || '—') + '</td><td class="n">' + (U.arr(c.symptoms).length + U.arr(c.customSymptoms).length) + '</td><td class="n">' + meals + '/4</td><td>' + esc(String(c.notes || '').slice(0, 60)) + (String(c.notes || '').length > 60 ? '…' : '') + '</td></tr>';
         }).join('') + '</tbody></table></div>');
     } else {
+      h.push('</section>');
       var withData = rows.filter(function (r) { return L.dayHasData(r.day); });
       h.push('<section class="card mt">' + (withData.length ? withData.map(function (r) { return dayBlock(s, r, p); }).join('') : '<p class="muted">Todavía no hay días con registros.</p>') + '</section>');
     }

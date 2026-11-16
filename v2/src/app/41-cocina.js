@@ -65,12 +65,14 @@
   function recipes() {
     var cats = U.arr(L.tx().recipeCategories), f = A.ui.rf || {};
     var used = new Set(L.allRecipes(A.P()).map(function (r) { return r.category; }));
-    return '<div class="search big">' + I('buscar') + '<input class="input" id="rq" type="search" data-bind="rq" value="' + esc(A.ui.rq || '') + '" placeholder="Buscar por nombre, ingrediente o etiqueta" aria-label="Buscar recetas" autocomplete="off"></div>' +
+    return '<section class="toolbar-card">' +
+      '<div class="search big">' + I('buscar') + '<input class="input" id="rq" type="search" data-bind="rq" value="' + esc(A.ui.rq || '') + '" placeholder="Buscar por nombre, ingrediente o etiqueta" aria-label="Buscar recetas" autocomplete="off"></div>' +
       '<div class="chips scroll mt-s" role="group" aria-label="Categorías"><button class="chip' + (!A.ui.rcat ? ' on' : '') + '" data-action="rCat" data-c="" aria-pressed="' + !A.ui.rcat + '">Todas</button>' +
       cats.filter(function (c) { return used.has(c.id); }).map(function (c) { var on = A.ui.rcat === c.id; return '<button class="chip' + (on ? ' on' : '') + '" data-action="rCat" data-c="' + c.id + '" aria-pressed="' + on + '">' + esc(c.label) + '</button>'; }).join('') + '</div>' +
       '<div class="chips mt-s" role="group" aria-label="Filtros">' + FILTERS.map(function (x) { var on = !!f[x[0]]; return '<button class="chip soft' + (on ? ' on' : '') + '" data-action="rFilter" data-f="' + x[0] + '" aria-pressed="' + on + '">' + esc(x[1]) + '</button>'; }).join('') + '</div>' +
+      '</section>' +
       '<div class="row between mt"><label class="row"><span class="meta">Orden</span><select class="input" style="min-height:40px;width:auto" data-change="rSort"><option value="sug"' + ((A.ui.rsort || 'sug') === 'sug' ? ' selected' : '') + '>Sugeridas</option><option value="az"' + (A.ui.rsort === 'az' ? ' selected' : '') + '>A-Z</option><option value="time"' + (A.ui.rsort === 'time' ? ' selected' : '') + '>Tiempo</option></select></label>' +
-      '<a class="btn sm" href="#/cocina/nueva">' + I('mas', 'sm') + 'Receta propia</a></div>' +
+      '<a class="btn primary sm" href="#/cocina/nueva">' + I('mas', 'sm') + 'Receta propia</a></div>' +
       '<div data-part="rlist" class="mt">' + recipeList() + '</div>';
   }
   A.binds.rq = U.debounce(function (el) { A.ui.rq = el.value; A.refresh('rlist'); }, 120);
@@ -102,18 +104,18 @@
     var ph = curPhase();
     var hits = L.recipeAllergyHits(r, p);
     var h = [K.back('#/cocina/recetas', 'Recetas')];
-    h.push('<article class="recipe"><header class="recipe-h"><p class="rc-cat">' + esc(L.categoryLabel(r.category)) + (own ? ' · receta propia' : '') + '</p><h1>' + esc(r.title) + '</h1>' +
+    h.push('<article class="recipe"><section class="recipe-hero"><header class="recipe-h"><p class="rc-cat">' + esc(L.categoryLabel(r.category)) + (own ? ' · receta propia' : '') + '</p><h1 class="serif">' + esc(r.title) + '</h1>' +
       '<div class="recipe-meta">' + (t.total ? '<span>' + I('reloj', 'sm') + (r.timeEstimated ? 'aprox. ' : '') + U.fmtMin(t.total) + (t.active && t.active !== t.total ? ' (' + U.fmtMin(t.active) + ' activos)' : '') + '</span>' : '') +
       (t.wait ? '<span>' + I('frasco', 'sm') + 'espera ' + U.fmtMin(t.wait) + '</span>' : '') + (r.method ? '<span>' + I('olla', 'sm') + esc(r.method) + '</span>' : '') +
       (r.servings ? '<span>' + I('personas', 'sm') + U.plural(r.servings, 'porción', 'porciones') + (r.servingsEstimated ? ' aprox.' : '') + '</span>' : '') + (cooked ? '<span>' + I('check', 'sm') + 'Cocinada ' + U.plural(cooked, 'vez', 'veces') + '</span>' : '') + '</div>' +
       '<div class="rc-tags mt-s">' + K.allergenTags(r, p) + (ph && !recipeFits(r, ph) ? '<span class="tag warn">' + I('info', 'sm') + 'No es de la fase actual</span>' : '') +
       U.arr(r.tags).filter(function (x) { return /friolento|caluroso|crudo|cocido|batch|fermento/.test(x); }).map(function (x) { return '<span class="tag">' + esc(x.replace('-ok', ': bien').replace('-', ' ')) + '</span>'; }).join('') + '</div>' +
       (r.allergens && r.allergens.length && !hits.any ? '<p class="meta mt-s">Contiene: ' + esc(r.allergens.map(function (a) { return L.allergenLabel(a).toLowerCase(); }).join(', ')) + (r.mayContain && r.mayContain.length ? ' · opcionales: ' + esc(r.mayContain.map(function (a) { return L.allergenLabel(a).toLowerCase(); }).join(', ')) : '') + '</p>' : '') +
-      '</header>');
-    h.push('<div class="btn-row mt"><button class="btn primary" data-action="cook" data-r="' + esc(id) + '">' + I('play', 'sm') + 'Cocinar</button>' +
+      '</header>' +
+      '<div class="btn-row mt"><button class="btn primary" data-action="cook" data-r="' + esc(id) + '">' + I('play', 'sm') + 'Cocinar</button>' +
       '<button class="btn fav-btn' + (fav ? ' on' : '') + '" data-action="fav" data-r="' + esc(id) + '" aria-pressed="' + fav + '">' + I('estrella', 'sm') + (fav ? 'Favorita' : 'Guardar') + '</button>' +
       '<button class="btn" data-action="planSheet" data-r="' + esc(id) + '">' + I('calendario', 'sm') + 'Al plan</button>' +
-      '<button class="btn" data-action="logMealSheet" data-r="' + esc(id) + '">' + I('check', 'sm') + 'Comí esto hoy</button></div>');
+      '<button class="btn" data-action="logMealSheet" data-r="' + esc(id) + '">' + I('check', 'sm') + 'Comí esto hoy</button></div></section>');
     var mult = [[0.5, '×½'], [1, '×1'], [2, '×2'], [3, '×3']];
     h.push('<div class="grid2 mt"><section class="card"><div class="card-h"><h2>Ingredientes</h2><div class="seg" role="group" aria-label="Cantidad">' + mult.map(function (m) { return '<button data-action="scale" data-r="' + esc(id) + '" data-k="' + m[0] + '" aria-pressed="' + (k === m[0]) + '">' + m[1] + '</button>'; }).join('') + '</div></div>' +
       (r.servings && k !== 1 ? '<p class="meta">Para ' + U.frac(r.servings * k) + ' porciones.</p>' : '') +
@@ -315,9 +317,11 @@
         (x.missing.length ? '<button class="btn sm" data-action="fridgeMissing" data-r="' + esc(x.recipe.id) + '">' + I('compras', 'sm') + '<span class="sr-only">Agregar faltantes de ' + esc(x.recipe.title) + ' a Compras</span><span aria-hidden="true">Agregar faltantes</span></button>' : '<button class="btn sm primary" data-action="cook" data-r="' + esc(x.recipe.id) + '">' + I('play', 'sm') + 'Cocinar</button>') + '</li>';
     }
     return '<p class="muted">Marcá lo que tenés y te mostramos qué cocinar. Los básicos de alacena (' + esc(pantry.join(', ') || 'sal, aceite, agua') + ') se cuentan siempre.</p>' +
-      '<div class="search mt-s">' + I('buscar') + '<input class="input" type="search" id="fq" data-bind="fq" value="' + esc(A.ui.fq || '') + '" placeholder="Buscar ingrediente (también por sinónimo)" aria-label="Buscar ingrediente" autocomplete="off"></div>' +
+      '<section class="toolbar-card mt-s">' +
+      '<div class="search">' + I('buscar') + '<input class="input" type="search" id="fq" data-bind="fq" value="' + esc(A.ui.fq || '') + '" placeholder="Buscar ingrediente (también por sinónimo)" aria-label="Buscar ingrediente" autocomplete="off"></div>' +
       '<div class="chips scroll mt-s"><button class="chip' + (!A.ui.fcat ? ' on' : '') + '" data-action="fCat" data-c="">Más usados</button>' + cats.map(function (c) { var on = A.ui.fcat === c; return '<button class="chip' + (on ? ' on' : '') + '" data-action="fCat" data-c="' + esc(c) + '" aria-pressed="' + on + '">' + esc(((U.arr(L.tx().ingredientCategories).filter(function (x) { return x.id === c; })[0]) || {}).label || U.cap(c.replace(/_/g, ' '))) + '</button>'; }).join('') + '</div>' +
       '<div data-part="fing" class="mt-s">' + fridgeIngredients() + '</div>' +
+      '</section>' +
       (have.length ? '<p class="meta mt-s">Tenés ' + U.plural(have.length, 'ingrediente') + ' marcados · <button class="btn ghost sm" data-action="fridgeClear">Vaciar</button></p>' : '') +
       '<div class="tier-h"><h2>Listas para cocinar</h2><span class="meta">' + ready.length + '</span></div>' + (ready.length ? '<ul class="list card">' + ready.map(item).join('') + '</ul>' : '<p class="muted">Todavía ninguna. Marcá más ingredientes.</p>') +
       '<div class="tier-h"><h2>Te falta poco</h2><span class="meta">' + near.length + '</span></div>' + (near.length ? '<ul class="list card">' + near.map(item).join('') + '</ul>' : '<p class="muted">Ninguna a 1 o 2 ingredientes.</p>');
@@ -355,9 +359,9 @@
         }).join('') + '</section>';
     }).join('');
     var n = L.planEntries(p.plan, w, U.addDays(w, 6)).length;
-    return '<div class="row wrap between"><div class="row"><button class="icon-btn" data-action="weekNav" data-n="-7" aria-label="Semana anterior">' + I('chev-izq') + '</button><h2 class="serif">' + esc(U.fmtDate(w, 'short')) + ' al ' + esc(U.fmtDate(U.addDays(w, 6), 'short')) + '</h2><button class="icon-btn" data-action="weekNav" data-n="7" aria-label="Semana siguiente">' + I('chev') + '</button>' +
+    return '<section class="toolbar-card"><div class="row wrap between"><div class="row"><button class="icon-btn" data-action="weekNav" data-n="-7" aria-label="Semana anterior">' + I('chev-izq') + '</button><h2 class="serif">' + esc(U.fmtDate(w, 'short')) + ' al ' + esc(U.fmtDate(U.addDays(w, 6), 'short')) + '</h2><button class="icon-btn" data-action="weekNav" data-n="7" aria-label="Semana siguiente">' + I('chev') + '</button>' +
       (w !== U.mondayOf(today) ? '<button class="btn ghost sm" data-action="weekNav" data-n="0">Esta semana</button>' : '') + '</div>' +
-      '<div class="btn-row"><button class="btn sm" data-action="planCopyPrev">' + I('copiar', 'sm') + 'Copiar semana anterior</button>' + (n ? '<button class="btn sm danger" data-action="planClear">' + I('borrar', 'sm') + 'Limpiar</button>' : '') + '</div></div>' +
+      '<div class="btn-row"><button class="btn sm" data-action="planCopyPrev">' + I('copiar', 'sm') + 'Copiar semana anterior</button>' + (n ? '<button class="btn sm danger" data-action="planClear">' + I('borrar', 'sm') + 'Limpiar</button>' : '') + '</div></div></section>' +
       (n ? '<div class="banner info mt-s">' + I('compras') + '<div class="grow"><b>' + U.plural(n, 'comida planificada', 'comidas planificadas') + '.</b>La lista de compras y los remojos se arman solos con este plan.</div><a class="btn sm" href="#/compras">Compras</a><a class="btn sm" href="#/cocina/remojos">Remojos</a></div>' : '<p class="muted mt-s">Planificá tocando «Agregar» en cada momento o desde una receta con «Al plan».</p>') +
       '<div class="week mt">' + cards + '</div>';
   }

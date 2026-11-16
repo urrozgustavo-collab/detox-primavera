@@ -1,8 +1,19 @@
 # 🌿 Detox Primavera — Estado del Proyecto & Guía de Continuidad
 
-> **Última actualización:** 15 de noviembre de 2026  
-> **Versión Actual:** `v2.0.0` — reescritura completa (rama git `rediseno-v2`, sin publicar todavía)  
+> **Última actualización:** 16 de noviembre de 2026  
+> **Versión Actual:** `v2.1.0` — rediseño editorial «Boticario Contemporáneo» sobre `v2.0.0` (rama git `rediseno-v2`, sin publicar todavía)  
 > **Versión anterior publicada:** `v1.4.2` (rama `main`, GitHub Pages)  
+
+---
+
+## v2.1.0 — Rediseño estético y ergonómico (16/11/2026)
+
+Sobre la base funcional y de datos `v2.0.0` creada por Claude (15/11/2026), se realizó un rediseño integral del sistema visual y la jerarquía de pantallas bajo la dirección **«Boticario Editorial Contemporáneo»** (manteniendo intacta la paleta botánica, el contraste AA, el motor de lógica, la migración v1, la sincronización cifrada y los 101 tests):
+
+- **Sistema de controles y geometría:** reemplazo de botones tipo píldora por botones arquitectónicos (`11px`) con sombras y biseles calibrados; diferenciación clara entre botones primarios (`--accent`), chips de filtro activos (`--ink`/`--paper`), tags técnicos (`6px`) y controles segmentados modernos.
+- **Navegación y cromo:** cabecera y barra inferior móvil translúcidas (`backdrop-filter`) con indicador tipo píldora en el ícono activo; barra lateral de escritorio refinada con buscador estilo comando.
+- **Pantalla Hoy & Kit visual:** encabezado Hero editorial en tarjeta dedicada, franja de días estilizada sin barra de scroll visible, medallón botánico SVG de trazo fino para la planta del programa, 3 tarjetas métricas junto al anillo, hábitos en tarjetas táctiles individuales, barra de progreso de hidratación y momentos de comida con ícono propio.
+- **Pantallas secundarias:** tarjetas estructuradas de recetas (`rc-top` / `rc-foot`), bloques `.toolbar-card` para búsqueda y filtros en Cocina/Compras/Semáforo, cabeceras `.recipe-hero` en detalles de Recetas/Herbario/Programas y separadores editoriales en Ajustes.
 
 ---
 

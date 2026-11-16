@@ -40,8 +40,10 @@
   function semaforo() {
     var st = A.ui.fdst || '';
     var opts = [['', 'Todos'], ['green', 'Libre'], ['yellow', 'Con moderación'], ['red', 'Evitar']];
-    return '<div class="search big">' + I('buscar') + '<input class="input" id="fdq" type="search" data-bind="fdq" value="' + esc(A.ui.fdq || '') + '" placeholder="¿Puedo comer…?" aria-label="Buscar un alimento" autocomplete="off"></div>' +
+    return '<section class="toolbar-card">' +
+      '<div class="search big">' + I('buscar') + '<input class="input" id="fdq" type="search" data-bind="fdq" value="' + esc(A.ui.fdq || '') + '" placeholder="¿Puedo comer…?" aria-label="Buscar un alimento" autocomplete="off"></div>' +
       '<div class="seg mt-s" role="group" aria-label="Filtrar por estado">' + opts.map(function (o) { return '<button data-action="fdSt" data-v="' + o[0] + '" aria-pressed="' + (st === o[0]) + '">' + (o[0] ? I(K.statusIcon(o[0]), 'sm') : '') + o[1] + '</button>'; }).join('') + '</div>' +
+      '</section>' +
       '<div data-part="flist" class="mt">' + foodList() + '</div>';
   }
   A.binds.fdq = U.debounce(function (el) { A.ui.fdq = el.value; A.refresh('flist'); }, 120);
@@ -107,9 +109,11 @@
     var cons = U.arr(h.contraindications).map(function (w) { var hit = c.indexOf(w.condition) > -1; return '<div class="contra' + (hit ? ' hit' : '') + '"><b>' + (hit ? I('alerta', 'sm') + ' ' : '') + esc(condLabel(w.condition).split(' (')[0]) + (w.scope ? ', ' + esc(w.scope) : '') + (hit ? ' (tu perfil)' : '') + ':</b> ' + esc(w.text) + '</div>'; }).join('');
     var p = A.P();
     var constit = U.arr(h.constitutionWarn).map(function (w) { var hit = p.settings.constitution && (w.constitution === p.settings.constitution || w.id === p.settings.constitution); return '<div class="contra' + (hit ? ' hit' : '') + '">' + esc(w.text || w) + '</div>'; }).join('');
-    return K.back('#/guia/herbario', 'Herbario') + '<p class="rc-cat">' + esc(KIND[h.kind] || h.kind) + '</p><h1 class="page-h">' + esc(h.name) + '</h1>' +
-      (locked ? '<div class="banner">' + I('candado') + '<div class="grow"><b>Desde el día ' + h.unlockDay + ' del programa.</b>La guía lo indica a partir de ese día. Mientras tanto podés leer la ficha.</div></div>' : '') +
+    return K.back('#/guia/herbario', 'Herbario') +
+      '<section class="recipe-hero"><header class="recipe-h"><p class="rc-cat">' + esc(KIND[h.kind] || h.kind) + '</p><h1 class="serif">' + esc(h.name) + '</h1>' +
       '<div class="recipe-meta">' + (h.thermalText || h.thermal ? '<span>' + I('sol', 'sm') + esc(h.thermalText || THERMAL[h.thermal]) + '</span>' : '') + (h.taste ? '<span>' + I('hoja', 'sm') + 'Sabor ' + esc(String(h.taste).toLowerCase()) + '</span>' : '') + '</div>' +
+      (locked ? '<div class="banner mt-s">' + I('candado') + '<div class="grow"><b>Desde el día ' + h.unlockDay + ' del programa.</b>La guía lo indica a partir de ese día. Mientras tanto podés leer la ficha.</div></div>' : '') +
+      '</header></section>' +
       (cons ? '<section class="card mt"><h2 class="mb">Contraindicaciones</h2>' + cons + '</section>' : '') +
       (constit ? '<section class="card mt"><h2 class="mb">Según tu constitución</h2>' + constit + '</section>' : '') +
       '<div class="grid2 mt">' +

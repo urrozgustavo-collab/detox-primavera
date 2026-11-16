@@ -263,6 +263,6 @@ test('informe de texto con título y versión correctos', () => {
   const d = complete(1); d.checkin.energy = 4; d.checkin.notes = 'bien';
   const t = L.reportText(p, L.summary(p, ed.id, '2026-11-15'));
   assert.match(t, /^INFORME DE SEGUIMIENTO/);
-  assert.match(t, /v2\.0\.0/);
+  assert.match(t, /v2\.1\.0/);
   assert.match(t, /Notas: bien/);
 });

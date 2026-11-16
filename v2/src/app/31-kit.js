@@ -1,10 +1,10 @@
-/* Detox v2 — piezas visuales: planta que crece, anillo, gráficos SVG, mapa de la edición, tarjetas. */
+/* Detox v2 — piezas visuales: planta botánica editorial, anillo, gráficos SVG, mapa de la edición, tarjetas. */
 (function (root) {
   'use strict';
   if (typeof document === 'undefined') return;
   var A = root.DXApp, U = A.util, L = A.logic, esc = U.esc, K = A.kit = {};
 
-  /* ---------- la planta del programa (firma visual) ---------- */
+  /* ---------- la planta del programa (medallón botánico editorial) ---------- */
   K.plantStage = function (sum) {
     if (!sum) return 0;
     var days = sum.clock.days;
@@ -19,33 +19,43 @@
   K.STAGE_NAMES = ['Semilla', 'Brote', 'Hojas', 'Capullo', 'Flor'];
   K.plant = function (stage, size, label) {
     size = size || 140;
-    var h = [10, 34, 62, 86, 96][stage];
-    var top = 124 - h;
+    var h = [12, 34, 60, 82, 92][stage];
+    var top = 118 - h;
     var parts = [];
-    parts.push('<path class="pl-ground" d="M14 126 Q60 118 106 126"/>');
-    parts.push('<path class="pl-soil" d="M34 126 Q60 112 86 126Z"/>');
+    // Medallón arqueado sutil y halo botánico editorial
+    parts.push('<rect class="pl-frame" x="10" y="6" width="100" height="128" rx="50"/>');
+    parts.push('<circle class="pl-halo" cx="60" cy="64" r="34"/>');
+    parts.push('<path class="pl-ground" d="M26 120 Q60 115 94 120"/>');
+    parts.push('<path class="pl-soil" d="M38 120 Q60 111 82 120Z"/>');
     if (stage === 0) {
-      parts.push('<ellipse class="pl-seed" cx="60" cy="117" rx="7.5" ry="5" transform="rotate(-18 60 117)"/>');
-      parts.push('<path class="pl-stem" d="M61 113 q2 -6 -1 -10"/>');
+      parts.push('<path class="pl-seed" d="M53 116 C53 110, 62 108, 67 113 C67 118, 57 120, 53 116Z"/>');
+      parts.push('<path class="pl-stem" d="M61 111 C62 106, 60 101, 63 97"/>');
     } else {
-      parts.push('<path class="pl-stem" d="M60 120 C 57 ' + (120 - h * .35) + ', 63 ' + (120 - h * .7) + ', 60 ' + top + '"/>');
-      var leaves = [0, 2, 4, 6, 6][stage];
+      parts.push('<path class="pl-stem" d="M60 116 C57 ' + (116 - h * .35) + ', 64 ' + (116 - h * .7) + ', 60 ' + top + '"/>');
       if (stage === 1) {
-        parts.push('<path class="pl-leaf" d="M60 ' + (top + 4) + ' c -4 -8 -15 -10 -19 -5 c 5 6 13 8 19 5z"/>');
-        parts.push('<path class="pl-leaf" d="M60 ' + (top + 2) + ' c 4 -8 15 -10 19 -5 c -5 6 -13 8 -19 5z"/>');
+        parts.push('<path class="pl-leaf" d="M60 ' + (top + 6) + ' C55 ' + (top - 3) + ', 44 ' + (top - 5) + ', 40 ' + (top + 1) + ' C45 ' + (top + 7) + ', 54 ' + (top + 9) + ', 60 ' + (top + 6) + 'Z"/>');
+        parts.push('<path class="pl-vein" d="M58 ' + (top + 5) + ' Q50 ' + (top + 2) + ' 44 ' + (top + 2) + '"/>');
+        parts.push('<path class="pl-leaf" d="M60 ' + (top + 3) + ' C65 ' + (top - 6) + ', 76 ' + (top - 8) + ', 80 ' + (top - 2) + ' C75 ' + (top + 4) + ', 66 ' + (top + 6) + ', 60 ' + (top + 3) + 'Z"/>');
+        parts.push('<path class="pl-vein" d="M62 ' + (top + 2) + ' Q70 ' + (top - 1) + ' 76 ' + (top - 1) + '"/>');
       }
+      var leaves = [0, 0, 4, 6, 6][stage];
       for (var i = 0; i < leaves; i++) {
-        var y = 116 - (i + 1) * (h - 14) / (leaves + 1);
-        var s = 1 - i * 0.07;
+        var y = 110 - (i + 1) * (h - 14) / (leaves + 1);
+        var s = 0.96 - i * 0.08;
         var left = i % 2 === 0;
-        parts.push('<path class="pl-leaf" transform="translate(60 ' + y.toFixed(1) + ') scale(' + (left ? -s : s) + ' ' + s + ')" d="M0 0 c 5 -11 20 -15 29 -9 c -6 10 -20 14 -29 9z"/>');
-        parts.push('<path class="pl-vein" transform="translate(60 ' + y.toFixed(1) + ') scale(' + (left ? -s : s) + ' ' + s + ')" d="M2 -1 Q14 -6 24 -8"/>');
+        parts.push('<path class="pl-leaf" transform="translate(60 ' + y.toFixed(1) + ') scale(' + (left ? -s : s) + ' ' + s + ')" d="M0 0 C5 -12, 18 -16, 28 -11 C23 0, 11 5, 0 0Z"/>');
+        parts.push('<path class="pl-vein" transform="translate(60 ' + y.toFixed(1) + ') scale(' + (left ? -s : s) + ' ' + s + ')" d="M2 -1 Q14 -6 23 -9"/>');
       }
-      if (stage === 3) parts.push('<path class="pl-bud" d="M60 ' + (top - 12) + ' c -7 4 -7 12 0 14 c 7 -2 7 -10 0 -14z"/><path class="pl-sepal" d="M53 ' + (top + 1) + ' q7 -5 14 0"/>');
+      if (stage === 3) {
+        parts.push('<path class="pl-bud" d="M60 ' + (top - 14) + ' C53 ' + (top - 8) + ', 53 ' + (top + 1) + ', 60 ' + (top + 2) + ' C67 ' + (top + 1) + ', 67 ' + (top - 8) + ', 60 ' + (top - 14) + 'Z"/>');
+        parts.push('<path class="pl-sepal" d="M54 ' + (top + 1) + ' Q60 ' + (top - 4) + ' 66 ' + (top + 1) + '"/>');
+      }
       if (stage === 4) {
-        var cy = top - 10;
-        for (var k = 0; k < 6; k++) parts.push('<ellipse class="pl-petal" cx="60" cy="' + (cy - 9) + '" rx="5.6" ry="9.5" transform="rotate(' + (k * 60) + ' 60 ' + cy + ')"/>');
-        parts.push('<circle class="pl-heart" cx="60" cy="' + cy + '" r="5"/>');
+        var cy = top - 11;
+        for (var k = 0; k < 5; k++) {
+          parts.push('<path class="pl-petal" transform="rotate(' + (k * 72) + ' 60 ' + cy + ')" d="M60 ' + cy + ' C54 ' + (cy - 6) + ', 54 ' + (cy - 16) + ', 60 ' + (cy - 18) + ' C66 ' + (cy - 16) + ', 66 ' + (cy - 6) + ', 60 ' + cy + 'Z"/>');
+        }
+        parts.push('<circle class="pl-heart" cx="60" cy="' + cy + '" r="4.2"/>');
       }
     }
     return '<svg class="plant stage-' + stage + '" viewBox="0 0 120 140" width="' + size + '" height="' + Math.round(size * 140 / 120) + '" role="img" aria-label="' + esc(label || ('Tu planta: ' + K.STAGE_NAMES[stage])) + '">' + parts.join('') + '</svg>';
@@ -148,11 +158,18 @@
     var fav = p && p.recipeLog.favorites.indexOf(r.id) > -1;
     var cooked = p && p.recipeLog.cooked[r.id] ? p.recipeLog.cooked[r.id].length : 0;
     var t = r.time && r.time.total ? U.fmtMin(r.time.total) : '';
+    var tags = K.allergenTags(r, p);
     return '<a class="rcard" id="r-' + esc(r.id) + '" href="#/cocina/receta/' + encodeURIComponent(r.id) + '">' +
-      '<span class="rc-cat">' + esc(L.categoryLabel(r.category)) + (String(r.id).indexOf('my-') === 0 ? ' · propia' : '') + '</span>' +
+      '<div class="rc-top"><span class="rc-cat">' + esc(L.categoryLabel(r.category)) + (String(r.id).indexOf('my-') === 0 ? ' · propia' : '') + '</span>' +
+      (fav ? '<span class="fav" aria-label="Favorita">' + A.icon('estrella', 'sm') + '</span>' : '') + '</div>' +
       '<b class="rc-t">' + esc(r.title) + '</b>' +
-      '<span class="rc-meta">' + (t ? A.icon('reloj', 'sm') + esc(t) : '') + (fav ? '<span class="fav" aria-label="Favorita">' + A.icon('estrella', 'sm') + '</span>' : '') + (cooked ? '<span>Cocinada ' + U.plural(cooked, 'vez', 'veces') + '</span>' : '') + '</span>' +
-      (extra || '') + '<span class="rc-tags">' + K.allergenTags(r, p) + '</span></a>';
+      (extra || '') +
+      (tags ? '<span class="rc-tags">' + tags + '</span>' : '') +
+      '<div class="rc-foot">' +
+      (t ? '<span class="rc-m">' + A.icon('reloj', 'sm') + esc(t) + '</span>' : '') +
+      (r.method ? '<span class="rc-m">' + esc(r.method) + '</span>' : '') +
+      (cooked ? '<span class="rc-m">Cocinada ' + U.plural(cooked, 'vez', 'veces') + '</span>' : '') +
+      '</div></a>';
   };
 
   K.statusIcon = function (st) { return st === 'green' ? 'check' : st === 'yellow' ? 'alerta' : 'cerrar'; };
@@ -161,7 +178,7 @@
     return '<span class="tag ' + cls + '">' + A.icon(K.statusIcon(st), 'sm') + esc(L.statusLabel(st)) + '</span>';
   };
   K.healthNote = function () {
-    return '<p class="health">' + A.icon('info', 'sm') + ' Material educativo del taller; no reemplaza la consulta médica. Si estás embarazada, en lactancia, tomás medicación o tenés una enfermedad crónica, consultá antes de empezar.</p>';
+    return '<p class="health">' + A.icon('info', 'sm') + '<span>Material educativo del taller; no reemplaza la consulta médica. Si estás embarazada, en lactancia, tomás medicación o tenés una enfermedad crónica, consultá antes de empezar.</span></p>';
   };
   K.back = function (href, label) { return '<a class="back" href="' + href + '">' + A.icon('atras', 'sm') + esc(label || 'Volver') + '</a>'; };
   K.tabs = function (items, current, label) {

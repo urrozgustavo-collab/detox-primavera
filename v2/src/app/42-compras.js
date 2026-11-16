@@ -57,20 +57,25 @@
       var r = range();
       var h = ['<header class="page-h"><h1>Compras</h1></header>'];
       h.push('<nav class="seg subnav" aria-label="Listas"><a href="#/compras"' + (view === 'semana' ? ' aria-current="page"' : '') + '>Para esta semana</a><a href="#/compras/base"' + (view === 'base' ? ' aria-current="page"' : '') + '>Lista base del programa</a></nav>');
+      var stores = groups.map(function (g) { return g.id; });
+      var tcard = ['<section class="toolbar-card mt-s">'];
       if (view === 'semana') {
         var cur = A.ui.shopRange || 'esta';
-        h.push('<div class="row wrap between"><div class="seg" role="group" aria-label="Rango">' + [['esta', 'Esta semana'], ['proxima', 'Próxima semana'], ['3', 'Próximos 3 días']].map(function (o) { return '<button data-action="shopRange" data-v="' + o[0] + '" aria-pressed="' + (cur === o[0]) + '">' + o[1] + '</button>'; }).join('') + '</div><span class="meta">Del ' + esc(U.fmtDate(r[0], 'short')) + ' al ' + esc(U.fmtDate(r[1], 'short')) + ' (semana de lunes a domingo, como el Plan)</span></div>');
-        if (!L.planEntries(p.plan, r[0], r[1]).length) h.push('<div class="banner info mt-s">' + I('calendario') + '<div class="grow"><b>No hay comidas planificadas para ' + esc(r[2]) + '.</b>Planificá en Cocina y los ingredientes aparecen acá sumados por comercio.</div><a class="btn sm" href="#/cocina/plan">Planificar</a></div>');
+        tcard.push('<div class="row wrap between"><div class="seg" role="group" aria-label="Rango">' + [['esta', 'Esta semana'], ['proxima', 'Próxima semana'], ['3', 'Próximos 3 días']].map(function (o) { return '<button data-action="shopRange" data-v="' + o[0] + '" aria-pressed="' + (cur === o[0]) + '">' + o[1] + '</button>'; }).join('') + '</div><span class="meta">Del ' + esc(U.fmtDate(r[0], 'short')) + ' al ' + esc(U.fmtDate(r[1], 'short')) + ' (semana de lunes a domingo, como el Plan)</span></div>');
       } else {
         h.push('<p class="muted">El listado de la guía para todo el programa. Los esenciales están marcados.</p>');
       }
-      h.push('<form class="row mt" data-submit="shopAdd"><input class="input" name="t" list="ing-dl" placeholder="Agregar algo a la lista…" aria-label="Agregar a la lista" autocomplete="off" maxlength="80"><button class="btn primary">' + I('mas', 'sm') + '<span class="sr-only">Agregar</span></button></form>' +
+      tcard.push('<form class="row' + (view === 'semana' ? ' mt' : '') + '" data-submit="shopAdd"><input class="input" name="t" list="ing-dl" placeholder="Agregar algo a la lista…" aria-label="Agregar a la lista" autocomplete="off" maxlength="80"><button class="btn primary">' + I('mas', 'sm') + '<span class="sr-only">Agregar</span></button></form>' +
         '<datalist id="ing-dl">' + U.arr(A.dx().ingredients).map(function (i) { return '<option value="' + esc(i.name) + '">'; }).join('') + '</datalist>');
-      var stores = groups.map(function (g) { return g.id; });
-      h.push('<div class="chips scroll mt"><button class="chip' + (!A.ui.shopStore ? ' on' : '') + '" data-action="shopStore" data-s="" aria-pressed="' + !A.ui.shopStore + '">Todos <span class="meta">' + pending + '</span></button>' +
+      tcard.push('<div class="chips scroll mt-s"><button class="chip' + (!A.ui.shopStore ? ' on' : '') + '" data-action="shopStore" data-s="" aria-pressed="' + !A.ui.shopStore + '">Todos <span class="meta">' + pending + '</span></button>' +
         groups.map(function (g) { var n = g.items.filter(function (x) { return !done(p, x) && !x.have; }).length, on = A.ui.shopStore === g.id; return '<button class="chip' + (on ? ' on' : '') + '" data-action="shopStore" data-s="' + g.id + '" aria-pressed="' + on + '">' + esc(g.label) + ' <span class="meta">' + n + '</span></button>'; }).join('') + '</div>');
-      h.push('<div class="row wrap mt-s"><label class="switch" style="min-height:40px;gap:8px"><input type="checkbox" data-change="hideBought"' + (A.ui.hideBought ? ' checked' : '') + '><span>Ocultar comprados</span></label>' +
+      tcard.push('<div class="row wrap mt-s"><label class="switch" style="min-height:40px;gap:8px"><input type="checkbox" data-change="hideBought"' + (A.ui.hideBought ? ' checked' : '') + '><span>Ocultar comprados</span></label>' +
         (view === 'base' ? '<label class="switch" style="min-height:40px;gap:8px"><input type="checkbox" data-change="onlyEss"' + (A.ui.onlyEss ? ' checked' : '') + '><span>Solo esenciales</span></label>' : '') + '</div>');
+      tcard.push('</section>');
+      h.push(tcard.join(''));
+      if (view === 'semana' && !L.planEntries(p.plan, r[0], r[1]).length) {
+        h.push('<div class="banner info mt-s">' + I('calendario') + '<div class="grow"><b>No hay comidas planificadas para ' + esc(r[2]) + '.</b>Planificá en Cocina y los ingredientes aparecen acá sumados por comercio.</div><a class="btn sm" href="#/cocina/plan">Planificar</a></div>');
+      }
       if (!items.length) h.push(K.empty(view === 'base' ? 'La lista base está vacía' : 'Nada para comprar', view === 'base' ? '' : 'Agregá algo arriba o planificá comidas.', ''));
       var shown = groups.filter(function (g) { return !A.ui.shopStore || g.id === A.ui.shopStore; });
       if (A.ui.shopStore && stores.indexOf(A.ui.shopStore) < 0) shown = groups;
@@ -79,7 +84,7 @@
         var list = g.items.slice().sort(function (a, b) { return rank(a) - rank(b); });
         if (A.ui.hideBought) list = list.filter(function (x) { return !done(p, x); });
         var n = g.items.filter(function (x) { return !done(p, x) && !x.have; }).length;
-        h.push('<section class="shop-store" aria-label="' + esc(g.label) + '"><h3><span class="serif">' + esc(g.label) + '</span><span class="meta">' + (n ? n + ' por comprar' : 'todo comprado') + '</span></h3>' +
+        h.push('<section class="shop-store" aria-label="' + esc(g.label) + '"><h3><span class="serif">' + esc(g.label) + '</span><span class="tag' + (n ? ' accent' : '') + '">' + (n ? n + ' por comprar' : 'Todo comprado') + '</span></h3>' +
           (list.length ? '<ul class="list card" style="padding:4px 14px">' + list.map(function (it) { return row(p, it); }).join('') + '</ul>' : '') + '</section>');
       });
       h.push('<div class="btn-row mt"><button class="btn" data-action="shopShare" data-v="' + view + '">' + I('compartir', 'sm') + 'Compartir pendientes</button>' +

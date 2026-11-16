@@ -21,7 +21,8 @@
       '<label class="field"><span>Nombre</span><input class="input" id="pf-name" data-bind="profName" value="' + esc(p.name) + '" maxlength="30" placeholder="¿Cómo te llamás?" autocomplete="given-name"></label>' +
       '<p class="label">Color</p><div class="swatches" role="group" aria-label="Color del perfil">' + L.PROFILE_COLORS.map(function (c) { return '<button class="swatch" style="background:' + c + '" data-action="profColor" data-c="' + c + '" aria-pressed="' + (p.color === c) + '" aria-label="Color ' + c + '"></button>'; }).join('') + '</div>' +
       '<p class="label mt">Ícono</p><div class="emoji-pick chips" role="group" aria-label="Ícono del perfil">' + L.PROFILE_EMOJIS.map(function (e) { return '<button data-action="profEmoji" data-e="' + e + '" aria-pressed="' + (p.emoji === e) + '">' + e + '</button>'; }).join('') + '</div>' +
-      '<p class="label mt">Personas en este dispositivo</p><ul class="list">' + profs.map(function (x) {
+      '<hr class="sep">' +
+      '<p class="label">Personas en este dispositivo</p><ul class="list">' + profs.map(function (x) {
         var me = x.id === p.id;
         return '<li class="profile-row">' + A.avatar(x, 36) + '<span class="grow"><b>' + esc(x.name || 'Sin nombre') + '</b>' + (me ? '<span class="meta"> · en uso</span>' : '') + '</span>' +
           (me ? '' : '<button class="btn sm" data-action="switchProfile" data-p="' + x.id + '">Usar</button>') + (profs.length > 1 ? '<button class="icon-btn sm" data-action="delProfile" data-p="' + x.id + '" aria-label="Borrar perfil ' + esc(x.name) + '">' + I('borrar', 'sm') + '</button>' : '') + '</li>';
@@ -61,8 +62,10 @@
       '<p class="label">Alergias e intolerancias</p><div class="chips" role="group" aria-label="Alergias">' + U.arr(tx.allergens).map(function (a) { var on = s.allergies.indexOf(a.id) > -1; return '<button class="chip' + (on ? ' on' : '') + '" data-action="allergy" data-a="' + a.id + '" aria-pressed="' + on + '">' + esc(a.label) + '</button>'; }).join('') +
       s.customAllergies.map(function (c) { return '<button class="chip on" data-action="customAllergyDel" data-a="' + esc(c) + '" aria-label="Quitar ' + esc(c) + '">' + esc(c) + I('cerrar', 'sm x') + '</button>'; }).join('') + '</div>' +
       '<form class="row mt-s" data-submit="customAllergyAdd"><input class="input" name="a" placeholder="Otra (ej.: palta)" maxlength="40" aria-label="Otra alergia o intolerancia"><button class="btn sm">Agregar</button></form><p class="meta mt-s">Se marcan en recetas, sugerencias y compras. Las que escribas se buscan por palabra completa en los ingredientes.</p>' +
-      '<p class="label mt">Condiciones de salud</p><p class="meta">Activan avisos en hábitos, SOS y el herbario. No se comparten con nadie.</p>' + U.arr(tx.conditions).map(function (c) { return '<label class="check"><input type="checkbox" data-change="condition" value="' + c.id + '"' + (s.conditions.indexOf(c.id) > -1 ? ' checked' : '') + '><span>' + esc(c.label) + '</span></label>'; }).join('') +
-      '<p class="label mt">Constitución</p><div class="seg" role="group" aria-label="Constitución">' + [[null, 'No sé'], ['friolento', 'Friolento/a'], ['caluroso', 'Caluroso/a']].map(function (c) { return '<button data-action="constitution" data-c="' + (c[0] || '') + '" aria-pressed="' + (s.constitution === c[0]) + '">' + c[1] + '</button>'; }).join('') + '</div>' +
+      '<hr class="sep">' +
+      '<p class="label">Condiciones de salud</p><p class="meta">Activan avisos en hábitos, SOS y el herbario. No se comparten con nadie.</p>' + U.arr(tx.conditions).map(function (c) { return '<label class="check"><input type="checkbox" data-change="condition" value="' + c.id + '"' + (s.conditions.indexOf(c.id) > -1 ? ' checked' : '') + '><span>' + esc(c.label) + '</span></label>'; }).join('') +
+      '<hr class="sep">' +
+      '<p class="label">Constitución</p><div class="seg" role="group" aria-label="Constitución">' + [[null, 'No sé'], ['friolento', 'Friolento/a'], ['caluroso', 'Caluroso/a']].map(function (c) { return '<button data-action="constitution" data-c="' + (c[0] || '') + '" aria-pressed="' + (s.constitution === c[0]) + '">' + c[1] + '</button>'; }).join('') + '</div>' +
       (s.constitution ? '<p class="meta mt-s">' + esc((U.arr(tx.constitutions).filter(function (x) { return x.id === s.constitution; })[0] || {}).desc || '') + '</p>' : '') +
       '<button class="btn sm mt-s" data-action="constTest">' + I('info', 'sm') + 'Hacer el test de 4 preguntas</button>');
   }
