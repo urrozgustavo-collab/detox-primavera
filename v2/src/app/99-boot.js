@@ -11,7 +11,7 @@
     if (d.textScale > 1) h.setAttribute('data-text', 'large'); else h.removeAttribute('data-text');
     if (d.reduceMotion) h.setAttribute('data-motion', 'reduce'); else h.removeAttribute('data-motion');
     var m = document.getElementById('meta-theme');
-    if (m) m.setAttribute('content', t === 'dark' ? '#111714' : '#F6F1E7');
+    if (m) m.setAttribute('content', t === 'dark' ? '#171413' : '#FADFD0');
   };
 
   function lsGet(k) { try { return root.localStorage.getItem(k); } catch (e) { return null; } }

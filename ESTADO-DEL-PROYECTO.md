@@ -1,19 +1,20 @@
 # 🌿 Detox Primavera — Estado del Proyecto & Guía de Continuidad
 
 > **Última actualización:** 16 de noviembre de 2026  
-> **Versión Actual:** `v2.1.0` — rediseño editorial «Boticario Contemporáneo» sobre `v2.0.0` (rama git `rediseno-v2`, sin publicar todavía)  
+> **Versión Actual:** `v2.1.0` — rediseño «Collage Botánico de Isabel Caparra» sobre `v2.0.0` (rama git `rediseno-v2`, sin publicar todavía)  
 > **Versión anterior publicada:** `v1.4.2` (rama `main`, GitHub Pages)  
 
 ---
 
 ## v2.1.0 — Rediseño estético y ergonómico (16/11/2026)
 
-Sobre la base funcional y de datos `v2.0.0` creada por Claude (15/11/2026), se realizó un rediseño integral del sistema visual y la jerarquía de pantallas bajo la dirección **«Boticario Editorial Contemporáneo»** (manteniendo intacta la paleta botánica, el contraste AA, el motor de lógica, la migración v1, la sincronización cifrada y los 101 tests):
+Sobre la base funcional y de datos `v2.0.0` creada por Claude (15/11/2026), se realizó un rediseño integral del sistema visual, la tipografía y la jerarquía de pantallas inspirado en las portadas ilustradas del PDF de **Isabel Caparra** (págs. 1, 26 y 40), conservando intactos el motor de lógica, la migración v1, la sincronización cifrada y los 101 tests:
 
-- **Sistema de controles y geometría:** reemplazo de botones tipo píldora por botones arquitectónicos (`11px`) con sombras y biseles calibrados; diferenciación clara entre botones primarios (`--accent`), chips de filtro activos (`--ink`/`--paper`), tags técnicos (`6px`) y controles segmentados modernos.
+- **Paleta del PDF y tipografía sans-serif moderna:** fondo durazno cálido (`#FADFD0`), tarjetas crema (`#FFF7F2`), texto carbón (`#222221`), mancha salvia (`#C9CEC3`), verde eucalipto (`#446650`), terracota coral (`#D4512A`), mandarina (`#E68A20`) y canela (`#9A5D24`), más su variante nocturna (`#171413`). Tipografía 100 % sans-serif sin dependencias externas (títulos geométricos pesados con el guión firma debajo de cada `h1` y cuerpo limpio).
+- **Sistema de controles y geometría:** reemplazo de botones tipo píldora por botones arquitectónicos (`11px`) con sombras y biseles calibrados; diferenciación clara entre botones primarios (`--accent`), chips de filtro activos (`--ink`/`--surface`), chips secundarios (`.chip.soft` en salvia/terracota) y controles segmentados modernos.
 - **Navegación y cromo:** cabecera y barra inferior móvil translúcidas (`backdrop-filter`) con indicador tipo píldora en el ícono activo; barra lateral de escritorio refinada con buscador estilo comando.
-- **Pantalla Hoy & Kit visual:** encabezado Hero editorial en tarjeta dedicada, franja de días estilizada sin barra de scroll visible, medallón botánico SVG de trazo fino para la planta del programa, 3 tarjetas métricas junto al anillo, hábitos en tarjetas táctiles individuales, barra de progreso de hidratación y momentos de comida con ícono propio.
-- **Pantallas secundarias:** tarjetas estructuradas de recetas (`rc-top` / `rc-foot`), bloques `.toolbar-card` para búsqueda y filtros en Cocina/Compras/Semáforo, cabeceras `.recipe-hero` en detalles de Recetas/Herbario/Programas y separadores editoriales en Ajustes.
+- **Pantalla Hoy & Collage botánico:** encabezado Hero editorial en tarjeta dedicada, ilustración `K.plant` redibujada en estilo *collage* orgánico de Isa Caparra, franja de días estilizada sin barra de scroll visible, 3 tarjetas métricas con los colores del PDF (salvia, mandarina y terracota), hábitos en tarjetas táctiles individuales, barra de hidratación e íconos por momento del día.
+- **Pantallas secundarias y espaciado:** tarjetas `.rcard` con bordes superiores rotativos (eucalipto, mandarina, terracota), bloques `.toolbar-card` con separación garantizada (`>= 12px`) entre buscadores y filas de chips (corrigiendo el solapamiento en Cocina y Compras), cabeceras `.recipe-hero` en detalles y separadores editoriales en Ajustes.
 
 ---
 

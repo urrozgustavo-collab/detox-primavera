@@ -83,12 +83,12 @@ def safe_js(text, name):
     return "\n/* ==== " + name + " ==== */\n" + text
 
 
-ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#3D6B4F"/><path d="M32 54V30" stroke="#F6F1E7" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M32 36c-9 0-15-6-15-15 9 0 15 6 15 15z" fill="#DDE9DA"/><path d="M32 30c0-9 6-15 15-15 0 9-6 15-15 15z" fill="#F6F1E7"/><circle cx="32" cy="13" r="4" fill="#E29AB2"/></svg>"""
+ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#446650"/><path d="M32 54V30" stroke="#FADFD0" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M32 36c-9 0-15-6-15-15 9 0 15 6 15 15z" fill="#E68A20"/><path d="M32 30c0-9 6-15 15-15 0 9-6 15-15 15z" fill="#FADFD0"/><circle cx="32" cy="13" r="4" fill="#D4512A"/></svg>"""
 
 
 def png_icon(size):
     """Rasteriza el icono de la planta (mismo dibujo que icon.svg) a PNG RGBA, solo con stdlib."""
-    bg = (0x3D, 0x6B, 0x4F); paper = (0xF6, 0xF1, 0xE7); soft = (0xDD, 0xE9, 0xDA); bloom = (0xE2, 0x9A, 0xB2)
+    bg = (0x44, 0x66, 0x50); paper = (0xFA, 0xDF, 0xD0); soft = (0xE6, 0x8A, 0x20); bloom = (0xD4, 0x51, 0x2A)
     ss = 3  # supermuestreo para bordes suaves
     k = 64.0 / size
 
@@ -213,8 +213,8 @@ def main():
             "start_url": "./",
             "scope": "./",
             "display": "standalone",
-            "background_color": "#F6F1E7",
-            "theme_color": "#3D6B4F",
+            "background_color": "#FADFD0",
+            "theme_color": "#446650",
             "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"},
                       {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
                       {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}],

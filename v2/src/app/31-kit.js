@@ -19,44 +19,46 @@
   K.STAGE_NAMES = ['Semilla', 'Brote', 'Hojas', 'Capullo', 'Flor'];
   K.plant = function (stage, size, label) {
     size = size || 140;
-    var h = [12, 34, 60, 82, 92][stage];
-    var top = 118 - h;
     var parts = [];
-    // Medallón arqueado sutil y halo botánico editorial
-    parts.push('<rect class="pl-frame" x="10" y="6" width="100" height="128" rx="50"/>');
-    parts.push('<circle class="pl-halo" cx="60" cy="64" r="34"/>');
-    parts.push('<path class="pl-ground" d="M26 120 Q60 115 94 120"/>');
-    parts.push('<path class="pl-soil" d="M38 120 Q60 111 82 120Z"/>');
+    // Mancha orgánica salvia piedra + lazo botánico eucalipto (collage portada Isabel Caparra)
+    parts.push('<path class="pl-blob" d="M36 22 C49 16, 67 25, 76 34 C86 43, 82 55, 68 58 C78 66, 75 84, 62 91 C48 98, 34 86, 36 70 C24 67, 22 52, 32 46 C27 36, 28 26, 36 22Z"/>');
+    parts.push('<path class="pl-loop" d="M52 80 C68 62, 95 66, 98 88 C100 109, 77 124, 58 119 C43 116, 38 96, 52 80Z"/>');
+    // Base de semillas canela (siempre visible, crece con el avance)
+    parts.push('<path class="pl-cinnamon" d="M24 112 C21 107, 27 102, 30 106 C32 110, 27 115, 24 112Z"/>');
+    parts.push('<path class="pl-cinnamon" d="M35 120 C32 115, 38 110, 41 114 C43 118, 38 123, 35 120Z"/>');
+    parts.push('<ellipse class="pl-euca" cx="22" cy="100" rx="4" ry="1.5" transform="rotate(-14 22 100)"/>');
     if (stage === 0) {
-      parts.push('<path class="pl-seed" d="M53 116 C53 110, 62 108, 67 113 C67 118, 57 120, 53 116Z"/>');
-      parts.push('<path class="pl-stem" d="M61 111 C62 106, 60 101, 63 97"/>');
-    } else {
-      parts.push('<path class="pl-stem" d="M60 116 C57 ' + (116 - h * .35) + ', 64 ' + (116 - h * .7) + ', 60 ' + top + '"/>');
-      if (stage === 1) {
-        parts.push('<path class="pl-leaf" d="M60 ' + (top + 6) + ' C55 ' + (top - 3) + ', 44 ' + (top - 5) + ', 40 ' + (top + 1) + ' C45 ' + (top + 7) + ', 54 ' + (top + 9) + ', 60 ' + (top + 6) + 'Z"/>');
-        parts.push('<path class="pl-vein" d="M58 ' + (top + 5) + ' Q50 ' + (top + 2) + ' 44 ' + (top + 2) + '"/>');
-        parts.push('<path class="pl-leaf" d="M60 ' + (top + 3) + ' C65 ' + (top - 6) + ', 76 ' + (top - 8) + ', 80 ' + (top - 2) + ' C75 ' + (top + 4) + ', 66 ' + (top + 6) + ', 60 ' + (top + 3) + 'Z"/>');
-        parts.push('<path class="pl-vein" d="M62 ' + (top + 2) + ' Q70 ' + (top - 1) + ' 76 ' + (top - 1) + '"/>');
-      }
-      var leaves = [0, 0, 4, 6, 6][stage];
-      for (var i = 0; i < leaves; i++) {
-        var y = 110 - (i + 1) * (h - 14) / (leaves + 1);
-        var s = 0.96 - i * 0.08;
-        var left = i % 2 === 0;
-        parts.push('<path class="pl-leaf" transform="translate(60 ' + y.toFixed(1) + ') scale(' + (left ? -s : s) + ' ' + s + ')" d="M0 0 C5 -12, 18 -16, 28 -11 C23 0, 11 5, 0 0Z"/>');
-        parts.push('<path class="pl-vein" transform="translate(60 ' + y.toFixed(1) + ') scale(' + (left ? -s : s) + ' ' + s + ')" d="M2 -1 Q14 -6 23 -9"/>');
-      }
-      if (stage === 3) {
-        parts.push('<path class="pl-bud" d="M60 ' + (top - 14) + ' C53 ' + (top - 8) + ', 53 ' + (top + 1) + ', 60 ' + (top + 2) + ' C67 ' + (top + 1) + ', 67 ' + (top - 8) + ', 60 ' + (top - 14) + 'Z"/>');
-        parts.push('<path class="pl-sepal" d="M54 ' + (top + 1) + ' Q60 ' + (top - 4) + ' 66 ' + (top + 1) + '"/>');
-      }
-      if (stage === 4) {
-        var cy = top - 11;
-        for (var k = 0; k < 5; k++) {
-          parts.push('<path class="pl-petal" transform="rotate(' + (k * 72) + ' 60 ' + cy + ')" d="M60 ' + cy + ' C54 ' + (cy - 6) + ', 54 ' + (cy - 16) + ', 60 ' + (cy - 18) + ' C66 ' + (cy - 16) + ', 66 ' + (cy - 6) + ', 60 ' + cy + 'Z"/>');
-        }
-        parts.push('<circle class="pl-heart" cx="60" cy="' + cy + '" r="4.2"/>');
-      }
+      parts.push('<path class="pl-cinnamon" d="M56 105 C52 98, 63 93, 68 100 C71 106, 61 111, 56 105Z"/>');
+      parts.push('<path class="pl-euca" d="M63 97 C64 91, 69 87, 73 88 C71 94, 67 98, 63 97Z"/>');
+    }
+    if (stage >= 1) {
+      // Cintas curvas mandarina/ocre
+      parts.push('<path class="pl-amber" d="M38 58 C45 55, 51 67, 57 83 C63 98, 72 108, 79 112 C74 116, 62 110, 53 96 C44 82, 36 65, 38 58Z"/>');
+      parts.push('<path class="pl-amber" d="M49 54 C56 52, 62 64, 68 79 C74 93, 83 102, 90 105 C85 109, 73 103, 64 90 C55 76, 47 61, 49 54Z"/>');
+    }
+    if (stage >= 2) {
+      // Hojas lanceoladas color canela
+      parts.push('<path class="pl-cinnamon" d="M62 60 C60 46, 62 35, 67 27 C69 39, 69 50, 62 60Z"/>');
+      parts.push('<path class="pl-cinnamon" d="M68 62 C70 46, 76 34, 86 24 C84 38, 77 52, 68 62Z"/>');
+      parts.push('<path class="pl-cinnamon" d="M72 67 C77 54, 85 45, 95 39 C90 52, 82 61, 72 67Z"/>');
+    }
+    if (stage >= 3) {
+      // Primer fruto terracota + hojas verde eucalipto
+      parts.push('<path class="pl-euca" d="M84 58 C78 51, 78 41, 84 36 C90 42, 90 52, 84 58Z"/>');
+      parts.push('<path class="pl-euca" d="M87 58 C93 52, 102 52, 106 58 C99 63, 91 63, 87 58Z"/>');
+      parts.push('<path class="pl-berry" d="M76 62 C82 56, 94 58, 96 68 C97 79, 88 89, 78 86 C71 84, 70 69, 76 62Z"/>');
+      parts.push('<circle class="pl-speck" cx="81" cy="70" r="2.1"/>');
+      parts.push('<circle class="pl-speck" cx="87" cy="78" r="1.9"/>');
+    }
+    if (stage >= 4) {
+      // Racimo completo de frutos terracota y follaje eucalipto
+      parts.push('<path class="pl-euca" d="M98 46 C96 39, 101 32, 108 32 C107 40, 104 45, 98 46Z"/>');
+      parts.push('<path class="pl-berry" d="M92 48 C100 44, 111 49, 111 59 C110 68, 100 72, 92 67 C86 63, 87 51, 92 48Z"/>');
+      parts.push('<circle class="pl-speck" cx="98" cy="56" r="2"/>');
+      parts.push('<path class="pl-euca" d="M100 72 C95 66, 97 59, 104 59 C106 65, 105 70, 100 72Z"/>');
+      parts.push('<path class="pl-berry" d="M93 73 C101 70, 111 76, 110 86 C109 96, 98 100, 91 93 C86 87, 87 76, 93 73Z"/>');
+      parts.push('<circle class="pl-speck" cx="98" cy="83" r="2"/>');
+      parts.push('<circle class="pl-speck" cx="104" cy="89" r="1.8"/>');
     }
     return '<svg class="plant stage-' + stage + '" viewBox="0 0 120 140" width="' + size + '" height="' + Math.round(size * 140 / 120) + '" role="img" aria-label="' + esc(label || ('Tu planta: ' + K.STAGE_NAMES[stage])) + '">' + parts.join('') + '</svg>';
   };
