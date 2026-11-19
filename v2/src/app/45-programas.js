@@ -25,14 +25,14 @@
       return '<a class="rcard prog-card" href="#/programas/' + encodeURIComponent(x.id) + '"><span class="rc-cat">' + (own ? 'Programa propio' : x.season ? 'Para ' + esc((SEASONS[x.season] || x.season).toLowerCase()) : 'Programa') + '</span><h3>' + esc(x.name) + '</h3><span class="meta">' + esc(x.subtitle || '') + '</span>' +
         '<span class="rc-meta">' + I('calendario', 'sm') + U.plural(x.days, 'día') + ' · ' + U.plural(U.arr(x.habits).length, 'hábito') + '</span><span class="rc-tags">' + (active ? '<span class="tag bloom">' + I('planta', 'sm') + 'En curso</span>' : '') + (x.season === now ? '<span class="tag accent">De esta estación</span>' : '') + '</span></a>';
     }).join('');
-    return '<header class="page-h"><h1>Programas</h1><p>Cada vez que empezás uno se guarda como una edición nueva, con su historial.</p></header>' +
+    return K.crumb() + '<header class="page-h"><h1>Programas</h1><p>Cada vez que empezás uno se guarda como una edición nueva, con su historial.</p></header>' +
       '<div class="grid-cards">' + cards + '</div>' +
       '<div class="btn-row mt"><a class="btn" href="#/programas/nuevo">' + I('mas', 'sm') + 'Crear programa propio</a><button class="btn ghost" data-action="importProgram">' + I('subir', 'sm') + 'Importar programa</button></div>';
   }
 
   function detail(id) {
     var p = A.P(), x = L.program(id, p);
-    if (!x) return K.back('#/programas', 'Programas') + K.empty('No encontramos ese programa', '', '<a class="btn" href="#/programas">Ver programas</a>');
+    if (!x) return K.back('#/programas', 'Programas') + K.empty('No encontramos ese programa', '', '<a class="btn" href="#/programas">Ver programas</a>', 'h1');
     var own = String(x.id).indexOf('my-') === 0;
     var ed = A.ED();
     var active = ed && ed.programId === x.id && (ed.status === 'active' || ed.status === 'planned');

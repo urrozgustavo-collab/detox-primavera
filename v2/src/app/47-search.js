@@ -35,12 +35,12 @@
     var m = function (txt) { return U.matchQuery(txt, q); };
     var add = function (group, label, meta, go) { out.push({ group: group, label: label, meta: meta, go: go }); };
     L.allRecipes(p).forEach(function (r) { if (m(r.title + ' ' + U.arr(r.ingredients).map(function (i) { return i.text; }).join(' ') + ' ' + (r.tags || []).join(' '))) add('Recetas', r.title, L.categoryLabel(r.category), nav('/cocina/receta/' + r.id)); });
-    U.arr(dx.foods).forEach(function (f) { if (m([f.name, f.category].concat(f.synonyms || []).join(' '))) add('¿Puedo comer…?', f.name, L.statusLabel(f.status), nav('/guia/semaforo', 'f-' + f.id, function () { A.ui.fdq = ''; A.ui.fdst = ''; })); });
+    U.arr(dx.foods).forEach(function (f) { if (m([f.name, f.category].concat(f.synonyms || []).join(' '))) add('¿Puedo comer…?', f.name, L.statusLabel(f.status), nav('/guia/semaforo', 'f-' + f.id, function () { A.ui.fdq = ''; A.ui.fdst = ''; A.ui.foodOpen = f.id; })); });
     U.arr(dx.ingredients).forEach(function (g) { if (m([g.name].concat(g.synonyms || []).join(' '))) add('Ingredientes', g.name, 'Ver en la heladera', nav('/cocina/heladera', null, function () { A.ui.fq = g.name; A.ui.fcat = ''; })); });
     U.arr(dx.sos).forEach(function (s) { if (m(s.symptom + ' ' + (s.cause || '') + ' ' + U.arr(s.steps).map(function (x) { return x.text; }).join(' '))) add('SOS', s.symptom, 'Protocolo', nav('/guia/sos/' + s.id)); });
     U.arr(dx.herbs).forEach(function (h) { if (m(h.name + ' ' + U.arr(h.properties).join(' '))) add('Herbario', h.name, 'Ficha', nav('/guia/herbario/' + h.id)); });
     var prog = A.PROG();
-    if (prog) U.arr(prog.habits).concat(U.arr(prog.prepHabits)).forEach(function (h) { if (m(h.text + ' ' + (h.tip || ''))) add('Hábitos', h.text, 'En Hoy', nav('/hoy', 'h-habitos')); });
+    if (prog) U.arr(prog.habits).concat(U.arr(prog.prepHabits)).forEach(function (h) { if (m(h.text + ' ' + (h.tip || ''))) add('Hábitos', h.text, 'En Hoy', nav('/hoy', 'h-habitos', function () { A.ui.allHabits = true; })); });
     U.arr(dx.shopping).forEach(function (s) { if (m(s.item)) add('Compras', s.item, L.storeLabel(s.store), nav('/compras/base', 'sh-' + s.id, function () { A.ui.shopStore = null; A.ui.hideBought = false; A.ui.onlyEss = false; })); });
     p.shopping.custom.forEach(function (c) { if (!c.deleted && m(c.text)) add('Compras', c.text, 'Tu lista', nav('/compras', 'sh-' + c.id, function () { A.ui.shopStore = null; A.ui.hideBought = false; })); });
     Object.keys(p.editions).forEach(function (eid) {
@@ -48,7 +48,7 @@
       var days = p.days[eid] || {};
       Object.keys(days).forEach(function (k) {
         var c = days[k].checkin;
-        if (c && c.notes && m(c.notes)) { var iso = L.dayDate(e, +k); add('Diario', (+k === 0 ? 'Preparación' : 'Día ' + k) + ' · ' + U.fmtDate(iso, 'short'), String(c.notes).slice(0, 80), eid === p.activeEdition ? nav('/hoy/' + iso, 'h-checkin') : nav('/progreso/edicion/' + eid)); }
+        if (c && c.notes && m(c.notes)) { var iso = L.dayDate(e, +k); add('Diario', (+k === 0 ? 'Preparación' : 'Día ' + k) + ' · ' + U.fmtDate(iso, 'short'), String(c.notes).slice(0, 80), eid === p.activeEdition ? nav('/hoy/' + iso, null, function () { A.ui.afterRoute = function () { A.openLive('checkin', { focus: '#checkin-notes' }); }; }) : nav('/progreso/edicion/' + eid)); }
       });
     });
     return out;
@@ -72,7 +72,7 @@
 
   /* ================= onboarding (≤ 4 pasos, salteable) ================= */
   A.onboarding = function (report) {
-    A.ui.onb = { step: 1, report: report && report.migrated ? report : null, prog: 'detox-primavera-21', date: A.today(), mode: null };
+    A.ui.onb = { step: 1, report: report && report.migrated ? report : null, prog: 'detox-primavera-21', date: null, mode: null };  // v2.3: sin fecha preelegida; «Después» no crea edición
     paintOnb();
   };
   function onbBody() {

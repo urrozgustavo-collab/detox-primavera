@@ -92,9 +92,13 @@
       var h1 = document.querySelector('#main h1') || document.getElementById('main');
       if (!h1.hasAttribute('tabindex')) h1.setAttribute('tabindex', '-1');
       if (A.booted && !A.anyDialogOpen()) h1.focus({ preventScroll: true });
-      var target = A.ui.scrollTo; A.ui.scrollTo = null;
-      if (target) setTimeout(function () { var el = document.getElementById(target); if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); setTimeout(function () { el.classList.remove('flash'); }, 1600); } }, 30);
     }
+    // El destino de la búsqueda se resalta aunque ya estuvieras en esa pantalla.
+    var target = A.ui.scrollTo; A.ui.scrollTo = null;
+    if (target) setTimeout(function () { var el = document.getElementById(target); if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); if (el.hasAttribute('tabindex')) try { el.focus({ preventScroll: true }); } catch (e) { /* nada */ } setTimeout(function () { el.classList.remove('flash'); }, 1600); } }, 30);
+    // Algo que hacer después de llegar (p. ej. abrir la hoja del registro desde la búsqueda).
+    var after = A.ui.afterRoute; A.ui.afterRoute = null;
+    if (after) setTimeout(function () { try { after(); } catch (e) { console.error(e); } }, 40);
   }
   root.addEventListener('hashchange', onRoute);
 
@@ -126,15 +130,20 @@
     var prog = A.PROG();
     document.documentElement.setAttribute('data-program-theme', (prog && prog.theme) || 'primavera');
     var h1 = main.querySelector('h1');
-    var names = { hoy: 'Hoy', cocina: 'Cocina', compras: 'Compras', guia: 'Guía', progreso: 'Progreso', programas: 'Programas', ajustes: 'Ajustes' };
-    var t = names[A.route.name] || '';
-    if (h1 && A.route.parts.length && h1.textContent.trim() !== t) t = h1.textContent.trim() + ' · ' + t;
-    document.title = (t ? t + ' · ' : '') + 'Detox de Primavera';
+    var names = { hoy: 'Hoy', cocina: 'Cocina', compras: 'Compras', guia: 'Guía', progreso: 'Progreso', programas: 'Programas', ajustes: 'Ajustes', vos: 'Vos' };
+    var bits = [], h1t = h1 ? h1.textContent.trim() : '';
+    if (h1t && A.route.parts.length && A.route.name !== 'vos' && h1t.length <= 60) bits.push(h1t);
+    if (names[A.route.name] && bits.indexOf(names[A.route.name]) < 0) bits.push(names[A.route.name]);
+    if (bits.indexOf('Detox de Primavera') < 0) bits.push('Detox de Primavera');
+    document.title = bits.join(' · ');
     A.markOverflow(main);
+    // La pestaña de texto activa queda a la vista aunque la fila se desplace.
+    main.querySelectorAll('.tabs-t').forEach(function (nav) { var on = nav.querySelector('[aria-current="page"]'); if (on && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = Math.max(0, on.offsetLeft - 24); });
+    A.repaintLive();
   };
   /* Pista de que una fila de chips o pestañas sigue hacia la derecha (difuminado del borde). */
   A.markOverflow = function (root) {
-    (root || document).querySelectorAll('.seg, .chips.scroll').forEach(function (el) {
+    (root || document).querySelectorAll('.seg, .chips.scroll, .tabs-t').forEach(function (el) {
       var more = el.scrollWidth > el.clientWidth + 2;
       el.classList.toggle('overflowing', more && el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
       if (more && !el.dataset.ovl) { el.dataset.ovl = 1; el.addEventListener('scroll', function () { el.classList.toggle('overflowing', el.scrollLeft + el.clientWidth < el.scrollWidth - 2); }, { passive: true }); }
@@ -148,30 +157,36 @@
     document.querySelectorAll('[data-part="' + name + '"]').forEach(function (el) { el.innerHTML = scr.parts[name](A.route, el); });
   };
 
-  /* ================= cromo: cabecera, riel, barra ================= */
+  /* ================= cromo: cabecera y cápsula de 3 destinos (v2.3 «Un paso a la vez») ================= */
   A.icon = function (name, cls) { return '<svg class="i' + (cls ? ' ' + cls : '') + '" aria-hidden="true"><use href="#i-' + name + '"/></svg>'; };
-  var NAV = [['hoy', 'Hoy', 'hoy'], ['cocina', 'Cocina', 'cocina'], ['compras', 'Compras', 'compras'], ['guia', 'Guía', 'guia'], ['progreso', 'Progreso', 'progreso']];
+  var NAV = [['hoy', 'Hoy', 'hoy'], ['cocina', 'Cocina', 'cocina'], ['vos', 'Vos', 'persona']];
+  /* Todas las rutas viejas siguen vivas; solo cambia a qué pestaña pertenecen. */
+  A.tabOf = function (name) {
+    if (name === 'hoy') return 'hoy';
+    if (name === 'cocina' || name === 'compras') return 'cocina';
+    return 'vos';   // vos, progreso, guia, programas, ajustes
+  };
   A.isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+  var wideMq = root.matchMedia ? root.matchMedia('(min-width: 960px)') : null;
+  A.isWide = function () { return !!(wideMq && wideMq.matches); };
+  if (wideMq) try { wideMq.addEventListener('change', function () { if (A.state) A.render(); }); } catch (e) { /* navegadores viejos */ }
   A.renderChrome = function () {
-    var p = A.P(), ed = A.ED(), prog = A.PROG(), r = A.route.name;
-    var badge = A.shoppingBadge ? A.shoppingBadge() : 0;
-    var bHtml = badge ? '<span class="badge" aria-label="' + badge + ' pendientes">' + (badge > 99 ? '99+' : badge) + '</span>' : '';
-    var tab = NAV.map(function (n) {
-      return '<a href="#/' + n[0] + '"' + (r === n[0] ? ' aria-current="page"' : '') + '>' + A.icon(n[2]) + '<span>' + n[1] + '</span>' + (n[0] === 'compras' ? bHtml : '') + '</a>';
-    }).join('');
-    document.getElementById('tabbar').innerHTML = tab;
-    var rail = '<a class="brand" href="#/hoy">' + A.plantMark(36) + '<span><b>' + esc(prog ? prog.name : 'Detox de Primavera') + '</b><small class="meta">' + esc(A.dayLabel()) + '</small></span></a>' +
-      NAV.concat([['programas', 'Programas', 'flor'], ['ajustes', 'Ajustes', 'ajustes']]).map(function (n, i) {
-        return (i === 5 ? '<div class="sep"></div>' : '') + '<a class="nav" href="#/' + n[0] + '"' + (r === n[0] ? ' aria-current="page"' : '') + '>' + A.icon(n[2]) + '<span>' + n[1] + '</span>' + (n[0] === 'compras' ? bHtml : '') + '</a>';
-      }).join('') +
-      '<button class="nav-search btn ghost" data-action="openSearch" style="justify-content:flex-start;margin-top:8px">' + A.icon('buscar') + 'Buscar <kbd class="meta" style="margin-left:auto">' + (A.isMac ? '⌘K' : 'Ctrl K') + '</kbd></button>' +
-      '<div class="foot">v' + esc(A.version) + (p ? ' · ' + esc(p.name || 'Sin nombre') : '') + '</div>';
-    document.getElementById('rail').innerHTML = rail;
+    var p = A.P(), prog = A.PROG(), tab = A.tabOf(A.route.name);
+    document.body.setAttribute('data-tab', tab);
+    var links = function (cls) {
+      return NAV.map(function (n) {
+        return '<a class="' + cls + '" href="#/' + n[0] + '"' + (tab === n[0] ? ' aria-current="page"' : '') + '>' + A.icon(n[2]) + '<span>' + n[1] + '</span></a>';
+      }).join('');
+    };
+    document.getElementById('tabbar').innerHTML = links('dock-a');
     var sync = A.Sync ? A.Sync.indicator() : '';
+    var kb = A.isMac ? '⌘K' : 'Ctrl K';
     document.getElementById('topbar').innerHTML =
-      '<div class="title"><b>' + esc(prog ? prog.name : 'Detox de Primavera') + '</b><span>' + esc(A.dayLabel()) + '</span></div>' + sync +
-      '<button class="icon-btn" data-action="openSearch" aria-label="Buscar (' + (A.isMac ? '⌘K' : 'Ctrl+K') + ')">' + A.icon('buscar') + '</button>' +
-      '<button class="icon-btn avatar-btn" data-action="openProfileSheet" aria-label="Perfil, programas y ajustes">' + A.avatar(p, 34) + '</button>';
+      '<div class="title"><b>' + esc(prog ? prog.name : 'Detox de Primavera') + '</b><span>' + esc(A.dayLabel()) + '</span></div>' +
+      '<nav class="topnav" aria-label="Secciones">' + links('top-a') + '</nav>' +
+      '<div class="top-r">' + sync +
+      '<button class="search-btn" data-action="openSearch" aria-label="Buscar (' + kb + ')">' + A.icon('buscar') + '<span class="lbl" aria-hidden="true">Buscar</span><kbd aria-hidden="true">' + kb + '</kbd></button>' +
+      '<button class="icon-btn avatar-btn" data-action="openProfileSheet" aria-label="Persona, tema, programas y ajustes">' + A.avatar(p, 32) + '</button></div>';
   };
   A.avatar = function (p, size) {
     size = size || 34;
@@ -260,6 +275,7 @@
       (o.headExtra || '') + '<button class="icon-btn" data-action="closeDialog" data-dlg="' + id + '" aria-label="Cerrar">' + A.icon('cerrar') + '</button></div>' +
       '<div class="sheet-b">' + (o.body || '') + '</div>' + (o.foot ? '<div class="sheet-f">' + o.foot + '</div>' : '');
     d.className = 'sheet' + (o.cls ? ' ' + o.cls : '');
+    delete d.dataset.live;
     var opener = prevRet || document.activeElement;
     dlgState[id] = { onClose: o.onClose, ret: opener, sel: prevSel || selectorFor(opener) };
     d.showModal();
@@ -277,6 +293,7 @@
     var d = document.getElementById(id);
     d.addEventListener('close', function () {
       if (d.open) return;   // se volvió a abrir con otro contenido antes de que llegara el evento
+      delete d.dataset.live;
       var st = dlgState[id] || {}; dlgState[id] = null;
       st.onClose && st.onClose();
       var back = st.ret && st.ret.isConnected ? st.ret : (st.sel ? document.querySelector(st.sel) : null);
@@ -290,9 +307,50 @@
     if (el.id) return '#' + CSS.escape(el.id);
     var a = el.getAttribute('data-action'); if (!a) return null;
     var sel = '[data-action="' + a + '"]';
-    ['data-r', 'data-p', 'data-slot', 'data-d', 'data-s', 'data-id', 'data-e'].forEach(function (k) { var v = el.getAttribute(k); if (v != null) sel += '[' + k + '="' + CSS.escape(v) + '"]'; });
+    ['data-r', 'data-p', 'data-slot', 'data-d', 'data-s', 'data-id', 'data-e', 'data-f', 'data-v', 'data-ml', 'data-h', 'data-k'].forEach(function (k) { var v = el.getAttribute(k); if (v != null) sel += '[' + k + '="' + CSS.escape(v) + '"]'; });
     return sel;
   }
+  /* Hoja secundaria: si ya hay una abierta, la nueva va encima (sheet2). */
+  A.sheetId = function () { var s = document.getElementById('sheet'); return s && s.open ? 'sheet2' : 'sheet'; };
+  /* Cierra el diálogo que contiene el elemento, salvo que sea una hoja «viva» (se repinta sola). */
+  A.closeOwn = function (el) { var d = el && el.closest ? el.closest('dialog') : null; if (d && d.open && !d.dataset.live) d.close(); };
+
+  /* Hojas «vivas»: su cuerpo se vuelve a pintar en cada render (agua, comidas, registro…).
+     A.live[tipo] = { title: texto|fn, body: fn → html (null = cerrar), foot: fn } */
+  A.live = {};
+  A.openLive = function (kind, o) {
+    var def = A.live[kind]; if (!def) return null;
+    var body = def.body(); if (body == null) return null;
+    var d = A.openSheet({ id: 'sheet', title: typeof def.title === 'function' ? def.title() : def.title, body: body, foot: def.foot ? def.foot() : '', cls: 'live live-' + kind, focus: o && o.focus });
+    d.dataset.live = kind;
+    return d;
+  };
+  A.repaintLive = function () {
+    var d = document.getElementById('sheet');
+    if (!d || !d.open || !d.dataset.live) return;
+    var def = A.live[d.dataset.live]; if (!def) return;
+    var html = def.body();
+    if (html == null) { d.close(); return; }
+    var b = d.querySelector('.sheet-b'); if (!b) return;
+    var act = document.activeElement, fk = null, sel = null;
+    if (act && b.contains(act)) {
+      fk = act.id ? '#' + CSS.escape(act.id) : selectorFor(act);
+      try { if (act.selectionStart != null) sel = [act.selectionStart, act.selectionEnd]; } catch (e) { /* sin selección */ }
+    }
+    var st = b.scrollTop;
+    b.innerHTML = html;
+    b.scrollTop = st;
+    if (fk) { var el = b.querySelector(fk); if (el) { el.focus({ preventScroll: true }); if (sel && el.setSelectionRange) try { el.setSelectionRange(sel[0], sel[1]); } catch (e) { /* nada */ } } }
+    A.markOverflow(b);
+  };
+  A.actions.openLive = function (el) { A.openLive(el.dataset.k); };
+  /* Anuncio para lectores de pantalla (región aria-live fija, fuera de lo que se repinta). */
+  A.announce = function (msg) {
+    var el = document.getElementById('sr-live'); if (!el) return;
+    el.textContent = '';
+    setTimeout(function () { el.textContent = msg; }, 60);
+  };
+
   /* Confirmación accesible (no confirm()). typed: palabra que hay que escribir. */
   A.confirm = function (o) {
     return new Promise(function (resolve) {

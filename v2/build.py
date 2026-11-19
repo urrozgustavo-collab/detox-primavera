@@ -22,7 +22,7 @@ import struct
 import sys
 from pathlib import Path
 
-VERSION = "2.2.0"
+VERSION = "2.3.0"
 NL = chr(10)
 V2 = Path(__file__).resolve().parent
 ROOT = V2.parent

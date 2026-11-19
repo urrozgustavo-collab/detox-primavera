@@ -55,8 +55,8 @@
       groups = groups.filter(function (g) { return g.items.length; });
       var pending = items.filter(function (x) { return !done(p, x) && !x.have; }).length;
       var r = range();
-      var h = ['<header class="page-h"><h1>Compras</h1></header>'];
-      h.push('<nav class="seg subnav" aria-label="Listas"><a href="#/compras"' + (view === 'semana' ? ' aria-current="page"' : '') + '>Para esta semana</a><a href="#/compras/base"' + (view === 'base' ? ' aria-current="page"' : '') + '>Lista base del programa</a></nav>');
+      var h = [A.cocinaHead ? A.cocinaHead('compras') : '<header class="page-h"><h1>Compras</h1></header>'];
+      h.push('<nav class="seg" aria-label="Listas"><a href="#/compras"' + (view === 'semana' ? ' aria-current="page"' : '') + '>Para esta semana</a><a href="#/compras/base"' + (view === 'base' ? ' aria-current="page"' : '') + '>Lista base del programa</a></nav>');
       var stores = groups.map(function (g) { return g.id; });
       var tcard = ['<section class="toolbar-card mt-s">'];
       if (view === 'semana') {

@@ -3,20 +3,67 @@
   'use strict';
   if (typeof document === 'undefined') return;
   var A = root.DXApp, U = A.util, L = A.logic, K = A.kit, esc = U.esc, I = A.icon;
-  var TABS = [['#/cocina/recetas', 'recetas', 'Recetas'], ['#/cocina/heladera', 'heladera', 'Heladera'], ['#/cocina/plan', 'plan', 'Plan'], ['#/cocina/batch', 'batch', 'Batch'], ['#/cocina/remojos', 'remojos', 'Remojos'], ['#/cocina/metodos', 'metodos', 'Métodos']];
+  /* v2.3: Cocina reúne recetas, plan, compras, heladera, batch y remojos, y métodos (pestañas de texto arriba). */
+  /* Celular: Recetas · Plan · Compras · Heladera · «Más» (Batch y remojos, Métodos). Computadora: las seis. */
+  var MORE = [['#/cocina/batch', 'batch', 'Batch y remojos', 'frasco', 'Bases para la semana y qué poner en remojo'], ['#/cocina/metodos', 'metodos', 'Métodos', 'olla', 'Cómo cocinar y cocción de granos']];
+  A.cocinaNav = function (cur) {
+    var b = A.shoppingBadge ? A.shoppingBadge() : 0;
+    var badge = b ? '<span class="badge" aria-label="' + U.plural(b, 'pendiente') + '">' + (b > 99 ? '99+' : b) + '</span>' : '';
+    var main = [['#/cocina/recetas', 'recetas', 'Recetas'], ['#/cocina/plan', 'plan', 'Plan'], ['#/compras', 'compras', 'Compras', badge], ['#/cocina/heladera', 'heladera', 'Heladera']];
+    if (A.isWide()) return K.tabs(main.concat(MORE.map(function (m) { return m.slice(0, 3); })), cur, 'Secciones de cocina');
+    var inMore = MORE.filter(function (m) { return m[1] === cur; })[0];
+    var more = '<button class="tab-more" data-action="cocinaMore" aria-haspopup="dialog"' + (inMore ? ' aria-current="page"' : '') + '>' + esc(inMore ? inMore[2] : 'Más') + I('abajo', 'sm') + '</button>';
+    return K.tabs(main, cur, 'Secciones de cocina').replace(/<\/nav>$/, more + '</nav>');
+  };
+  A.actions.cocinaMore = function () {
+    A.openSheet({ title: 'Más en Cocina', body: '<ul class="list">' + MORE.map(function (m) {
+      return '<li><a class="qlink" href="' + m[0] + '">' + I(m[3]) + '<span class="grow"><b>' + esc(m[2]) + '</b><small>' + esc(m[4]) + '</small></span>' + I('chev', 'sm chev') + '</a></li>';
+    }).join('') + '<li><a class="qlink" href="#/cocina/nueva">' + I('mas') + '<span class="grow"><b>Receta propia</b><small>Escribí una receta tuya</small></span>' + I('chev', 'sm chev') + '</a></li></ul>' });
+  };
+  A.cocinaHead = function (cur) { return '<header class="page-h"><h1>Cocina</h1></header>' + A.cocinaNav(cur); };
   var MEAL_TIME = { desayuno: '08:00', almuerzo: '13:00', merienda: '17:00', cena: '21:00' };
 
   A.screens.cocina = {
     render: function (route) {
       var sub = route.parts[0] || 'recetas';
-      if (sub === 'receta') return detail(route.parts[1]);
       if (sub === 'nueva' || sub === 'editar') return recipeForm(route.parts[1], sub === 'nueva' ? route.parts[1] : null);
-      var head = '<header class="page-h"><h1>Cocina</h1></header>' + K.tabs(TABS, sub, 'Secciones de cocina');
+      // Computadora: lista y receta abierta lado a lado. Celular: la receta tiene su propia pantalla.
+      if (sub === 'receta' && !A.isWide()) return detail(route.parts[1]);
+      if (sub === 'receta' || (sub === 'recetas' && A.isWide())) return A.cocinaHead('recetas') + split(route.parts[1]);
+      var cur = sub === 'remojos' ? 'batch' : sub;
       var body = ({ recetas: recipes, heladera: fridge, plan: plan, batch: batch, remojos: soaks, metodos: methods })[sub] || recipes;
-      return head + body();
+      if (sub === 'batch' || sub === 'remojos') body = prepWrap(sub, body);
+      return A.cocinaHead(({ recetas: 1, heladera: 1, plan: 1, batch: 1, remojos: 1, metodos: 1 })[sub] ? cur : 'recetas') + body();
+    },
+    mount: function (main) {
+      // Computadora: solo la lista hace scroll; buscador y filtros quedan siempre a la vista arriba.
+      var list = main.querySelector('.ks-scroll');
+      if (!list) return;
+      list.scrollTop = A.ui.ksScroll || 0;
+      var on = list.querySelector('[aria-current="page"]');
+      if (on && (on.offsetTop < list.scrollTop || on.offsetTop + on.offsetHeight > list.scrollTop + list.clientHeight)) list.scrollTop = Math.max(0, on.offsetTop - Math.round(list.clientHeight / 3));
+      A.ui.ksScroll = list.scrollTop;
+      list.addEventListener('scroll', function () { A.ui.ksScroll = list.scrollTop; }, { passive: true });
     },
     parts: { rlist: function () { return recipeList(); }, fing: function () { return fridgeIngredients(); } }
   };
+  /* Batch y remojos comparten pestaña: un selector tranquilo entre las dos vistas. */
+  function prepWrap(sub, body) {
+    return function () {
+      return '<nav class="seg" aria-label="Batch o remojos"><a href="#/cocina/batch"' + (sub === 'batch' ? ' aria-current="page"' : '') + '>Bases para la semana</a><a href="#/cocina/remojos"' + (sub === 'remojos' ? ' aria-current="page"' : '') + '>Remojos</a></nav><div class="mt">' + body() + '</div>';
+    };
+  }
+  /* Vista partida (≥ 960 px): lista a la izquierda, receta a la derecha. */
+  function split(id) {
+    var p = A.P();
+    if (!id || !L.recipe(id, p)) {
+      var last = A.ui.lastRecipe && L.recipe(A.ui.lastRecipe, p) ? A.ui.lastRecipe : null;
+      var first = filteredRecipes()[0];
+      id = last || (first && first.id) || null;
+    }
+    A.ui.openRecipe = id;
+    return '<div class="kitchen"><div class="ks-list"><div class="ks-head">' + recipeTools() + '</div><div class="ks-scroll" data-part="rlist">' + recipeList() + '</div></div><div class="ks-detail">' + (id ? detail(id) : K.empty('Elegí una receta', 'La vas a ver acá, al lado de la lista.', '')) + '</div></div>';
+  }
 
   /* ================= recetas ================= */
   var FILTERS = [['hoy', 'Aptas para hoy'], ['safe', 'Aptas para mí'], ['fav', 'Favoritas'], ['quick', 'Rápidas (≤ 20 min)'], ['own', 'Propias']];
@@ -49,31 +96,48 @@
     else if (sort === 'time') list.sort(function (a, b) { return ((a.time && a.time.total) || 999) - ((b.time && b.time.total) || 999); });
     else {
       var ed = A.ED(); var use = ed ? L.recipeUsage(p, ed.id) : {};
+      var hit = {};
+      list.forEach(function (r) { hit[r.id] = L.recipeAllergyHits(r, p).any ? 1 : 0; });
       list.sort(function (a, b) {
         var fa = recipeFits(a, ph) ? 0 : 1, fb = recipeFits(b, ph) ? 0 : 1;
+        if (hit[a.id] !== hit[b.id]) return hit[a.id] - hit[b.id];
         var ua = (use[a.id] || { count: 0 }).count, ub = (use[b.id] || { count: 0 }).count;
         return (fa - fb) || (ua - ub) || a.title.localeCompare(b.title, 'es');
       });
     }
     return list;
   }
-  function recipeList() {
-    var list = filteredRecipes(), p = A.P();
-    if (!list.length) return K.empty('No hay recetas con esos filtros', 'Probá con menos filtros o con otra palabra.', '<button class="btn" data-action="rClear">Limpiar filtros</button>');
-    return '<p class="meta" aria-live="polite">' + U.plural(list.length, 'receta') + '</p><div class="grid-cards">' + list.map(function (r) { return K.recipeCard(r, p); }).join('') + '</div>';
+  var CAT_ICON = {};
+  function catIcon(c) {
+    if (!CAT_ICON._ok) { U.arr(L.tx().recipeCategories).forEach(function (x) { CAT_ICON[x.id] = x.icon; }); CAT_ICON._ok = true; }
+    return CAT_ICON[c] || 'hoja';
   }
-  function recipes() {
+  function recipeRow(r, p, on) {
+    var fav = p && p.recipeLog.favorites.indexOf(r.id) > -1;
+    var cooked = p && p.recipeLog.cooked[r.id] ? p.recipeLog.cooked[r.id].length : 0;
+    var t = r.time && r.time.total ? U.fmtMin(r.time.total) : '';
+    var hits = L.recipeAllergyHits(r, p).any;
+    var meta = [t, L.categoryLabel(r.category).toLowerCase(), String(r.id).indexOf('my-') === 0 ? 'propia' : '', cooked ? 'cocinada ' + U.plural(cooked, 'vez', 'veces') : ''].filter(Boolean).join(' · ');
+    return '<li><a class="rrow" id="r-' + esc(r.id) + '" href="#/cocina/receta/' + encodeURIComponent(r.id) + '"' + (on ? ' aria-current="page"' : '') + '><span class="ph" aria-hidden="true">' + I(catIcon(r.category), 'sm') + '</span>' +
+      '<span class="t"><b>' + esc(r.title) + (fav ? ' <span class="fav" aria-label="favorita">' + I('estrella', 'sm') + '</span>' : '') + '</b><small>' + esc(meta) + (hits ? ' · <span class="alert-txt">' + I('alerta', 'sm') + 'tu alergia</span>' : '') + '</small></span></a></li>';
+  }
+  function recipeList() {
+    var list = filteredRecipes(), p = A.P(), open = A.isWide() ? A.ui.openRecipe : null;
+    if (!list.length) return K.empty('No hay recetas con esos filtros', 'Probá con menos filtros o con otra palabra.', '<button class="btn" data-action="rClear">Limpiar filtros</button>');
+    return '<p class="meta" aria-live="polite">' + U.plural(list.length, 'receta') + '</p><ul class="rlist">' + list.map(function (r) { return recipeRow(r, p, r.id === open); }).join('') + '</ul>';
+  }
+  function recipes() { return recipeTools() + '<div data-part="rlist" class="mt">' + recipeList() + '</div>'; }
+  function recipeTools() {
     var cats = U.arr(L.tx().recipeCategories), f = A.ui.rf || {};
     var used = new Set(L.allRecipes(A.P()).map(function (r) { return r.category; }));
     return '<section class="toolbar-card">' +
-      '<div class="search big">' + I('buscar') + '<input class="input" id="rq" type="search" data-bind="rq" value="' + esc(A.ui.rq || '') + '" placeholder="Buscar por nombre, ingrediente o etiqueta" aria-label="Buscar recetas" autocomplete="off"></div>' +
+      '<div class="search">' + I('buscar') + '<input class="input" id="rq" type="search" data-bind="rq" value="' + esc(A.ui.rq || '') + '" placeholder="Buscar receta o ingrediente" aria-label="Buscar recetas por nombre, ingrediente o etiqueta" autocomplete="off"></div>' +
       '<div class="chips scroll mt-s" role="group" aria-label="Categorías"><button class="chip' + (!A.ui.rcat ? ' on' : '') + '" data-action="rCat" data-c="" aria-pressed="' + !A.ui.rcat + '">Todas</button>' +
       cats.filter(function (c) { return used.has(c.id); }).map(function (c) { var on = A.ui.rcat === c.id; return '<button class="chip' + (on ? ' on' : '') + '" data-action="rCat" data-c="' + c.id + '" aria-pressed="' + on + '">' + esc(c.label) + '</button>'; }).join('') + '</div>' +
-      '<div class="chips mt-s" role="group" aria-label="Filtros">' + FILTERS.map(function (x) { var on = !!f[x[0]]; return '<button class="chip soft' + (on ? ' on' : '') + '" data-action="rFilter" data-f="' + x[0] + '" aria-pressed="' + on + '">' + esc(x[1]) + '</button>'; }).join('') + '</div>' +
+      '<div class="chips scroll mt-s" role="group" aria-label="Filtros">' + FILTERS.map(function (x) { var on = !!f[x[0]]; return '<button class="chip soft' + (on ? ' on' : '') + '" data-action="rFilter" data-f="' + x[0] + '" aria-pressed="' + on + '">' + esc(x[1]) + '</button>'; }).join('') + '</div>' +
       '</section>' +
-      '<div class="row between mt"><label class="row"><span class="meta">Orden</span><select class="input" style="min-height:40px;width:auto" data-change="rSort"><option value="sug"' + ((A.ui.rsort || 'sug') === 'sug' ? ' selected' : '') + '>Sugeridas</option><option value="az"' + (A.ui.rsort === 'az' ? ' selected' : '') + '>A-Z</option><option value="time"' + (A.ui.rsort === 'time' ? ' selected' : '') + '>Tiempo</option></select></label>' +
-      '<a class="btn primary sm" href="#/cocina/nueva">' + I('mas', 'sm') + 'Receta propia</a></div>' +
-      '<div data-part="rlist" class="mt">' + recipeList() + '</div>';
+      '<div class="row between mt-s"><label class="row"><span class="meta">Orden</span><select class="input" style="min-height:40px;width:auto" data-change="rSort"><option value="sug"' + ((A.ui.rsort || 'sug') === 'sug' ? ' selected' : '') + '>Sugeridas</option><option value="az"' + (A.ui.rsort === 'az' ? ' selected' : '') + '>A-Z</option><option value="time"' + (A.ui.rsort === 'time' ? ' selected' : '') + '>Tiempo</option></select></label>' +
+      '<a class="btn ghost sm" href="#/cocina/nueva">' + I('mas', 'sm') + 'Receta propia</a></div>';
   }
   A.binds.rq = U.debounce(function (el) { A.ui.rq = el.value; A.refresh('rlist'); }, 120);
   A.actions.rCat = function (el) { A.ui.rcat = el.dataset.c || ''; A.render(); };
@@ -93,7 +157,8 @@
   }
   function detail(id) {
     var p = A.P(), r = L.recipe(id, p);
-    if (!r) return K.back('#/cocina/recetas', 'Recetas') + K.empty('No encontramos esa receta', 'Puede que la hayas borrado.', '<a class="btn" href="#/cocina/recetas">Ver recetas</a>');
+    if (r) A.ui.lastRecipe = id;
+    if (!r) return K.back('#/cocina/recetas', 'Recetas') + K.empty('No encontramos esa receta', 'Puede que la hayas borrado.', '<a class="btn" href="#/cocina/recetas">Ver recetas</a>', 'h1');
     var k = (A.ui.scale && A.ui.scale[id]) || 1;
     var checks = (A.ui.ingChk && A.ui.ingChk[id]) || {};
     var fav = p.recipeLog.favorites.indexOf(id) > -1;
@@ -112,7 +177,7 @@
       U.arr(r.tags).filter(function (x) { return /friolento|caluroso|crudo|cocido|batch|fermento/.test(x); }).map(function (x) { return '<span class="tag">' + esc(x.replace('-ok', ': bien').replace('-', ' ')) + '</span>'; }).join('') + '</div>' +
       (r.allergens && r.allergens.length && !hits.any ? '<p class="meta mt-s">Contiene: ' + esc(r.allergens.map(function (a) { return L.allergenLabel(a).toLowerCase(); }).join(', ')) + (r.mayContain && r.mayContain.length ? ' · opcionales: ' + esc(r.mayContain.map(function (a) { return L.allergenLabel(a).toLowerCase(); }).join(', ')) : '') + '</p>' : '') +
       '</header>' +
-      '<div class="btn-row mt"><button class="btn primary" data-action="cook" data-r="' + esc(id) + '">' + I('play', 'sm') + 'Cocinar</button>' +
+      '<div class="btn-row mt"><button class="btn primary" data-action="cook" data-r="' + esc(id) + '">' + I('play', 'sm') + 'Cocinar paso a paso</button>' +
       '<button class="btn fav-btn' + (fav ? ' on' : '') + '" data-action="fav" data-r="' + esc(id) + '" aria-pressed="' + fav + '">' + I('estrella', 'sm') + (fav ? 'Favorita' : 'Guardar') + '</button>' +
       '<button class="btn" data-action="planSheet" data-r="' + esc(id) + '">' + I('calendario', 'sm') + 'Al plan</button>' +
       '<button class="btn" data-action="logMealSheet" data-r="' + esc(id) + '">' + I('check', 'sm') + 'Comí esto hoy</button></div></section>');
@@ -156,7 +221,7 @@
     A.confirm({ title: 'Borrar receta', text: 'La receta propia se borra de este perfil. ¿Seguimos?', ok: 'Borrar', danger: true }).then(function (ok) {
       if (!ok) return;
       A.update(function (s, p) { p.customRecipes.forEach(function (r) { if (r.id === id) { r.deleted = true; r.updatedAt = Date.now(); } }); });
-      A.go('/cocina/recetas'); A.toast('Receta borrada');
+      A.ui.lastRecipe = null; A.go('/cocina/recetas'); A.toast('Receta borrada');
     });
   };
   A.addToShopping = function (items, from) {
@@ -322,7 +387,7 @@
       '<div class="chips scroll mt-s"><button class="chip' + (!A.ui.fcat ? ' on' : '') + '" data-action="fCat" data-c="">Más usados</button>' + cats.map(function (c) { var on = A.ui.fcat === c; return '<button class="chip' + (on ? ' on' : '') + '" data-action="fCat" data-c="' + esc(c) + '" aria-pressed="' + on + '">' + esc(((U.arr(L.tx().ingredientCategories).filter(function (x) { return x.id === c; })[0]) || {}).label || U.cap(c.replace(/_/g, ' '))) + '</button>'; }).join('') + '</div>' +
       '<div data-part="fing" class="mt-s">' + fridgeIngredients() + '</div>' +
       '</section>' +
-      (have.length ? '<p class="meta mt-s">Tenés ' + U.plural(have.length, 'ingrediente') + ' marcados · <button class="btn ghost sm" data-action="fridgeClear">Vaciar</button></p>' : '') +
+      (have.length ? '<p class="meta mt-s">Tenés ' + U.plural(have.length, 'ingrediente marcado', 'ingredientes marcados') + ' · <button class="btn ghost sm" data-action="fridgeClear">Vaciar</button></p>' : '') +
       '<div class="tier-h"><h2>Listas para cocinar</h2><span class="meta">' + ready.length + '</span></div>' + (ready.length ? '<ul class="list card">' + ready.map(item).join('') + '</ul>' : '<p class="muted">Todavía ninguna. Marcá más ingredientes.</p>') +
       '<div class="tier-h"><h2>Te falta poco</h2><span class="meta">' + near.length + '</span></div>' + (near.length ? '<ul class="list card">' + near.map(item).join('') + '</ul>' : '<p class="muted">Ninguna a 1 o 2 ingredientes.</p>');
   }

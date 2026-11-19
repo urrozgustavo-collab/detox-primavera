@@ -11,6 +11,6 @@
   .print-root td, .print-root th { border-color: #999 !important; }
   .print-root h1, .print-root h2 { break-after: avoid; }
   .print-root tr { break-inside: avoid; }
-  .tabbar, .rail, .topbar, #timers, #toasts, dialog { display: none !important; }
+  .tabbar, .topbar, #timers, #toasts, dialog { display: none !important; }
   .shell { margin: 0 !important; }
 }

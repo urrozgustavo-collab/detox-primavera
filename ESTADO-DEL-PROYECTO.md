@@ -1,10 +1,22 @@
 # 🌿 Detox Primavera — Estado del Proyecto & Guía de Continuidad
 
 > **Última actualización:** 18 de noviembre de 2026  
-> **Versión Actual:** `v2.2.0` — estética minimalista «Primavera sutil» (rama git `rediseno-v2`, sin publicar todavía)  
+> **Versión Actual:** `v2.3.0` — organización «Un paso a la vez» (rama git `rediseno-v2`, sin publicar todavía)  
 > **Versión anterior publicada:** `v1.4.2` (rama `main`, GitHub Pages)  
 
 ---
+
+## v2.3.0 — Organización «A · Un paso a la vez» (18/11/2026)
+
+Gustavo eligió la organización A de las maquetas de calma (`rediseno-v2/maquetas/maquetas-calma.html` y `maquetas-a-computadora.html`). Cambia solo la presentación y la navegación; lógica, datos, datos guardados, migración v1 y sincronización quedan igual (101 tests en verde). Detalle de cada decisión en `rediseno-v2/DECISIONES.md` (prefijo `[v2.3]`).
+
+- **3 pestañas: Hoy · Cocina · Vos.** En el celular, una cápsula flotante abajo; en la computadora, arriba al centro (sin barra lateral), con «Buscar Ctrl K» y el avatar a la derecha. El avatar: cambiar o sumar persona, tema, Programas y Ajustes.
+- **Hoy:** fecha, «Día N de 21» grande, fase en coral y una línea de 21 tramos (tocar uno lleva a ese día). Una tarjeta «Ahora» con el próximo hábito («Hecho» / «Hoy no»; «ver todos» despliega la lista con consejos y avisos). Debajo, renglones tranquilos que se abren en una hoja (celular) o panel lateral (computadora): Agua (con + rápido), Comidas, ¿Cómo te sentís?, Para mañana y Nota del día. Constancia y racha en una línea discreta; puntos, logros y la planta pasan a Vos.
+- **Cocina:** pestañas de texto Recetas · Plan · Compras (con los pendientes) · Heladera · Batch y remojos · Métodos. En la computadora, lista de recetas y receta abierta lado a lado.
+- **Vos (nueva, `#/vos`):** frase de avance, mapa de los 21 días, energía y ánimo, puntos y logros, y accesos a Progreso, Diario, Logros, Historial, Informe, Reintroducción, Guía (semáforo, SOS, herbario, taller), Programas y Ajustes.
+- **Todos los enlaces viejos siguen andando** (`#/compras`, `#/guia/...`, `#/progreso/...`, etc.); solo cambia en qué pestaña aparecen.
+- **Ronda de QA (`rediseno-v2/QA-v2.3.md`, 19 hallazgos, todos corregidos):** la tarjeta de Hoy cambia según el día (hoy / pendiente / por venir / terminado), «¿Cómo te sentís?» con 5 puntos numerados y etiquetas cortas, Comidas con una sugerencia por momento, Cocina con «Más» en el celular y buscador fijo en computadora, Guía/Progreso/Ajustes/Programas con la misma calma (sin cajas; semáforo en renglones que se despliegan), mapa de días con formas además de colores, la planta también en el celular, bienvenida sin fecha preelegida y mejoras de accesibilidad.
+- Archivos: `v2/src/app/30-core.js` (cabecera, cápsula, hojas «vivas»), `40-hoy.js`, `41-cocina.js`, `48-vos.js` (nuevo), `v2/src/styles/sutil.css` (capa «calma» reescrita); retoques menores en compras, guía, progreso, programas, ajustes y búsqueda.
 
 ## v2.2.0 — Estética «Primavera sutil» (18/11/2026)
 

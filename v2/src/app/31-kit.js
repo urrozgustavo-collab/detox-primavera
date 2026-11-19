@@ -111,24 +111,32 @@
   var ST = {
     complete: ['Completo', 'check'], partial: ['Parcial', ''], grace: ['Día de gracia', 'hoja'], empty: ['Sin completar', ''], today: ['Hoy', ''], future: ['Por venir', '']
   };
+  /* v2.3: un solo dibujo del mapa (Vos y Progreso). Cada estado se distingue por forma además del color:
+     completo = círculo lleno con tilde · parcial = medio lleno · gracia = aro punteado con hoja ·
+     sin completar = aro con raya · hoy = aro coral · por venir = punto chico. */
+  var HD_MARK = { complete: 'check', grace: 'hoja', empty: 'menos' };
   K.heatmap = function (sum, link) {
     var cells = sum.days.filter(function (r) { return r.idx >= 1; }).map(function (r) {
-      var st = ST[r.status] || ST.future;
-      var lab = 'Día ' + r.idx + ': ' + st[0] + (r.total ? ' (' + r.done + '/' + r.total + ')' : '') + (r.graced && r.status === 'partial' ? ', cubierto por un día de gracia' : '');
-      var inner = st[1] ? A.icon(st[1], 'sm') : (r.graced ? A.icon('hoja', 'sm') : '<span>' + r.idx + '</span>');
-      var tag = link && r.iso && !r.future ? 'a href="#/hoy/' + r.iso + '"' : 'span';
-      return '<' + tag + ' class="hm hm-' + r.status + '" title="' + esc(lab) + '" aria-label="' + esc(lab) + '">' + inner + '</' + tag.split(' ')[0] + '>';
-    });
-    return '<div class="heatmap" role="list">' + cells.map(function (c) { return '<div role="listitem">' + c + '</div>'; }).join('') + '</div>' +
-      '<div class="legend"><span><i class="hm-k hm-complete"></i>Completo</span><span><i class="hm-k hm-partial"></i>Parcial</span><span><i class="hm-k hm-grace"></i>Gracia</span><span><i class="hm-k hm-empty"></i>Sin completar</span><span><i class="hm-k hm-future"></i>Por venir</span></div>';
+      var st = (ST[r.status] || ST.future)[0];
+      var lab = 'Día ' + r.idx + ': ' + st.toLowerCase() + (r.total ? ' (' + r.done + ' de ' + r.total + ')' : '') + (r.graced && r.status === 'partial' ? ', cubierto por un día de gracia' : '');
+      var kind = r.graced && r.status === 'partial' ? 'grace' : r.status;
+      var inner = HD_MARK[kind] ? A.icon(HD_MARK[kind], 'sm') : '';
+      var cls = 'hd hd-' + kind + (r.iso === A.today() && kind !== 'today' ? ' is-today' : '');
+      return link && r.iso && !r.future ? '<a class="' + cls + '" href="#/hoy/' + r.iso + '" aria-label="' + esc(lab) + '" title="' + esc(lab) + '">' + inner + '</a>'
+        : '<span class="' + cls + '" role="img" aria-label="' + esc(lab) + '" title="' + esc(lab) + '">' + inner + '</span>';
+    }).join('');
+    var key = function (k, t) { return '<span><i class="hd hd-' + k + ' key" aria-hidden="true">' + (HD_MARK[k] ? A.icon(HD_MARK[k], 'sm') : '') + '</i>' + t + '</span>'; };
+    return '<div class="heat-dots">' + cells + '</div>' +
+      '<div class="legend dots-legend">' + key('complete', 'Completo') + key('partial', 'Parcial') + key('grace', 'Gracia') + key('empty', 'Sin completar') + key('today', 'Hoy') + key('future', 'Por venir') + '</div>';
   };
 
   /* ---------- ilustración para estados vacíos ---------- */
   K.emptyArt = function () {
     return '<svg class="art" viewBox="0 0 84 84" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M42 74V34"/><path d="M42 50c-12 0-19-7-19-19 12 0 19 7 19 19zM42 40c0-12 7-19 19-19 0 12-7 19-19 19z"/><path d="M16 74h52"/></svg>';
   };
-  K.empty = function (title, text, action) {
-    return '<div class="empty">' + K.emptyArt() + '<h3>' + esc(title) + '</h3>' + (text ? '<p>' + esc(text) + '</p>' : '') + (action || '') + '</div>';
+  K.empty = function (title, text, action, tag) {
+    tag = tag === 'h1' ? 'h1' : 'h3';
+    return '<div class="empty">' + K.emptyArt() + '<' + tag + ' class="empty-h">' + esc(title) + '</' + tag + '>' + (text ? '<p>' + esc(text) + '</p>' : '') + (action || '') + '</div>';
   };
 
   /* ---------- recetas ---------- */
@@ -170,10 +178,12 @@
   };
   K.back = function (href, label) { return '<a class="back" href="' + href + '">' + A.icon('atras', 'sm') + esc(label || 'Volver') + '</a>'; };
   K.tabs = function (items, current, label) {
-    return '<nav class="seg subnav" aria-label="' + esc(label || 'Secciones') + '">' + items.map(function (it) {
-      return '<a href="' + it[0] + '"' + (it[1] === current ? ' aria-current="page"' : '') + '>' + esc(it[2]) + '</a>';
+    return '<nav class="tabs-t" aria-label="' + esc(label || 'Secciones') + '">' + items.map(function (it) {
+      return '<a href="' + it[0] + '"' + (it[1] === current ? ' aria-current="page"' : '') + '>' + esc(it[2]) + (it[3] || '') + '</a>';
     }).join('') + '</nav>';
   };
+  /* Migas tranquilas: las pantallas que viven dentro de «Vos» llevan un regreso a su portada. */
+  K.crumb = function (href, label) { return '<a class="back crumb" href="' + (href || '#/vos') + '">' + A.icon('chev-izq', 'sm') + esc(label || 'Vos') + '</a>'; };
   K.condWarnings = function (warnings, conditions) {
     return U.arr(warnings).filter(function (w) { return (conditions || []).indexOf(w.condition) > -1; });
   };

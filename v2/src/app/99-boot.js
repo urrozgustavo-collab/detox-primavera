@@ -54,7 +54,7 @@
       try { history.replaceState(null, '', clean || location.pathname); } catch (e) { /* file: */ }
     }
 
-    ['cocina', 'compras', 'guia', 'progreso', 'programas', 'ajustes'].forEach(function (n) {
+    ['cocina', 'compras', 'guia', 'progreso', 'programas', 'ajustes', 'vos'].forEach(function (n) {
       if (!A.screens[n]) A.screens[n] = { render: function () { return '<p class="muted">Sección en preparación.</p>'; } };
     });
     A.route = A.parseHash();

@@ -1,7 +1,7 @@
 /* Service worker de Detox v2.
    La pagina (index.html) va primero a la red: asi una version nueva se ve al primer recargar;
    sin conexion se usa la copia guardada. El resto de los archivos, de la cache. */
-const CACHE = 'detox-v2.2.0-6dd9008f65';
+const CACHE = 'detox-v2.3.0-03f0b7ccdf';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));

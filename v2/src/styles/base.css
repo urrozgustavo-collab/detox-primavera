@@ -75,47 +75,10 @@ main {
   width: 50px; height: 28px; border-radius: var(--r-pill); background: var(--accent-soft); z-index: -1;
 }
 .tabbar .badge { position: absolute; top: 6px; left: calc(50% + 8px); z-index: 2; }
-.rail { display: none; }
 
 @media (min-width: 960px) {
   :root { --gutter: 32px; }
   .tabbar { display: none; }
-  .rail {
-    display: flex; flex-direction: column; gap: 4px; position: fixed; top: 0; bottom: 0; left: 0; width: var(--rail);
-    padding: 24px 16px; border-right: 1px solid var(--border-subtle);
-    background: color-mix(in srgb, var(--surface) 75%, var(--paper));
-    overflow-y: auto; z-index: 25;
-  }
-  .rail .brand {
-    display: flex; align-items: center; gap: 11px; padding: 2px 10px 16px; margin-bottom: 10px;
-    border-bottom: 1px solid var(--border-subtle); text-decoration: none; color: var(--ink);
-  }
-  .rail .brand b { font-family: var(--f-display); font-weight: 800; font-size: var(--fs-18); letter-spacing: -0.02em; line-height: 1.15; }
-  .rail .brand small { display: block; margin-top: 2px; font-size: 0.8125rem; }
-  .rail a.nav {
-    display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; color: var(--ink-2);
-    text-decoration: none; font-size: 0.9375rem; font-weight: 500; min-height: 44px; position: relative;
-    transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
-  }
-  .rail a.nav svg { opacity: .78; transition: opacity var(--t-fast) var(--ease); }
-  .rail a.nav:hover { background: color-mix(in srgb, var(--surface-2) 85%, transparent); color: var(--ink); }
-  .rail a.nav:hover svg, .rail a.nav[aria-current="page"] svg { opacity: 1; }
-  .rail a.nav[aria-current="page"] {
-    background: var(--accent-soft); color: var(--accent-text); font-weight: 600;
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
-  }
-  .rail .sep { height: 1px; background: var(--border-subtle); margin: 10px 8px; }
-  .rail .badge { margin-left: auto; }
-  .rail .nav-search.btn {
-    width: 100%; background: var(--surface); border: 1px solid var(--border-ctl); border-radius: 10px;
-    padding: 8px 12px; color: var(--muted); font-size: 0.875rem; font-weight: 500; min-height: 40px;
-    box-shadow: var(--shadow-xs);
-  }
-  .rail .nav-search.btn:hover {
-    background: var(--surface); color: var(--ink); border-color: color-mix(in srgb, var(--ink) 28%, transparent);
-    transform: none;
-  }
-  .rail .foot { margin-top: auto; font-size: var(--fs-12); color: var(--muted); padding: 14px 10px 4px; }
   .shell { margin-left: var(--rail); min-width: 0; }
   main { padding-top: 16px; padding-bottom: 56px; }
   .topbar .title { visibility: hidden; }

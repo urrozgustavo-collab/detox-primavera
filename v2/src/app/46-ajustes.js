@@ -7,7 +7,7 @@
   A.screens.ajustes = {
     render: function () {
       var p = A.P(), d = A.state.device;
-      return '<header class="page-h"><h1>Ajustes</h1></header>' + profileSec(p) + healthSec(p) + homeSec(p) + lookSec(d) + backupSec(d) + syncSec(p) + icsSec() + editionSec(p) + dataSec() + aboutSec();
+      return K.crumb() + '<header class="page-h"><h1>Ajustes</h1></header>' + profileSec(p) + healthSec(p) + homeSec(p) + lookSec(d) + backupSec(d) + syncSec(p) + icsSec() + editionSec(p) + dataSec() + aboutSec();
     },
     mount: function (main, route) { if (route.parts[0] === 'sync') { var el = document.getElementById('sync'); el && el.scrollIntoView({ block: 'start' }); } }
   };
@@ -360,7 +360,9 @@
     var profs = Object.keys(A.state.profiles).map(function (k) { return A.state.profiles[k]; });
     A.openSheet({ title: p.name || 'Tu perfil', body:
       '<ul class="list">' + profs.map(function (x) { var me = x.id === p.id; return '<li><button class="li" data-action="' + (me ? 'closeDialog' : 'switchProfile') + '" data-p="' + x.id + '" data-dlg="sheet">' + A.avatar(x, 36) + '<span class="grow"><b>' + esc(x.name || 'Sin nombre') + '</b>' + (me ? '<span class="meta">En uso</span>' : '<span class="meta">Cambiar a este perfil</span>') + '</span>' + (me ? I('check') : I('chev', 'chev')) + '</button></li>'; }).join('') + '</ul>' +
-      '<hr class="sep"><div class="btn-row"><a class="btn" href="#/programas">' + I('flor', 'sm') + 'Programas</a><a class="btn" href="#/ajustes">' + I('ajustes', 'sm') + 'Ajustes</a><button class="btn ghost" data-action="addProfile">' + I('mas', 'sm') + 'Sumar persona</button></div>' +
+      '<ul class="list mt-s"><li><button class="li" data-action="addProfile">' + I('mas') + '<span class="grow"><b>Sumar persona</b><span class="meta">Cada una lleva su propio diario</span></span></button></li>' +
+      '<li><a class="li" href="#/programas">' + I('flor') + '<span class="grow"><b>Programas</b><span class="meta">Repetir, cambiar o crear uno</span></span>' + I('chev', 'chev') + '</a></li>' +
+      '<li><a class="li" href="#/ajustes">' + I('ajustes') + '<span class="grow"><b>Ajustes</b><span class="meta">Salud, copia de seguridad, sincronizar</span></span>' + I('chev', 'chev') + '</a></li></ul>' +
       '<p class="label mt">Tema</p><div class="seg" role="group" aria-label="Tema">' + [['system', 'Sistema', 'sistema'], ['light', 'Claro', 'sol'], ['dark', 'Oscuro', 'luna']].map(function (t) { return '<button data-action="themeSheet" data-t="' + t[0] + '" aria-pressed="' + (d.theme === t[0]) + '">' + I(t[2], 'sm') + t[1] + '</button>'; }).join('') + '</div>' });
   };
   A.actions.themeSheet = function (el) {

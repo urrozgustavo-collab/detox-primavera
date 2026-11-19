@@ -9,10 +9,10 @@
     render: function (route) {
       var sub = route.parts[0] || 'resumen';
       if (sub === 'informe') return report(route.parts[1]);
-      if (sub === 'edicion') return '<header class="page-h"><h1>Progreso</h1></header>' + K.tabs(TABS, 'historial') + K.back('#/progreso/historial', 'Historial') + resumen(route.parts[1], true);
-      if (sub === 'comparar') return '<header class="page-h"><h1>Progreso</h1></header>' + K.tabs(TABS, 'historial') + K.back('#/progreso/historial', 'Historial') + compare();
+      if (sub === 'edicion') return K.crumb() + '<header class="page-h"><h1>Progreso</h1></header>' + K.tabs(TABS, 'historial') + K.back('#/progreso/historial', 'Historial') + resumen(route.parts[1], true);
+      if (sub === 'comparar') return K.crumb() + '<header class="page-h"><h1>Progreso</h1></header>' + K.tabs(TABS, 'historial') + K.back('#/progreso/historial', 'Historial') + compare();
       var body = ({ resumen: function () { return resumen(); }, diario: diario, historial: historial, reintro: reintro })[sub] || resumen;
-      return '<header class="page-h"><h1>Progreso</h1></header>' + K.tabs(TABS, sub, 'Secciones de progreso') + body();
+      return K.crumb() + '<header class="page-h"><h1>Progreso</h1></header>' + K.tabs(TABS, sub, 'Secciones de progreso') + body();
     }
   };
 
@@ -60,7 +60,7 @@
     var tried = s.recipesTried;
     h.push('<section class="card mt"><div class="card-h"><h2>Cobertura culinaria</h2><span class="meta">' + tried.all + ' de ' + total + '</span></div><div class="bar-h"><i style="width:' + Math.round(tried.all / Math.max(1, total) * 100) + '%"></i></div>' +
       (tried.ids.length ? '<div class="chips mt">' + tried.ids.slice(0, 30).map(function (id) { var r = L.recipe(id, p); return r ? '<a class="chip soft" href="#/cocina/receta/' + encodeURIComponent(id) + '">' + esc(r.title) + '</a>' : ''; }).join('') + '</div>' : '<p class="muted mt-s">Registrá comidas con recetas para ver cuántas probaste.</p>') + '</section>');
-    h.push('<h2 class="section-title">Logros</h2><div class="badges">' + s.badges.map(function (b) {
+    h.push('<h2 class="section-title" id="logros" tabindex="-1">Logros</h2><div class="badges">' + s.badges.map(function (b) {
       return '<div class="bdg' + (b.unlocked ? ' on' : '') + '"><span class="ic">' + I(b.unlocked ? 'flor' : 'candado') + '</span><div><b>' + esc(b.title) + '</b><span class="meta">' + esc(b.desc) + '</span><span class="meta"> · ' + (b.unlocked ? '+' + b.points + ' puntos' : (b.progress && b.progress.n > 1 ? b.progress.cur + ' de ' + b.progress.n : 'por lograr')) + '</span></div></div>';
     }).join('') + '</div>');
     h.push('<div class="btn-row mt"><a class="btn primary" href="#/progreso/informe/' + encodeURIComponent(edId) + '">' + I('libro', 'sm') + 'Ver informe</a><a class="btn" href="#/progreso/diario">' + I('lista', 'sm') + 'Diario</a>' + (past && p.activeEdition !== edId ? '<button class="btn" data-action="makeActive" data-e="' + esc(edId) + '">Hacerla activa</button>' : '') + '</div>');

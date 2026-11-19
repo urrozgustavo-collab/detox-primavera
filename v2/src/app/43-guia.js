@@ -17,7 +17,7 @@
       if (sub === 'sos' && route.parts[1]) return sosDetail(route.parts[1]) + K.healthNote();
       if (sub === 'herbario' && route.parts[1]) return herbDetail(route.parts[1]) + K.healthNote();
       var body = ({ semaforo: semaforo, sos: sosList, herbario: herbList, taller: taller })[sub] || semaforo;
-      return '<header class="page-h"><h1>Guía</h1></header>' + K.tabs(TABS, sub, 'Secciones de la guía') + body() + K.healthNote();
+      return K.crumb() + '<header class="page-h"><h1>Guía</h1></header>' + K.tabs(TABS, sub, 'Secciones de la guía') + body() + K.healthNote();
     },
     parts: { flist: function () { return foodList(); } }
   };
@@ -29,12 +29,16 @@
     var ph = phaseNow();
     var list = L.foodSearch(A.dx().foods, q).filter(function (f) { return !st || f.status === st; });
     if (!list.length) return '<div class="card"><p><b>No está en el semáforo.</b></p><p class="muted">Si dudás, consultalo en el grupo del taller. Como regla, la guía prioriza verduras, frutas, cereales integrales, legumbres y semillas, sin azúcar, harinas refinadas, lácteos ni estimulantes.</p></div>';
-    return '<p class="meta" aria-live="polite">' + U.plural(list.length, 'alimento') + '</p><div class="card" style="padding-top:4px;padding-bottom:4px">' + list.map(function (f) {
+    // v2.3: renglón compacto (nombre + estado con ícono y palabra); el detalle se despliega al tocar.
+    return '<p class="meta" aria-live="polite">' + U.plural(list.length, 'alimento') + '</p><div class="food-list">' + list.map(function (f) {
       var phaseSt = ph && f.phases && f.phases[ph];
-      return '<article class="food ' + f.status + '" id="f-' + esc(f.id) + '"><span class="ic" aria-hidden="true">' + I(K.statusIcon(f.status)) + '</span><div class="grow"><h3>' + esc(f.name) + ' ' + K.statusTag(f.status) + '</h3>' + (f._via ? '<p class="meta">Por «' + esc(f._via) + '»</p>' : '') +
-        (f.why ? '<p>' + esc(f.why) + '</p>' : '') + (f.howTo ? '<p class="meta">' + esc(f.howTo) + '</p>' : '') +
+      var open = A.ui.foodOpen === f.id;
+      return '<details class="food-row ' + f.status + '" id="f-' + esc(f.id) + '"' + (open ? ' open' : '') + '><summary>' +
+        '<span class="grow"><b>' + esc(f.name) + '</b>' + (f._via ? '<small>por «' + esc(f._via) + '»</small>' : '') + '</span>' +
+        '<span class="st st-' + f.status + '">' + I(K.statusIcon(f.status), 'sm') + esc(L.statusLabel(f.status)) + '</span>' + I('abajo', 'sm chev') + '</summary>' +
+        '<div class="food-body">' + (f.why ? '<p>' + esc(f.why) + '</p>' : '') + (f.howTo ? '<p class="meta">' + esc(f.howTo) + '</p>' : '') +
         (f.phases ? Object.keys(f.phases).map(function (k) { return '<p class="' + (k === ph ? 'note' : 'meta') + '">' + I('info', 'sm') + ' En ' + esc(L.phase(A.PROG(), k).name.toLowerCase()) + ': ' + esc(L.statusLabel(f.phases[k])) + (k === ph ? ' (tu fase actual)' : '') + '</p>'; }).join('') : '') +
-        (phaseSt && phaseSt !== f.status ? '' : '') + '</div></article>';
+        (!f.why && !f.howTo && !f.phases ? '<p class="meta">Sin más detalle en la guía.</p>' : '') + '</div></details>';
     }).join('') + '</div>';
   }
   function semaforo() {
@@ -59,7 +63,7 @@
   }
   function sosDetail(id) {
     var s = L.idx().sos[id], p = A.P();
-    if (!s) return K.back('#/guia/sos', 'SOS') + K.empty('No encontramos ese protocolo', '', '<a class="btn" href="#/guia/sos">Ver SOS</a>');
+    if (!s) return K.back('#/guia/sos', 'SOS') + K.empty('No encontramos ese protocolo', '', '<a class="btn" href="#/guia/sos">Ver SOS</a>', 'h1');
     var lad = (p.ladder && p.ladder[id]) || {};
     var ladder = U.arr(s.steps).some(function (x) { return x.ladder; });
     var c = conds();
@@ -103,7 +107,7 @@
   A.actions.hKind = function (el) { A.ui.hkind = el.dataset.k; A.render(); };
   function herbDetail(id) {
     var h = L.idx().herbs[id];
-    if (!h) return K.back('#/guia/herbario', 'Herbario') + K.empty('No encontramos esa ficha', '', '');
+    if (!h) return K.back('#/guia/herbario', 'Herbario') + K.empty('No encontramos esa ficha', '', '<a class="btn" href="#/guia/herbario">Ver herbario</a>', 'h1');
     var c = conds(), d = curDay();
     var locked = h.unlockDay && (d == null || d < h.unlockDay);
     var cons = U.arr(h.contraindications).map(function (w) { var hit = c.indexOf(w.condition) > -1; return '<div class="contra' + (hit ? ' hit' : '') + '"><b>' + (hit ? I('alerta', 'sm') + ' ' : '') + esc(condLabel(w.condition).split(' (')[0]) + (w.scope ? ', ' + esc(w.scope) : '') + (hit ? ' (tu perfil)' : '') + ':</b> ' + esc(w.text) + '</div>'; }).join('');
