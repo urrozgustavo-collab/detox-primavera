@@ -63,7 +63,7 @@
     var big = ctx.finishedHome ? '<span class="num">Terminado</span><small> ' + ctx.clock.days + ' días</small>' : ctx.idx === 0 ? '<span class="num">Preparación</span>' : '<span class="num">Día ' + ctx.idx + '</span><small> de ' + ctx.clock.days + '</small>';
     var desc = ctx.phase.desc;
     var head = '<header class="day-head">' +
-      '<p class="day-date">' + esc(iso ? noYear(U.cap(U.fmtDate(iso, 'long'))) : '') + (isToday ? ' · hoy' : '') + '</p>' +
+      '<p class="day-date">' + esc(iso ? noYear(U.cap(U.fmtDate(iso, 'long'))) : '') + '</p>' +
       '<h1 class="day-big">' + big + '</h1>';
     if (futurePrep) {
       var st = noYear(U.fmtDate(ctx.ed.startDate, 'long'));
@@ -88,13 +88,16 @@
       if (r.idx === 0 && !(ctx.clock.status === 'future' || ctx.idx === 0 || L.dayHasData(r.day))) return '';
       return '<a class="' + cls + '" href="' + dayHref(ctx.ed, r.idx) + '" aria-label="' + esc(lab) + '" title="' + esc(lab) + '"' + (r.idx === ctx.idx ? ' aria-current="date"' : '') + '></a>';
     }).join('');
-    var bits = [];
-    if (s.constancy != null) bits.push(Math.round(s.constancy * 100) + ' % de constancia');
-    if (s.streak) bits.push(s.streak === 1 ? '1 día seguido' : s.streak + ' días seguidos');
-    else if (ctx.clock.status === 'active' && 2 - s.graceUsed > 0 && ctx.todayIdx > 1) bits.push('te quedan ' + U.plural(2 - s.graceUsed, 'día') + ' de gracia');
+    // v2.4: tres números tranquilos debajo de la línea (constancia, días seguidos y energía de ayer).
+    var st = [];
+    if (s.constancy != null) st.push([Math.round(s.constancy * 100) + ' %', 'constancia']);
+    st.push([String(s.streak || 0), s.streak === 1 ? 'día seguido' : 'días seguidos']);
+    var prev = s.days[ctx.todayIdx - 1], en = prev && prev.day && prev.day.checkin && prev.day.checkin.energy;
+    if (en && ctx.clock.status === 'active') st.push([String(en), 'energía de ayer']);
+    else if (ctx.clock.status === 'active') st.push([String(Math.max(0, 2 - s.graceUsed)), 'días de gracia']);
     return '<div class="days-n"><p class="lab">Tus ' + ctx.clock.days + ' días</p>' +
       '<nav class="line21" aria-label="Días de la edición">' + segs + '</nav>' +
-      (bits.length ? '<p class="streak"><span>' + esc(bits[0]) + '</span>' + (bits[1] ? '<span>' + esc(bits[1]) + '</span>' : '') + '</p>' : '') + '</div>';
+      (ctx.clock.status === 'future' ? '' : '<div class="stats3">' + st.map(function (x) { return '<p><b>' + esc(x[0]) + '</b><small>' + esc(x[1]) + '</small></p>'; }).join('') + '</div>') + '</div>';
   }
 
   /* ---------- tarjeta foco «Ahora»: el próximo hábito pendiente, un paso a la vez ---------- */
@@ -102,7 +105,7 @@
   function condName(c) { var x = L.idx().conditions[c]; return x ? x.label.split(' (')[0].toLowerCase() : c; }
   function focusCard(ctx) {
     var hs = ctx.row.habits, conds = ctx.p.settings.conditions || [];
-    if (!hs.length) return '<section class="focus-card" aria-label="Hábitos"><p class="focus-q">Este programa no tiene hábitos para esta fase.</p></section>';
+    if (!hs.length) return '<section class="focus" aria-label="Hábitos"><p class="focus-q">Este programa no tiene hábitos para esta fase.</p></section>';
     var next = hs.filter(function (h) { return !habitState(ctx, h); })[0] || null;
     var mode = ctx.clock.status === 'future' && ctx.idx === 0 ? 'prep' : !ctx.editable ? 'future' : (ctx.idx === ctx.todayIdx && ctx.clock.status === 'active') ? 'now' : 'past';
     var KLAB = { prep: 'Para prepararte', now: ctx.idx === 0 ? 'Para prepararte' : 'Ahora', past: 'Pendiente de ese día', future: 'Por venir' };
@@ -117,8 +120,8 @@
       body = '<p class="focus-k">' + KLAB[mode] + '</p>' +
         '<h2 class="focus-q">' + esc(next.text) + '</h2>' +
         (warn.length ? '<p class="focus-warn">' + I('alerta', 'sm') + '<span>Consultá antes: ' + esc(warn.map(condName).join(', ')) + (next.warn ? '. ' + esc(warn.map(function (c) { return next.warn[c] || ''; }).filter(Boolean).join(' ')) : '') + '</span></p>' : '') +
-        '<div class="focus-acts"><button class="pill pri" id="focus-done" data-action="habit" data-h="' + esc(next.id) + '"' + dis + '>' + I('check', 'sm') + 'Hecho</button>' +
-        '<button class="pill ghost" id="focus-skip" data-action="habitSkip" data-h="' + esc(next.id) + '"' + dis + '>Hoy no</button></div>' +
+        '<div class="focus-acts"><button class="btn primary" id="focus-done" data-action="habit" data-h="' + esc(next.id) + '"' + dis + '>Hecho</button>' +
+        '<button class="link" id="focus-skip" data-action="habitSkip" data-h="' + esc(next.id) + '"' + dis + '>Hoy no</button></div>' +
         (next.tip ? '<button class="focus-why" data-action="habitTip" data-h="' + esc(next.id) + '" aria-expanded="' + (A.ui.tip === next.id) + '">¿Por qué?</button>' + (A.ui.tip === next.id ? '<p class="focus-tip">' + esc(next.tip) + '</p>' : '') : '');
     } else {
       var past = mode === 'past';
@@ -131,8 +134,8 @@
       return '<i class="' + (st === 'done' ? 'on' : st === 'skip' ? 'skip' : next && h.id === next.id ? 'now' : '') + '"></i>';
     }).join('') + '</div>';
     var open = !!A.ui.allHabits;
-    return '<section class="focus-card" aria-label="' + (ctx.idx === 0 ? 'Para prepararte' : 'Hábitos del día') + '">' + body + dots +
-      '<button class="focus-more" id="focus-more" data-action="toggleAllHabits" aria-expanded="' + open + '" aria-controls="h-habitos">' + ctx.row.done + ' de ' + ctx.row.total + ' · ' + (open ? 'ocultar' : 'ver todos') + '</button>' +
+    return '<section class="focus" aria-label="' + (ctx.idx === 0 ? 'Para prepararte' : 'Hábitos del día') + '">' + body + dots +
+      '<button class="focus-more" id="focus-more" data-action="toggleAllHabits" aria-expanded="' + open + '" aria-controls="h-habitos">' + ctx.row.done + ' de ' + U.plural(ctx.row.total, 'hábito') + ' · ' + (open ? 'ocultar' : 'ver todos') + '</button>' +
       (open ? habitsList(ctx) : '') + '</section>';
   }
   A.actions.toggleAllHabits = function () { A.ui.allHabits = !A.ui.allHabits; A.render(); };
@@ -146,23 +149,29 @@
       var warn = L.habitWarnings(h, conds);
       var warnTxt = warn.length ? '<span class="tag warn">' + I('alerta', 'sm') + 'Consultá: ' + esc(warn.map(condName).join(', ')) + '</span>' : '';
       return '<li class="habit' + (st === 'done' ? ' is-done' : st === 'skip' ? ' is-skip' : '') + '">' +
-        '<button class="habit-main" data-action="habit" data-h="' + esc(h.id) + '" aria-pressed="' + (st === 'done') + '"' + dis + '><span class="tick">' + I('check') + '</span><span class="grow"><span class="h-t">' + esc(h.text) + '</span>' + (st === 'skip' ? '<span class="meta">Hoy no, a conciencia</span>' : '') + warnTxt + '</span></button>' +
+        '<button class="habit-main" data-action="habit" data-h="' + esc(h.id) + '" aria-pressed="' + (st === 'done') + '"' + dis + '><span class="grow"><span class="h-t">' + esc(h.text) + '</span>' + (st === 'skip' ? '<span class="meta">Hoy no, a conciencia</span>' : '') + warnTxt + '</span><span class="mk" aria-hidden="true"></span></button>' +
         '<div class="habit-side">' + (h.tip ? '<button class="icon-btn sm" data-action="habitTip" data-h="' + esc(h.id) + '" aria-expanded="' + (A.ui.tip === h.id) + '" aria-label="Por qué: ' + esc(h.text) + '">' + I('info', 'sm') + '</button>' : '') +
-        (ctx.editable && st !== 'done' ? '<button class="btn ghost sm" data-action="habitSkip" data-h="' + esc(h.id) + '">' + (st === 'skip' ? 'Deshacer' : 'Hoy no') + '</button>' : '') + '</div>' +
+        (ctx.editable && st !== 'done' ? '<button class="link sm" data-action="habitSkip" data-h="' + esc(h.id) + '">' + (st === 'skip' ? 'Deshacer' : 'Hoy no') + '</button>' : '') + '</div>' +
         (A.ui.tip === h.id && h.tip ? '<p class="habit-tip">' + esc(h.tip) + '</p>' : '') + (warn.length && h.warn ? warn.map(function (c) { return h.warn[c] ? '<p class="habit-tip warn-tip">' + I('alerta', 'sm') + ' ' + esc(h.warn[c]) + '</p>' : ''; }).join('') : '') + '</li>';
     }).join('') + '</ul>';
   }
 
   /* ---------- renglones tranquilos: se abren en hoja (celular) o panel lateral (computadora) ---------- */
-  function qrow(kind, icon, title, small, extra) {
-    return '<div class="qrow"><button class="qrow-main" data-action="openLive" data-k="' + kind + '" aria-haspopup="dialog">' + I(icon) +
-      '<span class="grow"><span class="t">' + esc(title) + '</span>' + (small ? '<small>' + small + '</small>' : '') + '</span>' + (extra ? '' : I('chev', 'sm chev')) + '</button>' + (extra || '') + '</div>';
+  /* v2.4: renglones de texto (sin íconos a la izquierda), separados por líneas finas. */
+  function qrow(kind, icon, title, small, extra, under) {
+    return '<div class="qrow"><button class="qrow-main" data-action="openLive" data-k="' + kind + '" aria-haspopup="dialog">' +
+      '<span class="grow"><span class="t">' + esc(title) + '</span>' + (small ? '<small>' + small + '</small>' : '') + (under || '') + '</span>' + (extra ? '' : I('chev', 'sm chev')) + '</button>' + (extra || '') + '</div>';
+  }
+  function glass(total, goal) {
+    var n = Math.max(1, Math.round(goal / 250)), on = Math.min(n, Math.floor(total / 250));
+    if (n > 16) return '';
+    return '<span class="glass" aria-hidden="true">' + Array.from({ length: n }, function (_, i) { return '<i' + (i < on ? ' class="on"' : '') + '></i>'; }).join('') + '</span>';
   }
   function quietRows(ctx) {
     var out = [];
     var total = ctx.row.water, goal = ctx.sum.waterGoal;
     out.push(qrow('water', 'agua', 'Agua', total + ' de ' + goal + ' ml',
-      '<button class="plus" data-action="water" data-ml="250" aria-label="Sumar 250 ml de agua"' + (ctx.editable ? '' : ' disabled') + '>' + I('mas', 'sm') + '</button>'));
+      '<button class="go" data-action="water" data-ml="250" aria-label="Sumar 250 ml de agua"' + (ctx.editable ? '' : ' disabled') + '>+ 250 ml</button>', glass(total, goal)));
     out.push(qrow('meals', 'bowl', 'Comidas', esc(mealSummary(ctx))));
     out.push(qrow('checkin', 'hoja', '¿Cómo te sentís?', esc(checkinSummary(ctx))));
     var tom = tomorrowItems(ctx);
@@ -219,11 +228,12 @@
       var total = ctx.row.water, goal = ctx.sum.waterGoal, ratio = Math.min(1, total / goal);
       var dis = ctx.editable ? '' : ' disabled';
       return '<p class="big-figure"><b class="num">' + total + '</b> <span>de ' + goal + ' ml</span></p>' +
-        '<div class="bar-h" style="margin:12px 0 22px"><i style="width:' + Math.round(ratio * 100) + '%"></i></div>' +
-        '<div class="btn-row"><button class="btn" data-action="water" data-ml="250"' + dis + '>' + I('mas', 'sm') + '250 ml</button><button class="btn" data-action="water" data-ml="500"' + dis + '>' + I('mas', 'sm') + '500 ml</button>' +
-        (ctx.row.day && ctx.row.day.water.length && ctx.editable ? '<button class="btn ghost" data-action="waterUndo" aria-label="Deshacer el último vaso">' + I('deshacer', 'sm') + 'Deshacer</button>' : '') + '</div>' +
-        '<p class="meta mt">La guía sugiere agua tibia a sorbitos a lo largo del día.</p>' +
-        '<button class="btn ghost sm mt-s" data-action="waterGoal">Meta: ' + (goal / 1000).toString().replace('.', ',') + ' l por día · cambiar</button>' +
+        '<div class="bar-h" style="margin:12px 0 26px"><i style="width:' + Math.round(ratio * 100) + '%"></i></div>' +
+        '<button class="btn primary wide" data-action="water" data-ml="250"' + dis + '>+ 250 ml</button>' +
+        '<div class="more-acts"><button class="link" data-action="water" data-ml="500"' + dis + '>+ 500 ml</button>' +
+        (ctx.row.day && ctx.row.day.water.length && ctx.editable ? '<button class="link" data-action="waterUndo" aria-label="Deshacer el último vaso">Deshacer</button>' : '') +
+        '<button class="link" data-action="waterGoal">Meta: ' + (goal / 1000).toString().replace('.', ',') + ' l por día</button></div>' +
+        '<p class="meta mt c">La guía sugiere agua tibia a sorbitos a lo largo del día.</p>' +
         '<p class="sr-only" aria-live="polite">' + total + ' mililitros de ' + goal + '</p>';
     }
   };
@@ -234,7 +244,7 @@
   A.live.checkin = {
     title: '¿Cómo te sentís?',
     body: function () { var ctx = hoyCtx(); return ctx ? checkinBody(ctx) : null; },
-    foot: function () { return '<button class="btn primary" data-action="closeDialog" data-dlg="sheet">Listo</button>'; }
+    foot: function () { return '<button class="btn primary wide" data-action="closeDialog" data-dlg="sheet">Guardar</button>'; }
   };
   A.live.tomorrow = {
     title: 'Para mañana',
@@ -242,7 +252,7 @@
       var ctx = hoyCtx(); if (!ctx) return null;
       var items = tomorrowItems(ctx);
       if (!items.length) return '<p class="muted">Nada pendiente para mañana.</p>';
-      return '<ul class="list">' + items.map(function (x) { return '<li class="li">' + I(x.icon) + '<span class="grow"><b>' + esc(x.title) + '</b>' + (x.meta ? '<span class="meta">' + esc(x.meta) + '</span>' : '') + '</span>' + (x.href ? '<a class="btn ghost sm" href="' + x.href + '">Ver</a>' : '') + '</li>'; }).join('') + '</ul>';
+      return '<ul class="list">' + items.map(function (x) { return '<li class="li">' + I(x.icon) + '<span class="grow"><b>' + esc(x.title) + '</b>' + (x.meta ? '<span class="meta">' + esc(x.meta) + '</span>' : '') + '</span>' + (x.href ? '<a class="link" href="' + x.href + '">Ver</a>' : '') + '</li>'; }).join('') + '</ul>';
     }
   };
   A.live.note = {
@@ -266,21 +276,21 @@
       var list = items.map(function (m) {
         var r = m.recipeId ? L.recipe(m.recipeId, ctx.p) : null;
         var hits = r ? L.recipeAllergyHits(r, ctx.p) : L.textAllergyHits(m.name, null, ctx.p);
-        return '<li class="meal' + (m.done ? ' is-done' : '') + '"><button class="tick sq' + (m.done ? ' on' : '') + '" data-action="mealToggle" data-slot="' + s.id + '" data-id="' + esc(m.id) + '" aria-pressed="' + !!m.done + '" aria-label="' + (m.done ? 'Desmarcar' : 'Marcar como comida') + ': ' + esc(m.name) + '"' + (ctx.editable ? '' : ' disabled') + '>' + I('check') + '</button>' +
+        return '<li class="meal' + (m.done ? ' is-done' : '') + '"><button class="mkbtn" data-action="mealToggle" data-slot="' + s.id + '" data-id="' + esc(m.id) + '" aria-pressed="' + !!m.done + '" aria-label="' + (m.done ? 'Desmarcar' : 'Marcar como comida') + ': ' + esc(m.name) + '"' + (ctx.editable ? '' : ' disabled') + '><span class="mk"></span></button>' +
           '<span class="grow">' + (r ? '<a href="#/cocina/receta/' + encodeURIComponent(r.id) + '">' + esc(m.name) + '</a>' : esc(m.name)) + (hits.any ? ' <span class="tag alert">' + I('alerta', 'sm') + 'alérgeno</span>' : '') + '</span>' +
-          (ctx.editable ? '<button class="icon-btn sm" data-action="mealDelete" data-slot="' + s.id + '" data-id="' + esc(m.id) + '" aria-label="Quitar ' + esc(m.name) + '">' + I('borrar', 'sm') + '</button>' : '') + '</li>';
+          (ctx.editable ? '<button class="x-btn" data-action="mealDelete" data-slot="' + s.id + '" data-id="' + esc(m.id) + '" aria-label="Quitar ' + esc(m.name) + '">✕</button>' : '') + '</li>';
       }).join('');
       var fromPlan = U.arr(planDay && planDay[s.id]).filter(function (rid) { return !items.some(function (m) { return m.recipeId === rid; }); });
-      var planChips = fromPlan.map(function (rid) { var r = L.recipe(rid, ctx.p); return r ? '<button class="chip soft" data-action="mealAddRecipe" data-slot="' + s.id + '" data-r="' + esc(rid) + '"' + (ctx.editable ? '' : ' disabled') + '>' + I('calendario', 'sm') + 'Del plan: ' + esc(r.title) + '</button>' : ''; }).join('');
+      var planChips = fromPlan.map(function (rid) { var r = L.recipe(rid, ctx.p); return r ? '<button class="sug-line" data-action="mealAddRecipe" data-slot="' + s.id + '" data-r="' + esc(rid) + '"' + (ctx.editable ? '' : ' disabled') + '><span class="grow"><span class="sug-title">+ ' + esc(r.title) + '</span><small>Del plan</small></span></button>' : ''; }).join('');
       var sug = '';
       if (!items.length && !fromPlan.length && ctx.editable) {
         // Una sola sugerencia tranquila por momento; el resto, en «ver más opciones».
         sug = L.suggest({ profile: ctx.p, editionId: ctx.ed.id, program: ctx.prog, phaseId: ctx.row.phaseId, slot: s.id, dayIdx: ctx.idx, dateISO: ctx.iso, n: 1 }).map(function (x) {
-          return '<button class="sug-line" data-action="mealAddRecipe" data-slot="' + s.id + '" data-r="' + esc(x.recipe.id) + '" aria-label="Agregar ' + esc(x.recipe.title) + ' al ' + esc(s.label.toLowerCase()) + '">' + I('mas', 'sm') + '<span class="grow"><span class="sug-title">' + esc(x.recipe.title) + '</span><small>' + esc(x.reason) + '</small></span></button>';
+          return '<button class="sug-line" data-action="mealAddRecipe" data-slot="' + s.id + '" data-r="' + esc(x.recipe.id) + '" aria-label="Agregar ' + esc(x.recipe.title) + ' al ' + esc(s.label.toLowerCase()) + '"><span class="grow"><span class="sug-title">+ ' + esc(x.recipe.title) + '</span><small>' + esc(x.reason) + '</small></span></button>';
         }).join('') + '<button class="more-opts" data-action="mealAddSheet" data-slot="' + s.id + '">ver más opciones</button>';
       }
-      return '<div class="slot"><div class="slot-h"><h3>' + I(SLOT_ICON[s.id] || 'bowl', 'sm') + ' ' + esc(s.label) + '</h3>' + (ctx.editable ? '<button class="btn ghost sm" data-action="mealAddSheet" data-slot="' + s.id + '">' + I('mas', 'sm') + 'Agregar</button>' : '') + '</div>' +
-        (list ? '<ul class="list meals">' + list + '</ul>' : '') + (planChips ? '<div class="chips">' + planChips + '</div>' : '') + (sug ? '<div class="sug-box">' + sug + '</div>' : '') + (!list && !planChips && !sug ? '<p class="meta">Sin registrar.</p>' : '') + '</div>';
+      return '<div class="slot"><div class="slot-h"><h3>' + esc(s.label) + '</h3>' + (ctx.editable ? '<button class="link" data-action="mealAddSheet" data-slot="' + s.id + '">+ Agregar</button>' : '') + '</div>' +
+        (list ? '<ul class="list meals">' + list + '</ul>' : '') + (planChips ? '<div class="sug-box">' + planChips + '</div>' : '') + (sug ? '<div class="sug-box">' + sug + '</div>' : '') + (!list && !planChips && !sug ? '<p class="meta">Sin registrar.</p>' : '') + '</div>';
     }).join('');
     return body + '<p class="meta mt"><a href="#/cocina/plan">Planificar la semana en Cocina › Plan</a></p>' +
       (ctx.row.phaseId === 'monodieta' ? '<p class="note mt-s">En monodieta la guía indica solo las preparaciones permitidas de la fase.</p>' : '');
@@ -295,30 +305,23 @@
       var sy0 = U.arr(c.symptoms).map(function (s) { var x = L.idx().symptoms[s]; return x ? x.label : s; }).concat(U.arr(c.customSymptoms));
       return '<p>' + esc(checkinSummary(ctx)) + '</p>' + (sy0.length ? '<p class="meta">Señales: ' + esc(sy0.join(', ')) + '</p>' : '') + (c.notes ? '<p class="note">' + esc(c.notes) + '</p>' : '');
     }
-    // Energía y ánimo: 5 puntos numerados; la etiqueta solo del elegido, debajo.
-    function scale(field, list) {
-      var name = field === 'energy' ? 'Energía' : 'Ánimo';
-      var chosen = U.arr(list).filter(function (x) { return Number(c[field]) === x.v; })[0];
-      return '<div class="dots5" role="group" aria-label="' + name + '">' + U.arr(list).map(function (x) {
-        var on = Number(c[field]) === x.v;
-        return '<button class="d5' + (on ? ' on' : '') + '" data-action="checkin" data-f="' + field + '" data-v="' + x.v + '" aria-pressed="' + on + '" aria-label="' + x.v + ' de 5: ' + esc(x.label.split(' /')[0]) + '">' + x.v + '</button>';
-      }).join('') + '</div><p class="d5-lab" aria-hidden="true">' + (chosen ? esc(chosen.label.split(' /')[0]) : '&nbsp;') + '</p>';
-    }
-    var dig = U.arr(tx.digestionStates).map(function (x) { var on = c.digestion === x.id; return '<button class="chip' + (on ? ' on' : '') + '" data-action="checkin" data-f="digestion" data-v="' + x.id + '" aria-pressed="' + on + '" title="' + esc(x.label) + '">' + esc(digShort(x)) + '</button>'; }).join('');
+    // v2.4: energía y ánimo como fila de números; digestión y señales como palabras con punto verde.
+    function scale(field, list) { return K.nums(list, c[field], 'checkin', 'data-f="' + field + '"', field === 'energy' ? 'Energía' : 'Ánimo'); }
+    var dig = U.arr(tx.digestionStates).map(function (x) { var on = c.digestion === x.id; return '<button data-action="checkin" data-f="digestion" data-v="' + x.id + '" aria-pressed="' + on + '" title="' + esc(x.label) + '">' + esc(digShort(x)) + '</button>'; }).join('');
     var symList = U.arr(tx.symptoms).filter(function (x) { return x.exclusive; }).concat(U.arr(tx.symptoms).filter(function (x) { return !x.exclusive; }));
     var sym = symList.map(function (x) {
       var on = U.arr(c.symptoms).indexOf(x.id) > -1;
-      return '<span class="symp"><button class="chip' + (on ? ' on' : '') + '" data-action="symptom" data-s="' + x.id + '" aria-pressed="' + on + '" title="' + esc(x.label) + '">' + esc(symShort(x)) + '</button>' + (on && x.sos && L.idx().sos[x.sos] ? '<a class="sos-link" href="#/guia/sos/' + encodeURIComponent(x.sos) + '">' + I('botiquin', 'sm') + 'SOS</a>' : '') + '</span>';
+      return '<span class="symp"><button data-action="symptom" data-s="' + x.id + '" aria-pressed="' + on + '" title="' + esc(x.label) + '">' + esc(symShort(x)) + '</button>' + (on && x.sos && L.idx().sos[x.sos] ? '<a class="sos-link" href="#/guia/sos/' + encodeURIComponent(x.sos) + '">SOS</a>' : '') + '</span>';
     }).join('');
-    var custom = U.arr(c.customSymptoms).map(function (s) { return '<button class="chip on" data-action="customSymptomDel" data-s="' + esc(s) + '" aria-label="Quitar ' + esc(s) + '">' + esc(s) + I('cerrar', 'sm x') + '</button>'; }).join('');
-    return '<div class="checkin" id="h-checkin">' +
-      '<p class="label">Energía</p>' + scale('energy', tx.energyLevels) +
-      '<p class="label">Ánimo</p>' + scale('mood', tx.moodLevels) +
-      '<p class="label">Digestión</p><div class="chips">' + dig + '</div>' +
-      '<p class="label mt">Señales</p><div class="chips">' + sym + custom + '</div>' +
-      '<form class="row mt-s" data-submit="customSymptomAdd"><input class="input" id="custom-symptom" name="s" placeholder="Otra señal…" aria-label="Agregar otra señal" maxlength="60"><button class="btn sm">Agregar</button></form>' +
-      '<label class="field mt"><span>Nota del día</span><textarea class="input" id="checkin-notes" data-bind="checkinNotes" rows="3" placeholder="Cómo dormiste, qué notaste, qué te costó…">' + esc(c.notes || '') + '</textarea></label>' +
-      '<p class="meta">Se guarda solo, mientras lo completás.</p></div>';
+    var custom = U.arr(c.customSymptoms).map(function (s) { return '<button data-action="customSymptomDel" data-s="' + esc(s) + '" aria-pressed="true" aria-label="Quitar ' + esc(s) + '">' + esc(s) + ' <span class="x" aria-hidden="true">✕</span></button>'; }).join('');
+    return '<div class="checkin" id="h-checkin"><p class="sub c">Diez segundos, nada más.</p>' +
+      '<div class="g"><p class="lab c">Energía</p>' + scale('energy', tx.energyLevels) + '</div>' +
+      '<div class="g"><p class="lab c">Ánimo</p>' + scale('mood', tx.moodLevels) + '</div>' +
+      '<div class="g"><p class="lab c">Digestión</p><div class="words" role="group" aria-label="Digestión">' + dig + '</div></div>' +
+      '<div class="g"><p class="lab c">Señales</p><div class="words" role="group" aria-label="Señales">' + sym + custom + '</div>' +
+      '<form class="line-form" data-submit="customSymptomAdd"><input class="input" id="custom-symptom" name="s" placeholder="Otra señal…" aria-label="Agregar otra señal" maxlength="60"><button class="link">Agregar</button></form></div>' +
+      '<div class="g"><label class="field"><span class="sr-only">Nota del día</span><textarea class="input" id="checkin-notes" data-bind="checkinNotes" rows="2" placeholder="Una nota, si querés…">' + esc(c.notes || '') + '</textarea></label></div>' +
+      '<p class="meta c">Se guarda solo, mientras lo completás.</p></div>';
   }
 
   /* ---------- nota del día, cita y «para mañana» ---------- */
@@ -365,21 +368,22 @@
     if (!prog) return K.empty('No hay programas cargados', 'Faltan los datos de la app.', '');
     var mode = A.ui.wMode || (ctx ? ctx.ed.startMode : null) || prog.defaultStartMode;
     var today = A.today();
-    var opts = U.startChoices(today).map(function (o) { return [o[0], o[0], o[1]]; });
+    var opts = U.startChoices(today).map(function (o) { return [o[0], U.cap(o[0].replace('Próximo ', '')), o[1]]; });
     var dsel = A.ui.wDate || today;
     var modes = U.arr(prog.startModes);
     return '<section class="welcome">' +
       '<h1>' + (ctx ? 'Elegí cuándo empezar' : 'Empezá tu programa') + '</h1><p class="muted">' + (ctx ? 'Tu edición importada no tiene una fecha válida. Elegila y seguimos.' : 'Un paso por vez: elegí el programa, la fecha y cómo arrancar. Podés cambiarlo después.') + '</p>' +
       (ctx ? '' : '<label class="field"><span>Programa</span><select class="input" data-change="wProg">' + progs.map(function (x) { return '<option value="' + esc(x.id) + '"' + (x.id === prog.id ? ' selected' : '') + '>' + esc(x.name + (x.days ? ' · ' + x.days + ' días' : '')) + '</option>'; }).join('') + '</select></label>') +
-      '<p class="label">Fecha de inicio</p><div class="chips">' + opts.map(function (o) { return '<button class="chip' + (dsel === o[2] ? ' on' : '') + '" data-action="wDate" data-d="' + o[2] + '" aria-pressed="' + (dsel === o[2]) + '">' + o[1] + ' <span class="meta">' + U.fmtDate(o[2], 'short') + '</span></button>'; }).join('') + '</div>' +
-      '<label class="field mt-s"><span class="sr-only">Otra fecha</span><input type="date" class="input" data-change="wDateInput" value="' + esc(dsel) + '" aria-label="Elegir otra fecha"></label>' +
-      (modes.length > 1 ? '<p class="label">Cómo empezar</p><div class="stack-s">' + modes.map(function (m) { return '<label class="check"><input type="radio" name="wmode" value="' + esc(m.id) + '" data-change="wMode"' + (m.id === mode ? ' checked' : '') + '><span>' + esc(m.label) + '</span></label>'; }).join('') + '</div>' : '') +
-      '<div class="btn-row mt"><button class="btn primary" data-action="startEdition">' + (ctx ? 'Guardar fecha' : 'Empezar') + '</button><a class="btn ghost" href="#/programas">Ver programas</a></div>' +
+      '<p class="lab c">Fecha de inicio</p>' + K.opts(opts.map(function (o) { return [o[2], o[1], U.fmtDate(o[2], 'short')]; }).concat(opts.some(function (o) { return o[2] === dsel; }) ? [] : [[dsel, 'Otra', U.fmtDate(dsel, 'short')]]), dsel, 'wDate', 'Fecha de inicio') +
+      '<label class="field other-date"><span>Otra fecha</span><input type="date" class="input" data-change="wDateInput" value="' + esc(dsel) + '" aria-label="Elegir otra fecha"></label>' +
+      (modes.length > 1 ? '<p class="lab">Cómo empezar</p><div class="choices">' + modes.map(function (m) { return K.choice(m.id === mode, 'wModeSet', 'data-v="' + esc(m.id) + '"', m.label, m.id === prog.defaultStartMode && !/recomend/i.test(m.label) ? 'Recomendado por la guía' : ''); }).join('') + '</div>' : '') +
+      '<div class="cta"><button class="btn primary wide" data-action="startEdition">' + (ctx ? 'Guardar fecha' : 'Empezar') + '</button><a class="link" href="#/programas">Ver programas</a></div>' +
       K.healthNote() + '</section>';
   }
   A.changes.wProg = function (el) { A.ui.wProg = el.value; A.ui.wMode = null; A.render(); };
   A.changes.wMode = function (el) { A.ui.wMode = el.value; };
-  A.actions.wDate = function (el) { A.ui.wDate = el.dataset.d; A.render(); };
+  A.actions.wDate = function (el) { A.ui.wDate = el.dataset.v; A.render(); };
+  A.actions.wModeSet = function (el) { A.ui.wMode = el.dataset.v; A.render(); };
   A.changes.wDateInput = function (el) { if (U.isValidISO(el.value)) { A.ui.wDate = el.value; A.render(); } };
   A.actions.startEdition = function () {
     var ed = A.ED();
@@ -428,7 +432,7 @@
     return '<section class="calm-block closing" aria-label="Programa terminado"><p class="lab">Tu edición en números</p>' +
       '<h2 class="calm-h">Terminaste ' + esc(ctx.prog.name) + '.</h2>' +
       '<p class="calm-sub">' + (cons != null ? cons + ' % de constancia · ' : '') + U.plural(s.completeDays, 'día completo', 'días completos') + ' · mejor racha de ' + U.plural(s.bestStreak, 'día') + ' · ' + U.plural(s.recipesTried.all, 'receta probada', 'recetas probadas') + '</p>' +
-      '<div class="btn-row mt"><a class="btn primary" href="#/progreso/informe">Ver informe</a><a class="btn" href="#/progreso/reintro">Reintroducir alimentos</a><button class="btn ghost" data-action="repeatProgram">Repetir programa</button></div></section>';
+      '<div class="cta"><a class="btn primary" href="#/progreso/informe">Ver informe</a><div class="more-acts"><a class="link" href="#/progreso/reintro">Reintroducir alimentos</a><button class="link" data-action="repeatProgram">Repetir programa</button></div></div></section>';
   }
   A.actions.repeatProgram = function () { var ed = A.ED(); A.go('/programas/' + (ed ? ed.programId : '')); };
 
@@ -472,7 +476,7 @@
   A.actions.waterUndo = function () { withDay(function (d) { d.water.pop(); }, 'water'); };
   A.actions.waterGoal = function () {
     var p = A.P(), cur = L.waterGoal(p, A.PROG());
-    A.openSheet({ id: A.sheetId(), title: 'Meta de agua', body: '<form data-submit="waterGoalSave"><label class="field"><span>Mililitros por día</span><input class="input" name="ml" type="number" min="500" max="6000" step="50" value="' + cur + '" inputmode="numeric"></label><p class="meta">La guía sugiere agua tibia a lo largo del día. Ajustala a tu cuerpo y al clima.</p><button class="btn primary">Guardar</button></form>', focus: 'input' });
+    A.openSheet({ id: A.sheetId(), title: 'Meta de agua', body: '<form data-submit="waterGoalSave"><label class="field"><span>Mililitros por día</span><input class="input" name="ml" type="number" min="500" max="6000" step="50" value="' + cur + '" inputmode="numeric"></label><p class="meta">La guía sugiere agua tibia a lo largo del día. Ajustala a tu cuerpo y al clima.</p><button class="btn primary wide mt">Guardar</button></form>', focus: 'input' });
   };
   A.actions.waterGoalSave = function (f) {
     var v = Math.max(500, Math.min(6000, Math.round(+f.ml.value || 2000)));
@@ -513,7 +517,7 @@
       title: 'Agregar al ' + lab.toLowerCase(),
       body: '<form data-submit="mealAddFree" data-slot="' + slot + '"><div class="search">' + I('buscar') + '<input class="input" id="meal-q" name="q" data-bind="mealSearch" data-slot="' + slot + '" placeholder="Buscá una receta o escribí lo que comiste" autocomplete="off" aria-describedby="meal-hint"></div><p class="meta" id="meal-hint">Enter registra el texto como comida libre.</p></form>' +
         '<div id="meal-results" aria-live="polite"></div>' +
-        '<h3 class="mt">Sugerencias para hoy</h3>' + (sug.length ? '<ul class="list">' + sug.map(function (x) { return resultRow(slot, x.recipe, x.reason, ctx.p); }).join('') + '</ul>' : '<p class="muted">No hay sugerencias aptas para tu perfil en esta fase.</p>') +
+        '<p class="lab mt">Sugerencias para hoy</p>' + (sug.length ? '<ul class="list">' + sug.map(function (x) { return resultRow(slot, x.recipe, x.reason, ctx.p); }).join('') + '</ul>' : '<p class="muted">No hay sugerencias aptas para tu perfil en esta fase.</p>') +
         (ctx.row.phaseId === 'monodieta' ? '<p class="note mt">En monodieta la guía indica solo las preparaciones permitidas de la fase.</p>' : ''),
       focus: '#meal-q'
     });

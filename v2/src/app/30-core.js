@@ -173,6 +173,7 @@
   A.renderChrome = function () {
     var p = A.P(), prog = A.PROG(), tab = A.tabOf(A.route.name);
     document.body.setAttribute('data-tab', tab);
+    document.body.setAttribute('data-screen', A.route.name + (A.route.parts[0] ? '-' + String(A.route.parts[0]).replace(/[^a-z]/g, '') : ''));
     var links = function (cls) {
       return NAV.map(function (n) {
         return '<a class="' + cls + '" href="#/' + n[0] + '"' + (tab === n[0] ? ' aria-current="page"' : '') + '>' + A.icon(n[2]) + '<span>' + n[1] + '</span></a>';
@@ -359,7 +360,7 @@
         id: 'sheet2', title: o.title,
         body: '<p>' + (o.html || esc(o.text || '')) + '</p>' + (o.typed ? '<label class="field"><span>Escribí <b>' + esc(o.typed) + '</b> para confirmar</span><input class="input" id="confirm-typed" autocomplete="off"></label>' : '') +
           (o.checkbox ? '<label class="check"><input type="checkbox" id="confirm-check"><span>' + esc(o.checkbox) + '</span></label>' : ''),
-        foot: '<button class="btn" data-action="closeDialog" data-dlg="sheet2">' + esc(o.cancel || 'Cancelar') + '</button><button class="btn ' + (o.danger ? 'danger solid' : 'primary') + '" id="confirm-ok">' + esc(o.ok || 'Aceptar') + '</button>',
+        foot: '<button class="btn ' + (o.danger ? 'danger solid' : 'primary') + ' wide" id="confirm-ok">' + esc(o.ok || 'Aceptar') + '</button><button class="link" data-action="closeDialog" data-dlg="sheet2">' + esc(o.cancel || 'Cancelar') + '</button>',
         focus: o.typed ? '#confirm-typed' : '#confirm-ok',
         onClose: function () { if (!done) resolve(false); },
         mount: function (d) {

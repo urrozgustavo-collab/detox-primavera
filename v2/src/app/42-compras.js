@@ -58,25 +58,29 @@
       var h = [A.cocinaHead ? A.cocinaHead('compras') : '<header class="page-h"><h1>Compras</h1></header>'];
       h.push('<nav class="seg" aria-label="Listas"><a href="#/compras"' + (view === 'semana' ? ' aria-current="page"' : '') + '>Para esta semana</a><a href="#/compras/base"' + (view === 'base' ? ' aria-current="page"' : '') + '>Lista base del programa</a></nav>');
       var stores = groups.map(function (g) { return g.id; });
-      var tcard = ['<section class="toolbar-card mt-s">'];
-      if (view === 'semana') {
-        var cur = A.ui.shopRange || 'esta';
-        tcard.push('<div class="row wrap between"><div class="seg" role="group" aria-label="Rango">' + [['esta', 'Esta semana'], ['proxima', 'Próxima semana'], ['3', 'Próximos 3 días']].map(function (o) { return '<button data-action="shopRange" data-v="' + o[0] + '" aria-pressed="' + (cur === o[0]) + '">' + o[1] + '</button>'; }).join('') + '</div><span class="meta">Del ' + esc(U.fmtDate(r[0], 'short')) + ' al ' + esc(U.fmtDate(r[1], 'short')) + ' (semana de lunes a domingo, como el Plan)</span></div>');
-      } else {
-        h.push('<p class="muted">El listado de la guía para todo el programa. Los esenciales están marcados.</p>');
-      }
-      tcard.push('<form class="row' + (view === 'semana' ? ' mt' : '') + '" data-submit="shopAdd"><input class="input" name="t" list="ing-dl" placeholder="Agregar algo a la lista…" aria-label="Agregar a la lista" autocomplete="off" maxlength="80"><button class="btn primary">' + I('mas', 'sm') + '<span class="sr-only">Agregar</span></button></form>' +
-        '<datalist id="ing-dl">' + U.arr(A.dx().ingredients).map(function (i) { return '<option value="' + esc(i.name) + '">'; }).join('') + '</datalist>');
-      tcard.push('<div class="chips scroll mt-s"><button class="chip' + (!A.ui.shopStore ? ' on' : '') + '" data-action="shopStore" data-s="" aria-pressed="' + !A.ui.shopStore + '">Todos <span class="meta">' + pending + '</span></button>' +
-        groups.map(function (g) { var n = g.items.filter(function (x) { return !done(p, x) && !x.have; }).length, on = A.ui.shopStore === g.id; return '<button class="chip' + (on ? ' on' : '') + '" data-action="shopStore" data-s="' + g.id + '" aria-pressed="' + on + '">' + esc(g.label) + ' <span class="meta">' + n + '</span></button>'; }).join('') + '</div>');
-      tcard.push('<div class="row wrap mt-s"><label class="switch" style="min-height:40px;gap:8px"><input type="checkbox" data-change="hideBought"' + (A.ui.hideBought ? ' checked' : '') + '><span>Ocultar comprados</span></label>' +
-        (view === 'base' ? '<label class="switch" style="min-height:40px;gap:8px"><input type="checkbox" data-change="onlyEss"' + (A.ui.onlyEss ? ' checked' : '') + '><span>Solo esenciales</span></label>' : '') + '</div>');
-      tcard.push('</section>');
-      h.push(tcard.join(''));
+      // v2.4: título centrado con la cuenta en una frase; opciones como palabras; renglones con línea fina.
+      var nDone = items.filter(function (x) { return done(p, x); }).length, nHave = items.filter(function (x) { return x.have && !done(p, x); }).length;
+      var cur = A.ui.shopRange || 'esta';
+      var title = view === 'base' ? 'Lista base' : ({ esta: 'Esta semana', proxima: 'Próxima semana', 3: 'Próximos 3 días' })[cur] || 'Esta semana';
+      var bits = [U.plural(items.length, 'cosa', 'cosas')];
+      if (nDone) bits.push(nDone + (nDone === 1 ? ' comprada' : ' compradas'));
+      if (nHave) bits.push(nHave + ' ya en casa');
+      if (view === 'semana') bits.push('del ' + U.fmtDate(r[0], 'short') + ' al ' + U.fmtDate(r[1], 'short'));
+      h.push('<header class="shop-head c"><h2 class="disp-h">' + esc(title) + '</h2><p class="muted">' + esc(bits.join(' · ')) + '</p></header>');
+      if (view === 'semana') h.push(K.opts([['esta', 'Esta semana'], ['proxima', 'Próxima'], ['3', 'Próximos 3 días']], cur, 'shopRange', 'Rango de la lista'));
+      else h.push('<p class="muted c">El listado de la guía para todo el programa. Los esenciales están señalados.</p>');
+      var tw = ['<div class="shop-tools">'];
+      tw.push('<div class="cats" role="group" aria-label="Comercios"><button type="button" data-action="shopStore" data-s="" aria-pressed="' + !A.ui.shopStore + '">Todos <span class="meta">' + pending + '</span></button>' +
+        groups.map(function (g) { var n = g.items.filter(function (x) { return !done(p, x) && !x.have; }).length, on = A.ui.shopStore === g.id; return '<button type="button" data-action="shopStore" data-s="' + g.id + '" aria-pressed="' + on + '">' + esc(g.label) + ' <span class="meta">' + n + '</span></button>'; }).join('') + '</div>');
+      tw.push('<div class="words" role="group" aria-label="Ver"><button type="button" data-action="shopHide" aria-pressed="' + !!A.ui.hideBought + '">Ocultar comprados</button>' +
+        (view === 'base' ? '<button type="button" data-action="shopEss" aria-pressed="' + !!A.ui.onlyEss + '">Solo esenciales</button>' : '') + '</div>');
+      tw.push('</div>');
+      h.push(tw.join(''));
       if (view === 'semana' && !L.planEntries(p.plan, r[0], r[1]).length) {
         h.push('<div class="banner info mt-s">' + I('calendario') + '<div class="grow"><b>No hay comidas planificadas para ' + esc(r[2]) + '.</b>Planificá en Cocina y los ingredientes aparecen acá sumados por comercio.</div><a class="btn sm" href="#/cocina/plan">Planificar</a></div>');
       }
       if (!items.length) h.push(K.empty(view === 'base' ? 'La lista base está vacía' : 'Nada para comprar', view === 'base' ? '' : 'Agregá algo arriba o planificá comidas.', ''));
+      var shownHtml = [];
       var shown = groups.filter(function (g) { return !A.ui.shopStore || g.id === A.ui.shopStore; });
       if (A.ui.shopStore && stores.indexOf(A.ui.shopStore) < 0) shown = groups;
       shown.forEach(function (g) {
@@ -84,26 +88,37 @@
         var list = g.items.slice().sort(function (a, b) { return rank(a) - rank(b); });
         if (A.ui.hideBought) list = list.filter(function (x) { return !done(p, x); });
         var n = g.items.filter(function (x) { return !done(p, x) && !x.have; }).length;
-        h.push('<section class="shop-store" aria-label="' + esc(g.label) + '"><h3><span class="serif">' + esc(g.label) + '</span><span class="tag' + (n ? ' accent' : '') + '">' + (n ? n + ' por comprar' : 'Todo comprado') + '</span></h3>' +
-          (list.length ? '<ul class="list card" style="padding:4px 14px">' + list.map(function (it) { return row(p, it); }).join('') + '</ul>' : '') + '</section>');
+        shownHtml.push('<section class="shop-store" aria-label="' + esc(g.label) + '"><p class="lab"><span>' + esc(g.label) + '</span><span>' + (n ? n + ' por comprar' : 'todo comprado') + '</span></p>' +
+          (list.length ? '<ul class="its">' + list.map(function (it) { return row(p, it); }).join('') + '</ul>' : '') + '</section>');
       });
-      h.push('<div class="btn-row mt"><button class="btn" data-action="shopShare" data-v="' + view + '">' + I('compartir', 'sm') + 'Compartir pendientes</button>' +
-        (view === 'semana' ? '<button class="btn" data-action="shopClearDone">' + I('borrar', 'sm') + 'Quitar comprados propios</button>' : '<button class="btn" data-action="shopResetBase">' + I('refrescar', 'sm') + 'Desmarcar todo</button>') +
-        '<button class="btn ghost" data-action="shopOrder">' + I('lista', 'sm') + 'Ordenar comercios</button></div>');
+      if (shownHtml.length) h.push('<div class="two">' + shownHtml.join('') + '</div>');
+      h.push('<div class="cta"><form class="add-form" data-submit="shopAdd"><input class="input" name="t" list="ing-dl" placeholder="Agregar algo a la lista…" aria-label="Agregar a la lista" autocomplete="off" maxlength="80"><button class="btn primary">Agregar</button></form>' +
+        '<datalist id="ing-dl">' + U.arr(A.dx().ingredients).map(function (i) { return '<option value="' + esc(i.name) + '">'; }).join('') + '</datalist>' +
+        '<div class="more-acts"><button class="link" data-action="shopShare" data-v="' + view + '">Compartir pendientes</button>' +
+        (view === 'semana' ? '<button class="link" data-action="shopClearDone">Quitar comprados propios</button>' : '<button class="link" data-action="shopResetBase">Desmarcar todo</button>') +
+        '<button class="link" data-action="shopOrder">Ordenar comercios</button></div></div>');
       return h.join('');
     }
   };
   function row(p, it) {
     var d = done(p, it);
     var hit = L.textAllergyHits(it.text, it.ingredient, p);
-    return '<li class="shop-item' + (d ? ' is-done' : it.have ? ' is-have' : '') + '" id="sh-' + esc(it.id) + '"><button class="tick sq' + (d ? ' on' : '') + '" data-action="shopToggle" data-id="' + esc(it.id) + '" data-k="' + it.kind + '" aria-pressed="' + d + '" aria-label="' + (d ? 'Desmarcar ' : 'Marcar como comprado: ') + esc(it.text) + '">' + I('check') + '</button>' +
-      '<span class="grow"><b>' + esc(it.text) + '</b>' + (it.qty ? ' <span class="meta">· ' + esc(it.qty) + '</span>' : '') + (it.have && !d ? ' <span class="tag accent">' + I('heladera', 'sm') + 'ya tenés</span>' : '') + (it.essential ? ' <span class="tag accent">esencial</span>' : '') + (it.stage === 'previa' ? ' <span class="tag bloom">para empezar</span>' : '') +
-      (hit.any ? ' <span class="tag alert">' + I('alerta', 'sm') + 'tu alergia</span>' : '') + (it.src ? '<span class="src">' + esc(it.src) + '</span>' : '') + '</span>' +
-      (it.kind === 'custom' ? '<button class="icon-btn sm" data-action="shopDel" data-id="' + esc(it.id) + '" aria-label="Quitar ' + esc(it.text) + '">' + I('cerrar', 'sm') + '</button>' : '') + '</li>';
+    // v2.4: todo el renglón marca; lo comprado lleva punto verde a la izquierda y tachado suave.
+    var notes = [];
+    if (it.have && !d) notes.push('ya tenés');
+    if (it.essential) notes.push('esencial');
+    if (it.stage === 'previa') notes.push('para empezar');
+    if (it.src) notes.push(it.src);
+    return '<li class="it' + (d ? ' got' : it.have ? ' have' : '') + '" id="sh-' + esc(it.id) + '"><button class="it-main" data-action="shopToggle" data-id="' + esc(it.id) + '" data-k="' + it.kind + '" aria-pressed="' + d + '" aria-label="' + (d ? 'Desmarcar ' : 'Marcar como comprado: ') + esc(it.text) + '">' +
+      '<span class="mk" aria-hidden="true"></span><span class="n">' + esc(it.text) + (hit.any ? ' <span class="alert-txt">tu alergia</span>' : '') + (notes.length ? '<small>' + esc(notes.join(' · ')) + '</small>' : '') + '</span>' +
+      '<span class="q">' + esc(it.qty || '') + '</span></button>' +
+      (it.kind === 'custom' ? '<button class="x-btn" data-action="shopDel" data-id="' + esc(it.id) + '" aria-label="Quitar ' + esc(it.text) + '">✕</button>' : '') + '</li>';
   }
   A.actions.shopRange = function (el) { A.ui.shopRange = el.dataset.v; A.render(); };
   A.actions.shopStore = function (el) { A.ui.shopStore = el.dataset.s || null; A.render(); };
   A.changes.hideBought = function (el) { A.ui.hideBought = el.checked; A.render(); };
+  A.actions.shopHide = function () { A.ui.hideBought = !A.ui.hideBought; A.render(); };
+  A.actions.shopEss = function () { A.ui.onlyEss = !A.ui.onlyEss; A.render(); };
   A.changes.onlyEss = function (el) { A.ui.onlyEss = el.checked; A.render(); };
   A.actions.shopToggle = function (el) {
     var id = el.dataset.id, kind = el.dataset.k;
@@ -151,7 +166,7 @@
   };
   function orderBody() {
     var o = storeOrder(A.P());
-    return '<p class="muted">En el orden en que recorrés los comercios.</p><ul class="list">' + o.map(function (id, i) {
+    return '<p class="muted">En el orden en que recorrés los comercios.</p><ul class="list order-list">' + o.map(function (id, i) {
       return '<li class="li"><span class="grow">' + esc(L.storeLabel(id)) + '</span><button class="icon-btn sm" data-action="storeMove" data-i="' + i + '" data-d="-1" aria-label="Subir ' + esc(L.storeLabel(id)) + '"' + (i === 0 ? ' disabled' : '') + '>' + I('arriba', 'sm') + '</button><button class="icon-btn sm" data-action="storeMove" data-i="' + i + '" data-d="1" aria-label="Bajar ' + esc(L.storeLabel(id)) + '"' + (i === o.length - 1 ? ' disabled' : '') + '>' + I('abajo', 'sm') + '</button></li>';
     }).join('') + '</ul>';
   }

@@ -20,7 +20,7 @@
     var p = A.P(), last = A.state.device.lastBackupAt;
     var st = L.backupStatus(p, last, Date.now());
     if (!st.hasData) return '';
-    if (!st.due) return always || last ? '<p class="meta">' + I('check', 'sm') + ' ' + (last ? 'Última copia de seguridad: ' + esc(U.ago(last)) + '.' : 'Todavía no hiciste una copia; te lo recordamos a las dos semanas.') + '</p>' : '';
+    if (!st.due) return always || last ? '<p class="meta">' + (last ? 'Última copia de seguridad: ' + esc(U.ago(last)) + '.' : 'Todavía no hiciste una copia; te lo recordamos a las dos semanas.') + '</p>' : '';
     return '<div class="banner"><span>' + I('descargar') + '</span><div class="grow"><b>' + (st.never ? 'Llevás ' + U.plural(st.days, 'día') + ' de registros sin copia de seguridad.' : 'Última copia hace ' + U.plural(st.days, 'día') + '.') + '</b>Tus datos viven en este navegador. Una copia te protege si se borra o cambiás de celular.</div><button class="btn sm" data-action="exportBackup">Exportar</button></div>';
   };
 

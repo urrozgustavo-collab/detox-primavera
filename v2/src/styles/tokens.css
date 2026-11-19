@@ -9,7 +9,7 @@
   --bloom: #C9542F; --bloom-soft: #FBE7DF; --bloom-text: #9A3B1C;
   --pollen: #B87A1E; --pollen-soft: #F8EBD6; --pollen-text: #6E4808;
   --clay: #9A5D24; --clay-soft: #F4E6D8; --clay-text: #6E3F12;
-  --ok: #446650; --warn: #B76E14; --danger: #B83B24;
+  --ok: #446650; --warn: #B76E14; --danger: #B83B24; --amber: #B8862B; --faint: #B5AAA3;
   --warn-soft: #FBEEDB; --warn-text: #734308; --danger-soft: #FBE3DD; --danger-text: #8C2715;
 
   --border-subtle: var(--line);
@@ -22,8 +22,9 @@
   --shadow-primary: none;
   --scrim: rgba(36, 28, 24, .38);
 
-  --f-display: "Avenir Next", "Avenir", "Montserrat", "Segoe UI Variable Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --f-text: "Avenir Next", "Avenir", "Montserrat", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* v2.4: el texto va en Geist (incrustada por build.py); los títulos grandes siguen en Segoe UI Variable Display. */
+  --f-display: "Segoe UI Variable Display", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, Helvetica, Arial, sans-serif;
+  --f-text: "Geist", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --fs-12: .75rem; --fs-14: .875rem; --fs-16: 1rem; --fs-17: 1.0625rem; --fs-18: 1.125rem; --fs-22: 1.375rem;
   --fs-28: 1.75rem; --fs-36: 2.125rem; --fs-52: 3.5rem;
 
@@ -46,7 +47,7 @@
   --bloom: #EE8A68; --bloom-soft: #3E2A22; --bloom-text: #F2A588;
   --pollen: #E6B05C; --pollen-soft: #3A2D18; --pollen-text: #F1C98A;
   --clay: #DF9B62; --clay-soft: #3A281B; --clay-text: #EBB68A;
-  --ok: #8DB89A; --warn: #E6B05C; --danger: #F28673;
+  --ok: #8DB89A; --warn: #E6B05C; --danger: #F28673; --amber: #D9AE5E; --faint: #6B605B;
   --warn-soft: #3A2D18; --warn-text: #F1C98A; --danger-soft: #3D211D; --danger-text: #F7A899;
 
   --shadow-md: 0 6px 20px rgba(0, 0, 0, .35);

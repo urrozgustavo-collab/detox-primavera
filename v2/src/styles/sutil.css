@@ -1,4 +1,6 @@
-/* Capa «Calma · Un paso a la vez» (v2.3, organización A elegida por Gustavo el 18/11/2026).
+/* Capa «Calma · Un paso a la vez» (v2.3; en v2.4 se quitaron el panel lateral, la cocina partida
+   y las dos columnas de Hoy/Vos: los reemplaza texto.css, «texto y líneas finas» en una columna central).
+   (v2.3, organización A elegida por Gustavo el 18/11/2026).
    Se carga después de base/components/screens. Paleta «Primavera sutil» (tokens.css).
    Reglas: mucho aire, sin cajas de color, sin mayúsculas sostenidas, sin sombras salvo la
    cápsula flotante y el panel lateral; un solo foco por pantalla. Claro y oscuro. */
@@ -80,19 +82,6 @@ dialog.sheet { border: 0; border-radius: 28px 28px 0 0; box-shadow: none; }
 .sheet-f { border-top: 0; padding: 8px 24px calc(18px + env(safe-area-inset-bottom)); }
 .grabber { background: var(--line-strong); margin-top: 10px; }
 @media (min-width: 720px) and (max-width: 959px) { dialog.sheet { margin: auto auto 0; border-radius: 28px 28px 0 0; } .grabber { display: block; } }
-@media (min-width: 960px) {
-  dialog.sheet {
-    margin: 0 0 0 auto; width: min(440px, 100vw); max-width: 440px; height: 100vh; height: 100dvh; max-height: none;
-    border-radius: 0; border-left: 1px solid var(--line); box-shadow: var(--panel-shadow);
-  }
-  dialog.sheet[open] { animation: panel-in var(--t-med) var(--ease); }
-  .sheet-h { padding: 26px 22px 6px 34px; }
-  .sheet-h h2 { font-size: 1.625rem; font-weight: 300; }
-  .sheet-b { flex: 1; padding: 14px 34px 28px; }
-  .sheet-f { padding: 12px 34px 26px; }
-  .grabber { display: none; }
-}
-@keyframes panel-in { from { transform: translateX(32px); opacity: 0; } }
 .toast-host { bottom: calc(16px + env(safe-area-inset-bottom)) !important; }
 
 /* ================= piezas comunes ================= */
@@ -179,10 +168,6 @@ h1.page-h { font-size: 2rem; font-weight: 300; letter-spacing: -0.02em; }
 /* ================= Hoy ================= */
 .hoy-a { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "close" "head" "line" "focus" "rows" "extra"; }
 .a-close { grid-area: close; } .a-head { grid-area: head; } .a-line { grid-area: line; } .a-focus { grid-area: focus; } .a-rows { grid-area: rows; } .a-extra { grid-area: extra; }
-@media (min-width: 960px) {
-  .hoy-a { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); column-gap: 56px; grid-template-areas: "close close" "head line" "focus rows" "extra extra"; align-items: start; margin-top: 12px; }
-  .a-line { padding-top: 6px; }
-}
 .day-head { padding-top: 4px; }
 .day-date { font-size: 0.9375rem; color: var(--muted); margin: 0; }
 .day-big { font-family: var(--f-display); font-size: clamp(3rem, 13vw, 4rem); font-weight: 300; letter-spacing: -0.045em; line-height: 1; margin: 8px 0 6px; }
@@ -300,23 +285,6 @@ button.day-phase { text-decoration: underline dotted color-mix(in srgb, var(--bl
 .alert-txt svg { width: 13px; height: 13px; }
 .rrow:hover .t b { text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
 
-@media (min-width: 960px) {
-  .kitchen { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 40px; align-items: start; }
-  .ks-list { position: sticky; top: 80px; height: calc(100vh - 96px); display: flex; flex-direction: column; min-height: 0; }
-  .ks-head { flex: none; padding: 2px 10px 10px 2px; border-bottom: 1px solid var(--line); }
-  .ks-scroll { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 6px 10px 24px 2px; scrollbar-width: thin; }
-  .ks-list .toolbar-card .chips.scroll { margin-left: 0; margin-right: 0; padding-left: 0; padding-right: 0; }
-  .ks-list .rlist > li + li { border-top: 0; }
-  .ks-list .rrow { padding: 10px 12px; }
-  .ks-list .rrow:hover { background: color-mix(in srgb, var(--surface) 70%, transparent); }
-  .ks-list .rrow:hover .t b { text-decoration: none; }
-  .ks-list .rrow[aria-current="page"] { background: var(--surface); box-shadow: 0 0 0 1px var(--line); }
-  .ks-detail { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 34px 40px 30px; min-width: 0; }
-  .ks-detail > .back { display: none; }
-  .ks-detail .card { border: 0; padding: 0; background: transparent; border-radius: 0; }
-  .ks-detail .grid2 { gap: 36px; }
-  .ks-detail .card.mt { margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--line); }
-}
 .recipe-h h1 { font-weight: 300; letter-spacing: -0.025em; font-size: clamp(1.9rem, 6vw, 2.4rem); }
 .rc-cat { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 0.8125rem; color: var(--muted); }
 .rcard:hover { transform: none; box-shadow: none; }
@@ -341,7 +309,6 @@ button.day-phase { text-decoration: underline dotted color-mix(in srgb, var(--bl
 .vos-plant .meta { font-size: 0.75rem; }
 @media (max-width: 520px) { .vos-top { gap: 10px; align-items: flex-start; } .vos-plant svg { width: 44px; height: 51px; } }
 .vos-grid { display: grid; grid-template-columns: 1fr; gap: 26px; margin-top: 28px; }
-@media (min-width: 960px) { .vos-grid { grid-template-columns: 1fr 1.3fr; gap: 28px; margin-top: 34px; } .vos-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 26px 28px; } }
 .heat-dots { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; max-width: 340px; }
 .hd { display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%; color: var(--accent-text); text-decoration: none; }
 .hd svg.i { width: 46%; height: 46%; stroke-width: 2.4; }

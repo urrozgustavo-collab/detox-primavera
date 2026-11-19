@@ -22,7 +22,7 @@ import struct
 import sys
 from pathlib import Path
 
-VERSION = "2.3.0"
+VERSION = "2.4.0"
 NL = chr(10)
 V2 = Path(__file__).resolve().parent
 ROOT = V2.parent
@@ -41,6 +41,23 @@ def read(path):
         return path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
         fail("el archivo no esta en UTF-8: " + str(path.relative_to(ROOT)))
+
+
+FONT = SRC / "fonts" / "Geist-Variable.woff2"
+FONT_SHA256 = "206f01ed08e05c98a51daa7472331c3c71bbb8c1f9d55ea8c70074f3c528a706"
+
+
+def font_face():
+    """Geist (texto de la app) incrustada en base64: sin pedidos a internet. Se verifica el SHA-256 de FUENTES.md."""
+    if not FONT.is_file():
+        fail("falta la fuente " + str(FONT.relative_to(ROOT)))
+    raw = FONT.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != FONT_SHA256:
+        fail("el SHA-256 de Geist-Variable.woff2 no coincide con v2/src/fonts/FUENTES.md")
+    b64 = base64.b64encode(raw).decode("ascii")
+    return ("/* ==== Geist (SIL OFL 1.1, ver v2/src/fonts/) ==== */" + NL +
+            "@font-face { font-family: \"Geist\"; font-style: normal; font-weight: 100 900; font-display: swap; "
+            "src: url(data:font/woff2;base64," + b64 + ") format(\"woff2\"); }" + NL)
 
 
 def css_files():
@@ -167,7 +184,7 @@ def main():
         if mark not in shell:
             fail("shell.html no tiene la marca " + mark)
 
-    css = "\n".join("/* ==== %s ==== */\n%s" % (p.name, read(p)) for p in css_files())
+    css = font_face() + "\n".join("/* ==== %s ==== */\n%s" % (p.name, read(p)) for p in css_files())
     if "</style" in css.lower():
         fail("un CSS contiene '</style'")
 
@@ -231,8 +248,8 @@ def main():
     print("  CSS  %8d B" % len(css.encode("utf-8")))
     print("  JS   %8d B%s" % (len(js.encode("utf-8")), data_note))
     print("  HTML %8d B  -> %s" % (size, out / "index.html"))
-    if size > 600 * 1024:
-        print("AVISO: el HTML supera los 600 KB del contrato", file=sys.stderr)
+    if size > 800 * 1024:
+        print("AVISO: el HTML supera los 800 KB del contrato (600 KB + fuente Geist incrustada, v2.4)", file=sys.stderr)
 
 
 SW_TEMPLATE = """/* Service worker de Detox v2.

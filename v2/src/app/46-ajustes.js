@@ -219,7 +219,7 @@
       return sec('sync', 'Sincronizar dispositivos',
         '<p>Usá tu perfil en el celular y en la compu. Los datos viajan <b>cifrados</b>: sin tu código nadie puede leerlos. Cada persona sincroniza su propio perfil.</p>' +
         (s.legacyCode ? '<div class="banner info">' + I('nube') + '<div class="grow"><b>Tenías el código ' + esc(s.legacyCode) + ' en la versión anterior.</b>Podés traer lo que quedó en la nube y fusionarlo.</div><button class="btn sm" data-action="syncLegacy">Recuperar</button></div>' : '') +
-        '<div class="btn-row"><button class="btn primary" data-action="syncCreate">' + I('nube', 'sm') + 'Crear código nuevo</button></div>' +
+        '<div class="btn-row"><button class="btn" data-action="syncCreate">' + I('nube', 'sm') + 'Crear código nuevo</button></div>' +
         '<form class="row mt" data-submit="syncLinkForm"><input class="input" name="c" placeholder="XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" aria-label="Código de otro dispositivo" maxlength="40"><button class="btn">Vincular</button></form><p class="meta mt-s">¿Ya lo creaste en otro dispositivo? Escribí el código o abrí el enlace que te mandaste.</p>');
     }
     var legacy = L.isLegacyCode(s.code);
@@ -228,7 +228,7 @@
       (legacy ? '<div class="banner">' + I('candado') + '<div class="grow"><b>Estás usando un código viejo y corto.</b>Pasá a uno nuevo de 12 caracteres: es mucho más seguro y tus datos quedan cifrados.</div><button class="btn sm" data-action="syncUpgrade">Pasar ahora</button></div>' : '') +
       '<p class="label">Tu código</p><p class="code">' + esc(L.fmtCode(s.code)) + '</p>' +
       '<p class="meta">Último envío: ' + esc(U.ago(s.lastPushAt)) + (s.lastPullAt ? ' · última recepción: ' + esc(U.ago(s.lastPullAt)) : '') + (A.Sync.error || s.error ? '<br><span style="color:var(--danger-text)">' + esc(A.Sync.error || s.error) + '</span>' : '') + (s.dirty ? '<br>Hay cambios esperando para enviarse.' : '') + '</p>' +
-      '<div class="btn-row mt"><button class="btn primary" data-action="syncNow">' + I('refrescar', 'sm') + 'Sincronizar ahora</button><button class="btn" data-action="syncCopy">' + I('link', 'sm') + 'Copiar enlace</button><button class="btn" data-action="syncShare">' + I('compartir', 'sm') + 'Compartir</button><button class="btn" data-action="syncQR">' + I('qr', 'sm') + 'QR</button><button class="btn danger" data-action="syncUnlink">Desvincular</button></div>' +
+      '<div class="btn-row mt"><button class="btn" data-action="syncNow">' + I('refrescar', 'sm') + 'Sincronizar ahora</button><button class="btn" data-action="syncCopy">' + I('link', 'sm') + 'Copiar enlace</button><button class="btn" data-action="syncShare">' + I('compartir', 'sm') + 'Compartir</button><button class="btn" data-action="syncQR">' + I('qr', 'sm') + 'QR</button><button class="btn danger" data-action="syncUnlink">Desvincular</button></div>' +
       '<p class="meta mt-s">Abrí el enlace o escaneá el QR en tu otro dispositivo, <b>con el perfil de la misma persona</b>. El código es la llave: compartilo solo con vos.</p><input type="hidden" id="sync-link" value="' + esc(link) + '">');
   }
   A.actions.syncCreate = function (el) {
@@ -266,7 +266,7 @@
       '<p>Descargá un archivo .ics y abrilo: se agregan a Google Calendar, Apple o Outlook. Funcionan aunque la app esté cerrada.</p>' +
       '<div class="grid2"><label class="field"><span>Agua con limón</span><input class="input" type="time" data-change="icsTime" data-k="water" value="' + t.water + '"></label><label class="field"><span>Check-in del día</span><input class="input" type="time" data-change="icsTime" data-k="checkin" value="' + t.checkin + '"></label></div>' +
       '<label class="field"><span>Remojos (solo los días que el plan lo necesita)</span><input class="input" type="time" data-change="icsTime" data-k="soak" value="' + t.soak + '"></label>' +
-      '<button class="btn primary" data-action="downloadICS">' + I('calendario', 'sm') + 'Descargar recordatorios</button>');
+      '<button class="btn" data-action="downloadICS">' + I('calendario', 'sm') + 'Descargar recordatorios</button>');
   }
   A.changes.icsTime = function (el) { A.ui.ics[el.dataset.k] = el.value; };
   A.actions.downloadICS = function () {
@@ -359,7 +359,7 @@
     var p = A.P(), d = A.state.device;
     var profs = Object.keys(A.state.profiles).map(function (k) { return A.state.profiles[k]; });
     A.openSheet({ title: p.name || 'Tu perfil', body:
-      '<ul class="list">' + profs.map(function (x) { var me = x.id === p.id; return '<li><button class="li" data-action="' + (me ? 'closeDialog' : 'switchProfile') + '" data-p="' + x.id + '" data-dlg="sheet">' + A.avatar(x, 36) + '<span class="grow"><b>' + esc(x.name || 'Sin nombre') + '</b>' + (me ? '<span class="meta">En uso</span>' : '<span class="meta">Cambiar a este perfil</span>') + '</span>' + (me ? I('check') : I('chev', 'chev')) + '</button></li>'; }).join('') + '</ul>' +
+      '<ul class="list">' + profs.map(function (x) { var me = x.id === p.id; return '<li><button class="li" data-action="' + (me ? 'closeDialog' : 'switchProfile') + '" data-p="' + x.id + '" data-dlg="sheet">' + A.avatar(x, 36) + '<span class="grow"><b>' + esc(x.name || 'Sin nombre') + '</b>' + (me ? '<span class="meta">En uso</span>' : '<span class="meta">Cambiar a este perfil</span>') + '</span>' + (me ? '<span class="mk on" aria-hidden="true"></span>' : I('chev', 'chev')) + '</button></li>'; }).join('') + '</ul>' +
       '<ul class="list mt-s"><li><button class="li" data-action="addProfile">' + I('mas') + '<span class="grow"><b>Sumar persona</b><span class="meta">Cada una lleva su propio diario</span></span></button></li>' +
       '<li><a class="li" href="#/programas">' + I('flor') + '<span class="grow"><b>Programas</b><span class="meta">Repetir, cambiar o crear uno</span></span>' + I('chev', 'chev') + '</a></li>' +
       '<li><a class="li" href="#/ajustes">' + I('ajustes') + '<span class="grow"><b>Ajustes</b><span class="meta">Salud, copia de seguridad, sincronizar</span></span>' + I('chev', 'chev') + '</a></li></ul>' +

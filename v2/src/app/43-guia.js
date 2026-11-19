@@ -25,7 +25,8 @@
   /* ---------- semáforo ---------- */
   function phaseNow() { var ed = A.ED(), prog = A.PROG(), d = curDay(); return ed && prog && d != null ? L.phaseId(prog, ed.startMode, d) : null; }
   function foodList() {
-    var q = A.ui.fdq || '', st = A.ui.fdst || '';
+    // v2.4: un grupo por vez (Libre, Con moderación, Evitar); al buscar, se ven todos los que coinciden.
+    var q = A.ui.fdq || '', st = U.norm(q).length ? '' : (A.ui.fdst || 'green');
     var ph = phaseNow();
     var list = L.foodSearch(A.dx().foods, q).filter(function (f) { return !st || f.status === st; });
     if (!list.length) return '<div class="card"><p><b>No está en el semáforo.</b></p><p class="muted">Si dudás, consultalo en el grupo del taller. Como regla, la guía prioriza verduras, frutas, cereales integrales, legumbres y semillas, sin azúcar, harinas refinadas, lácteos ni estimulantes.</p></div>';
@@ -35,23 +36,23 @@
       var open = A.ui.foodOpen === f.id;
       return '<details class="food-row ' + f.status + '" id="f-' + esc(f.id) + '"' + (open ? ' open' : '') + '><summary>' +
         '<span class="grow"><b>' + esc(f.name) + '</b>' + (f._via ? '<small>por «' + esc(f._via) + '»</small>' : '') + '</span>' +
-        '<span class="st st-' + f.status + '">' + I(K.statusIcon(f.status), 'sm') + esc(L.statusLabel(f.status)) + '</span>' + I('abajo', 'sm chev') + '</summary>' +
+        (st ? '' : K.statusTag(f.status)) + I('abajo', 'sm chev') + '</summary>' +
         '<div class="food-body">' + (f.why ? '<p>' + esc(f.why) + '</p>' : '') + (f.howTo ? '<p class="meta">' + esc(f.howTo) + '</p>' : '') +
         (f.phases ? Object.keys(f.phases).map(function (k) { return '<p class="' + (k === ph ? 'note' : 'meta') + '">' + I('info', 'sm') + ' En ' + esc(L.phase(A.PROG(), k).name.toLowerCase()) + ': ' + esc(L.statusLabel(f.phases[k])) + (k === ph ? ' (tu fase actual)' : '') + '</p>'; }).join('') : '') +
         (!f.why && !f.howTo && !f.phases ? '<p class="meta">Sin más detalle en la guía.</p>' : '') + '</div></details>';
     }).join('') + '</div>';
   }
   function semaforo() {
-    var st = A.ui.fdst || '';
-    var opts = [['', 'Todos'], ['green', 'Libre'], ['yellow', 'Con moderación'], ['red', 'Evitar']];
-    return '<section class="toolbar-card">' +
-      '<div class="search big">' + I('buscar') + '<input class="input" id="fdq" type="search" data-bind="fdq" value="' + esc(A.ui.fdq || '') + '" placeholder="¿Puedo comer…?" aria-label="Buscar un alimento" autocomplete="off"></div>' +
-      '<div class="seg mt-s" role="group" aria-label="Filtrar por estado">' + opts.map(function (o) { return '<button data-action="fdSt" data-v="' + o[0] + '" aria-pressed="' + (st === o[0]) + '">' + (o[0] ? I(K.statusIcon(o[0]), 'sm') : '') + o[1] + '</button>'; }).join('') + '</div>' +
-      '</section>' +
-      '<div data-part="flist" class="mt">' + foodList() + '</div>';
+    var st = A.ui.fdst || 'green';
+    var opts = [['green', 'Libre'], ['yellow', 'Con moderación'], ['red', 'Evitar']];
+    var ph = phaseNow(), prog = A.PROG();
+    return (ph && prog ? '<p class="muted c">' + esc(L.phase(prog, ph).name) + ' · según la guía de tu programa</p>' : '') +
+      '<div class="srch big">' + I('buscar') + '<input class="input" id="fdq" type="search" data-bind="fdq" value="' + esc(A.ui.fdq || '') + '" placeholder="¿Puedo comer…?" aria-label="Buscar un alimento" autocomplete="off"></div>' +
+      '<div class="semtabs" role="group" aria-label="Grupo del semáforo">' + opts.map(function (o) { return '<button data-action="fdSt" data-v="' + o[0] + '" aria-pressed="' + (st === o[0]) + '">' + K.statusDot(o[0]) + o[1] + '</button>'; }).join('') + '</div>' +
+      '<div data-part="flist">' + foodList() + '</div>';
   }
   A.binds.fdq = U.debounce(function (el) { A.ui.fdq = el.value; A.refresh('flist'); }, 120);
-  A.actions.fdSt = function (el) { A.ui.fdst = el.dataset.v; A.render(); };
+  A.actions.fdSt = function (el) { A.ui.fdst = el.dataset.v; A.ui.fdq = ''; A.render(); };
 
   /* ---------- SOS ---------- */
   function sosList() {
@@ -70,9 +71,9 @@
     var steps = U.arr(s.steps).map(function (x, i) {
       if (ladder && x.ladder) {
         var on = !!lad[i];
-        return '<li class="' + (on ? 'is-done' : '') + '"><button class="tick sq' + (on ? ' on' : '') + '" data-action="ladder" data-s="' + esc(id) + '" data-i="' + i + '" aria-pressed="' + on + '" aria-label="Lo probé: paso ' + (i + 1) + '">' + I('check') + '</button><div class="grow"><b>Paso ' + (i + 1) + '.</b> ' + esc(x.text) + (on ? '<span class="meta"> · lo probaste</span>' : '') + '</div></li>';
+        return '<li class="' + (on ? 'is-done' : '') + '"><button class="ladder-row" data-action="ladder" data-s="' + esc(id) + '" data-i="' + i + '" aria-pressed="' + on + '" aria-label="Lo probé: paso ' + (i + 1) + '"><b>' + (i + 1) + '</b><span class="grow">' + esc(x.text) + (on ? '<span class="meta"> · lo probaste</span>' : '') + '</span><span class="mk" aria-hidden="true"></span></button></li>';
       }
-      return '<li><span class="tag">' + (i + 1) + '</span><div class="grow">' + esc(x.text) + '</div></li>';
+      return '<li><b class="n">' + (i + 1) + '</b><div class="grow">' + esc(x.text) + '</div></li>';
     }).join('');
     var warns = U.arr(s.warnings).map(function (w) { var hit = c.indexOf(w.condition) > -1; return '<div class="contra' + (hit ? ' hit' : '') + '">' + (hit ? '<b>' + I('alerta', 'sm') + ' Para vos (' + esc(condLabel(w.condition).split(' (')[0]) + '):</b> ' : '<b>' + esc(condLabel(w.condition).split(' (')[0]) + ':</b> ') + esc(w.text) + '</div>'; }).join('');
     var herbs = U.arr(s.relatedHerbs).map(function (h) { var x = L.idx().herbs[h]; return x ? '<a class="chip" href="#/guia/herbario/' + encodeURIComponent(h) + '">' + I('hoja', 'sm') + esc(x.name) + '</a>' : ''; }).join('');
@@ -81,7 +82,7 @@
       (s.cause ? '<p class="hero-desc">' + esc(s.cause) + '</p>' : '') +
       (s.whenToConsult ? '<div class="banner danger mt">' + I('alerta') + '<div class="grow"><b>Cuándo consultar</b>' + esc(s.whenToConsult) + '</div></div>' : '') +
       '<section class="card mt"><h2 class="mb">' + (ladder ? 'Ir sumando de a una' : 'Qué hacer') + '</h2>' + (s.intro ? '<p class="muted">' + esc(s.intro) + '</p>' : '') + '<ul class="list ladder">' + steps + '</ul>' +
-      (ladder ? '<p class="meta">Tildá lo que ya probaste para saber dónde estás. Se guarda en tu perfil.</p>' : '') + '</section>' +
+      (ladder ? '<p class="meta">Tocá lo que ya probaste para saber dónde estás (queda con un punto verde). Se guarda en tu perfil.</p>' : '') + '</section>' +
       (warns ? '<section class="card mt"><h2 class="mb">Avisos</h2>' + warns + '</section>' : '') +
       (herbs || recs ? '<section class="card mt">' + (herbs ? '<h3>Hierbas relacionadas</h3><div class="chips mt-s">' + herbs + '</div>' : '') + (recs ? '<h3 class="mt">Recetas que ayudan</h3><div class="chips mt-s">' + recs + '</div>' : '') + '</section>' : '');
   }
@@ -101,7 +102,7 @@
         var hit = K.condWarnings(h.contraindications, c).length;
         var locked = h.unlockDay && (d == null || d < h.unlockDay);
         return '<a class="rcard' + (locked ? ' locked' : '') + '" id="h-' + esc(h.id) + '" href="#/guia/herbario/' + encodeURIComponent(h.id) + '"><span class="rc-cat">' + esc(KIND[h.kind] || h.kind) + (h.thermal ? ' · ' + esc(THERMAL[h.thermal] || h.thermal) : '') + '</span><b class="rc-t">' + esc(h.name) + '</b>' +
-          '<span class="rc-tags">' + (hit ? '<span class="tag alert">' + I('alerta', 'sm') + 'Contraindicación para vos</span>' : '') + (h.unlockDay ? '<span class="tag ' + (locked ? '' : 'accent') + '">' + I(locked ? 'candado' : 'check', 'sm') + 'Desde el día ' + h.unlockDay + '</span>' : '') + '</span></a>';
+          '<span class="rc-tags">' + (hit ? '<span class="tag alert">' + I('alerta', 'sm') + 'Contraindicación para vos</span>' : '') + (h.unlockDay ? '<span class="tag ' + (locked ? '' : 'accent') + '">' + (locked ? I('candado', 'sm') : '') + 'Desde el día ' + h.unlockDay + '</span>' : '') + '</span></a>';
       }).join('') + '</div>';
   }
   A.actions.hKind = function (el) { A.ui.hkind = el.dataset.k; A.render(); };

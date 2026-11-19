@@ -63,7 +63,7 @@
   /* ---------- gráfico de líneas: series [{ pts:[{idx,v}], cls, label }] ---------- */
   K.lineChart = function (series, o) {
     o = o || {};
-    var W = 340, H = o.h || 150, pl = 26, pr = 8, pt = 10, pb = 22;
+    var W = o.w || 340, H = o.h || 150, pl = 26, pr = 8, pt = 10, pb = 22;
     var n = o.n || Math.max.apply(null, series.map(function (s) { return s.pts.length; }).concat([1]));
     var y0 = o.min != null ? o.min : 1, y1 = o.max != null ? o.max : 5;
     var x = function (i) { return pl + (n <= 1 ? 0 : (i - 1) * (W - pl - pr) / (n - 1)); };
@@ -107,27 +107,25 @@
     }).join('') + '</ul>';
   };
 
-  /* ---------- mapa de la edición (heatmap con ícono + color) ---------- */
+  /* ---------- mapa de la edición ---------- */
   var ST = {
-    complete: ['Completo', 'check'], partial: ['Parcial', ''], grace: ['Día de gracia', 'hoja'], empty: ['Sin completar', ''], today: ['Hoy', ''], future: ['Por venir', '']
+    complete: ['Completo', ''], partial: ['Parcial', ''], grace: ['Día de gracia', 'hoja'], empty: ['Sin completar', ''], today: ['Hoy', ''], future: ['Por venir', '']
   };
-  /* v2.3: un solo dibujo del mapa (Vos y Progreso). Cada estado se distingue por forma además del color:
-     completo = círculo lleno con tilde · parcial = medio lleno · gracia = aro punteado con hoja ·
-     sin completar = aro con raya · hoy = aro coral · por venir = punto chico. */
-  var HD_MARK = { complete: 'check', grace: 'hoja', empty: 'menos' };
+  /* v2.4: el mapa son puntos lisos, sin tildes ni íconos adentro (sistema «texto y líneas finas»).
+     completo = punto verde lleno · parcial = medio lleno · gracia = punto gris · sin completar = aro fino ·
+     hoy = aro coral · por venir = punto chico. Cada celda conserva su descripción para lectores de pantalla. */
   K.heatmap = function (sum, link) {
     var cells = sum.days.filter(function (r) { return r.idx >= 1; }).map(function (r) {
       var st = (ST[r.status] || ST.future)[0];
       var lab = 'Día ' + r.idx + ': ' + st.toLowerCase() + (r.total ? ' (' + r.done + ' de ' + r.total + ')' : '') + (r.graced && r.status === 'partial' ? ', cubierto por un día de gracia' : '');
       var kind = r.graced && r.status === 'partial' ? 'grace' : r.status;
-      var inner = HD_MARK[kind] ? A.icon(HD_MARK[kind], 'sm') : '';
       var cls = 'hd hd-' + kind + (r.iso === A.today() && kind !== 'today' ? ' is-today' : '');
-      return link && r.iso && !r.future ? '<a class="' + cls + '" href="#/hoy/' + r.iso + '" aria-label="' + esc(lab) + '" title="' + esc(lab) + '">' + inner + '</a>'
-        : '<span class="' + cls + '" role="img" aria-label="' + esc(lab) + '" title="' + esc(lab) + '">' + inner + '</span>';
+      return link && r.iso && !r.future ? '<a class="' + cls + '" href="#/hoy/' + r.iso + '" aria-label="' + esc(lab) + '" title="' + esc(lab) + '"></a>'
+        : '<span class="' + cls + '" role="img" aria-label="' + esc(lab) + '" title="' + esc(lab) + '"></span>';
     }).join('');
-    var key = function (k, t) { return '<span><i class="hd hd-' + k + ' key" aria-hidden="true">' + (HD_MARK[k] ? A.icon(HD_MARK[k], 'sm') : '') + '</i>' + t + '</span>'; };
+    var key = function (k, t) { return '<span><i class="hd hd-' + k + ' key" aria-hidden="true"></i>' + t + '</span>'; };
     return '<div class="heat-dots">' + cells + '</div>' +
-      '<div class="legend dots-legend">' + key('complete', 'Completo') + key('partial', 'Parcial') + key('grace', 'Gracia') + key('empty', 'Sin completar') + key('today', 'Hoy') + key('future', 'Por venir') + '</div>';
+      '<div class="legend dots-legend">' + key('complete', 'Completo') + key('partial', 'Parcial') + key('grace', 'De gracia') + key('empty', 'Sin completar') + key('today', 'Hoy') + '</div>';
   };
 
   /* ---------- ilustración para estados vacíos ---------- */
@@ -168,15 +166,33 @@
       '</div></a>';
   };
 
-  K.statusIcon = function (st) { return st === 'green' ? 'check' : st === 'yellow' ? 'alerta' : 'cerrar'; };
-  K.statusTag = function (st) {
-    var cls = st === 'green' ? 'accent' : st === 'yellow' ? 'pollen' : 'clay';
-    return '<span class="tag ' + cls + '">' + A.icon(K.statusIcon(st), 'sm') + esc(L.statusLabel(st)) + '</span>';
-  };
+  /* Semáforo: un punto de color (verde, ámbar, coral) + la palabra. Sin tildes. */
+  K.statusDot = function (st) { return '<i class="dot dot-' + (st === 'green' ? 'green' : st === 'yellow' ? 'amber' : 'coral') + '" aria-hidden="true"></i>'; };
+  K.statusTag = function (st) { return '<span class="st st-' + esc(st) + '">' + K.statusDot(st) + esc(L.statusLabel(st)) + '</span>'; };
   K.healthNote = function () {
     return '<p class="health">' + A.icon('info', 'sm') + '<span>Material educativo del taller; no reemplaza la consulta médica. Si estás embarazada, en lactancia, tomás medicación o tenés una enfermedad crónica, consultá antes de empezar.</span></p>';
   };
-  K.back = function (href, label) { return '<a class="back" href="' + href + '">' + A.icon('atras', 'sm') + esc(label || 'Volver') + '</a>'; };
+  K.back = function (href, label) { return '<a class="back" href="' + href + '">' + A.icon('chev-izq', 'sm') + esc(label || 'Volver') + '</a>'; };
+  /* v2.4 · opciones cortas como palabras: la elegida en negrita con un puntito coral debajo.
+     items: [[valor, texto, textoChico?]]; attrs: atributos extra para cada botón (p. ej. 'data-k="date"'). */
+  K.opts = function (items, cur, action, label, attrs) {
+    return '<div class="opts" role="group" aria-label="' + esc(label || 'Opciones') + '">' + items.map(function (o) {
+      var on = String(cur) === String(o[0]);
+      return '<button type="button" data-action="' + action + '" data-v="' + esc(o[0]) + '"' + (attrs ? ' ' + attrs : '') + ' aria-pressed="' + on + '">' + esc(o[1]) + (o[2] ? '<small>' + esc(o[2]) + '</small>' : '') + '</button>';
+    }).join('') + '</div>';
+  };
+  /* Renglón elegible (opciones largas): punto verde a la derecha en el elegido. */
+  K.choice = function (on, action, attrs, title, sub) {
+    return '<button type="button" class="choice" data-action="' + action + '" ' + attrs + ' aria-pressed="' + !!on + '"><span class="t">' + esc(title) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span></button>';
+  };
+  /* Fila de números 1–5 (energía, ánimo): el elegido subrayado en coral y su palabra debajo. */
+  K.nums = function (list, cur, action, attrs, label) {
+    var chosen = U.arr(list).filter(function (x) { return Number(cur) === x.v; })[0];
+    return '<div class="nums" role="group" aria-label="' + esc(label) + '">' + U.arr(list).map(function (x) {
+      var on = Number(cur) === x.v;
+      return '<button type="button" data-action="' + action + '" ' + attrs + ' data-v="' + x.v + '" aria-pressed="' + on + '" aria-label="' + x.v + ' de 5: ' + esc(String(x.label).split(' /')[0]) + '">' + x.v + '</button>';
+    }).join('') + '</div><p class="word" aria-hidden="true">' + (chosen ? esc(String(chosen.label).split(' /')[0]) : '&nbsp;') + '</p>';
+  };
   K.tabs = function (items, current, label) {
     return '<nav class="tabs-t" aria-label="' + esc(label || 'Secciones') + '">' + items.map(function (it) {
       return '<a href="' + it[0] + '"' + (it[1] === current ? ' aria-current="page"' : '') + '>' + esc(it[2]) + (it[3] || '') + '</a>';

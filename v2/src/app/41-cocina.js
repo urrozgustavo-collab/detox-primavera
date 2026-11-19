@@ -20,30 +20,19 @@
       return '<li><a class="qlink" href="' + m[0] + '">' + I(m[3]) + '<span class="grow"><b>' + esc(m[2]) + '</b><small>' + esc(m[4]) + '</small></span>' + I('chev', 'sm chev') + '</a></li>';
     }).join('') + '<li><a class="qlink" href="#/cocina/nueva">' + I('mas') + '<span class="grow"><b>Receta propia</b><small>Escribí una receta tuya</small></span>' + I('chev', 'sm chev') + '</a></li></ul>' });
   };
-  A.cocinaHead = function (cur) { return '<header class="page-h"><h1>Cocina</h1></header>' + A.cocinaNav(cur); };
+  A.cocinaHead = function (cur) { return '<header class="page-h cocina-h"><h1>Cocina</h1></header>' + A.cocinaNav(cur); };
   var MEAL_TIME = { desayuno: '08:00', almuerzo: '13:00', merienda: '17:00', cena: '21:00' };
 
   A.screens.cocina = {
     render: function (route) {
       var sub = route.parts[0] || 'recetas';
       if (sub === 'nueva' || sub === 'editar') return recipeForm(route.parts[1], sub === 'nueva' ? route.parts[1] : null);
-      // Computadora: lista y receta abierta lado a lado. Celular: la receta tiene su propia pantalla.
-      if (sub === 'receta' && !A.isWide()) return detail(route.parts[1]);
-      if (sub === 'receta' || (sub === 'recetas' && A.isWide())) return A.cocinaHead('recetas') + split(route.parts[1]);
+      // v2.4: una sola columna también en computadora; la receta se abre sola, con «‹ Recetas» para volver.
+      if (sub === 'receta') return detail(route.parts[1]);
       var cur = sub === 'remojos' ? 'batch' : sub;
       var body = ({ recetas: recipes, heladera: fridge, plan: plan, batch: batch, remojos: soaks, metodos: methods })[sub] || recipes;
       if (sub === 'batch' || sub === 'remojos') body = prepWrap(sub, body);
       return A.cocinaHead(({ recetas: 1, heladera: 1, plan: 1, batch: 1, remojos: 1, metodos: 1 })[sub] ? cur : 'recetas') + body();
-    },
-    mount: function (main) {
-      // Computadora: solo la lista hace scroll; buscador y filtros quedan siempre a la vista arriba.
-      var list = main.querySelector('.ks-scroll');
-      if (!list) return;
-      list.scrollTop = A.ui.ksScroll || 0;
-      var on = list.querySelector('[aria-current="page"]');
-      if (on && (on.offsetTop < list.scrollTop || on.offsetTop + on.offsetHeight > list.scrollTop + list.clientHeight)) list.scrollTop = Math.max(0, on.offsetTop - Math.round(list.clientHeight / 3));
-      A.ui.ksScroll = list.scrollTop;
-      list.addEventListener('scroll', function () { A.ui.ksScroll = list.scrollTop; }, { passive: true });
     },
     parts: { rlist: function () { return recipeList(); }, fing: function () { return fridgeIngredients(); } }
   };
@@ -53,20 +42,10 @@
       return '<nav class="seg" aria-label="Batch o remojos"><a href="#/cocina/batch"' + (sub === 'batch' ? ' aria-current="page"' : '') + '>Bases para la semana</a><a href="#/cocina/remojos"' + (sub === 'remojos' ? ' aria-current="page"' : '') + '>Remojos</a></nav><div class="mt">' + body() + '</div>';
     };
   }
-  /* Vista partida (≥ 960 px): lista a la izquierda, receta a la derecha. */
-  function split(id) {
-    var p = A.P();
-    if (!id || !L.recipe(id, p)) {
-      var last = A.ui.lastRecipe && L.recipe(A.ui.lastRecipe, p) ? A.ui.lastRecipe : null;
-      var first = filteredRecipes()[0];
-      id = last || (first && first.id) || null;
-    }
-    A.ui.openRecipe = id;
-    return '<div class="kitchen"><div class="ks-list"><div class="ks-head">' + recipeTools() + '</div><div class="ks-scroll" data-part="rlist">' + recipeList() + '</div></div><div class="ks-detail">' + (id ? detail(id) : K.empty('Elegí una receta', 'La vas a ver acá, al lado de la lista.', '')) + '</div></div>';
-  }
 
   /* ================= recetas ================= */
-  var FILTERS = [['hoy', 'Aptas para hoy'], ['safe', 'Aptas para mí'], ['fav', 'Favoritas'], ['quick', 'Rápidas (≤ 20 min)'], ['own', 'Propias']];
+  var FILTERS = [['hoy', 'Aptas para hoy', 'Según la fase del programa'], ['safe', 'Sin mis alergias', 'Ni mis condiciones de salud'], ['fav', 'Favoritas'], ['quick', 'Rápidas, 20 min o menos'], ['own', 'Propias']];
+  var SORTS = [['sug', 'Sugeridas'], ['az', 'A–Z'], ['time', 'Tiempo']];
   function curPhase() {
     var ed = A.ED(), prog = A.PROG(); if (!ed || !prog) return null;
     var c = L.clock(ed, prog, A.today()); if (c.status === 'nodate') return null;
@@ -112,38 +91,61 @@
     if (!CAT_ICON._ok) { U.arr(L.tx().recipeCategories).forEach(function (x) { CAT_ICON[x.id] = x.icon; }); CAT_ICON._ok = true; }
     return CAT_ICON[c] || 'hoja';
   }
-  function recipeRow(r, p, on) {
+  /* v2.4: renglón de texto (nombre y categoría a la izquierda, tiempo a la derecha), sin ícono ni recuadro. */
+  function recipeRow(r, p) {
     var fav = p && p.recipeLog.favorites.indexOf(r.id) > -1;
     var cooked = p && p.recipeLog.cooked[r.id] ? p.recipeLog.cooked[r.id].length : 0;
     var t = r.time && r.time.total ? U.fmtMin(r.time.total) : '';
     var hits = L.recipeAllergyHits(r, p).any;
-    var meta = [t, L.categoryLabel(r.category).toLowerCase(), String(r.id).indexOf('my-') === 0 ? 'propia' : '', cooked ? 'cocinada ' + U.plural(cooked, 'vez', 'veces') : ''].filter(Boolean).join(' · ');
-    return '<li><a class="rrow" id="r-' + esc(r.id) + '" href="#/cocina/receta/' + encodeURIComponent(r.id) + '"' + (on ? ' aria-current="page"' : '') + '><span class="ph" aria-hidden="true">' + I(catIcon(r.category), 'sm') + '</span>' +
-      '<span class="t"><b>' + esc(r.title) + (fav ? ' <span class="fav" aria-label="favorita">' + I('estrella', 'sm') + '</span>' : '') + '</b><small>' + esc(meta) + (hits ? ' · <span class="alert-txt">' + I('alerta', 'sm') + 'tu alergia</span>' : '') + '</small></span></a></li>';
+    var meta = [L.categoryLabel(r.category), String(r.id).indexOf('my-') === 0 ? 'propia' : '', cooked ? 'cocinada ' + U.plural(cooked, 'vez', 'veces') : ''].filter(Boolean).join(' · ');
+    return '<li><a class="rrow" id="r-' + esc(r.id) + '" href="#/cocina/receta/' + encodeURIComponent(r.id) + '">' +
+      '<span class="t"><b>' + esc(r.title) + (fav ? ' <span class="fav" aria-label="favorita">' + I('estrella', 'sm') + '</span>' : '') + '</b><small>' + esc(meta) + (hits ? ' · <span class="alert-txt">tu alergia</span>' : '') + '</small></span>' +
+      (t ? '<span class="m">' + esc(t) + '</span>' : '') + '</a></li>';
   }
   function recipeList() {
-    var list = filteredRecipes(), p = A.P(), open = A.isWide() ? A.ui.openRecipe : null;
-    if (!list.length) return K.empty('No hay recetas con esos filtros', 'Probá con menos filtros o con otra palabra.', '<button class="btn" data-action="rClear">Limpiar filtros</button>');
-    return '<p class="meta" aria-live="polite">' + U.plural(list.length, 'receta') + '</p><ul class="rlist">' + list.map(function (r) { return recipeRow(r, p, r.id === open); }).join('') + '</ul>';
+    var list = filteredRecipes(), p = A.P();
+    if (!list.length) return K.empty('No hay recetas con esos filtros', 'Probá con menos filtros o con otra palabra.', '<button class="link" data-action="rClear">Limpiar filtros</button>');
+    return '<ul class="rlist">' + list.map(function (r) { return recipeRow(r, p); }).join('') + '</ul><p class="meta c count" aria-live="polite">' + U.plural(list.length, 'receta') + '</p>';
   }
-  function recipes() { return recipeTools() + '<div data-part="rlist" class="mt">' + recipeList() + '</div>'; }
+  function recipes() { return recipeTools() + '<div data-part="rlist">' + recipeList() + '</div>'; }
+  /* v2.4: buscador de línea fina, categorías como texto y un solo «Filtrar» que abre el panel;
+     los filtros activos se leen como una frase corta que se borra con la ✕. */
+  function activeFilters() {
+    var f = A.ui.rf || {}, out = FILTERS.filter(function (x) { return f[x[0]]; }).map(function (x) {
+      return '<span class="af">' + esc(x[1]) + '<button type="button" data-action="rFilter" data-f="' + x[0] + '" aria-label="Quitar el filtro ' + esc(x[1]) + '">✕</button></span>';
+    });
+    if (A.ui.rsort && A.ui.rsort !== 'sug') { var so = SORTS.filter(function (x) { return x[0] === A.ui.rsort; })[0]; out.push('<span class="af">Orden ' + esc(so[1]) + '<button type="button" data-action="rSortSet" data-v="sug" aria-label="Volver al orden sugerido">✕</button></span>'); }
+    return out.join('');
+  }
   function recipeTools() {
     var cats = U.arr(L.tx().recipeCategories), f = A.ui.rf || {};
     var used = new Set(L.allRecipes(A.P()).map(function (r) { return r.category; }));
-    return '<section class="toolbar-card">' +
-      '<div class="search">' + I('buscar') + '<input class="input" id="rq" type="search" data-bind="rq" value="' + esc(A.ui.rq || '') + '" placeholder="Buscar receta o ingrediente" aria-label="Buscar recetas por nombre, ingrediente o etiqueta" autocomplete="off"></div>' +
-      '<div class="chips scroll mt-s" role="group" aria-label="Categorías"><button class="chip' + (!A.ui.rcat ? ' on' : '') + '" data-action="rCat" data-c="" aria-pressed="' + !A.ui.rcat + '">Todas</button>' +
-      cats.filter(function (c) { return used.has(c.id); }).map(function (c) { var on = A.ui.rcat === c.id; return '<button class="chip' + (on ? ' on' : '') + '" data-action="rCat" data-c="' + c.id + '" aria-pressed="' + on + '">' + esc(c.label) + '</button>'; }).join('') + '</div>' +
-      '<div class="chips scroll mt-s" role="group" aria-label="Filtros">' + FILTERS.map(function (x) { var on = !!f[x[0]]; return '<button class="chip soft' + (on ? ' on' : '') + '" data-action="rFilter" data-f="' + x[0] + '" aria-pressed="' + on + '">' + esc(x[1]) + '</button>'; }).join('') + '</div>' +
-      '</section>' +
-      '<div class="row between mt-s"><label class="row"><span class="meta">Orden</span><select class="input" style="min-height:40px;width:auto" data-change="rSort"><option value="sug"' + ((A.ui.rsort || 'sug') === 'sug' ? ' selected' : '') + '>Sugeridas</option><option value="az"' + (A.ui.rsort === 'az' ? ' selected' : '') + '>A-Z</option><option value="time"' + (A.ui.rsort === 'time' ? ' selected' : '') + '>Tiempo</option></select></label>' +
-      '<a class="btn ghost sm" href="#/cocina/nueva">' + I('mas', 'sm') + 'Receta propia</a></div>';
+    var n = FILTERS.filter(function (x) { return f[x[0]]; }).length + (A.ui.rsort && A.ui.rsort !== 'sug' ? 1 : 0);
+    return '<div class="srch">' + I('buscar') + '<input class="input" id="rq" type="search" data-bind="rq" value="' + esc(A.ui.rq || '') + '" placeholder="Buscar receta o ingrediente" aria-label="Buscar recetas por nombre, ingrediente o etiqueta" autocomplete="off"></div>' +
+      '<div class="toolrow"><div class="cats" role="group" aria-label="Categorías"><button type="button" data-action="rCat" data-c="" aria-pressed="' + !A.ui.rcat + '">Todas</button>' +
+      cats.filter(function (c) { return used.has(c.id); }).map(function (c) { var on = A.ui.rcat === c.id; return '<button type="button" data-action="rCat" data-c="' + c.id + '" aria-pressed="' + on + '">' + esc(String(c.label).split(' y ')[0]) + '</button>'; }).join('') + '</div>' +
+      '<button type="button" class="flt" data-action="rFilterSheet" aria-haspopup="dialog">' + I('lista', 'sm') + 'Filtrar' + (n ? ' (' + n + ')' : '') + '</button></div>' +
+      (n ? '<div class="afs">' + activeFilters() + '</div>' : '');
   }
+  A.live.rfilter = {
+    title: 'Filtrar',
+    body: function () {
+      if (A.route.name !== 'cocina') return null;
+      var f = A.ui.rf || {}, n = filteredRecipes().length;
+      return '<div class="g"><p class="lab">Mostrar</p><div class="choices">' + FILTERS.map(function (x) { return K.choice(f[x[0]], 'rFilter', 'data-f="' + x[0] + '"', x[1], x[2]); }).join('') + '</div></div>' +
+        '<div class="g"><p class="lab c">Ordenar por</p>' + K.opts(SORTS, A.ui.rsort || 'sug', 'rSortSet', 'Ordenar recetas') + '</div>' +
+        '<div class="g cta"><button class="btn primary wide" data-action="closeDialog" data-dlg="sheet">Ver ' + U.plural(n, 'receta') + '</button>' +
+        '<div class="more-acts"><button class="link" data-action="rClearF">Limpiar filtros</button><a class="link" href="#/cocina/nueva">+ Receta propia</a></div></div>';
+    }
+  };
+  A.actions.rFilterSheet = function () { A.openLive('rfilter'); };
   A.binds.rq = U.debounce(function (el) { A.ui.rq = el.value; A.refresh('rlist'); }, 120);
   A.actions.rCat = function (el) { A.ui.rcat = el.dataset.c || ''; A.render(); };
   A.actions.rFilter = function (el) { A.ui.rf = A.ui.rf || {}; A.ui.rf[el.dataset.f] = !A.ui.rf[el.dataset.f]; A.render(); };
+  A.actions.rSortSet = function (el) { A.ui.rsort = el.dataset.v; A.render(); };
   A.changes.rSort = function (el) { A.ui.rsort = el.value; A.refresh('rlist'); };
-  A.actions.rClear = function () { A.ui.rq = ''; A.ui.rcat = ''; A.ui.rf = {}; A.render(); };
+  A.actions.rClear = function () { A.ui.rq = ''; A.ui.rcat = ''; A.ui.rf = {}; A.ui.rsort = 'sug'; A.render(); };
+  A.actions.rClearF = function () { A.ui.rf = {}; A.ui.rsort = 'sug'; A.render(); };
 
   /* ================= detalle ================= */
   function scaled(i, k) {
@@ -154,6 +156,31 @@
   function ingText(i, k) {
     if (k === 1 || i.qty == null) return esc(i.text);
     return '<span class="qty">' + esc(scaled(i, k)) + '</span> <span class="was">(' + esc(i.text) + ')</span>';
+  }
+  /* v2.4: separa la cantidad (columna gris a la izquierda) del nombre del ingrediente.
+     «1 cucharada de aceite de oliva» → ['1 cucharada', 'Aceite de oliva']. Si no se reconoce, va el texto entero. */
+  function ingSplit(i, k) {
+    var text = String(i.text || '');
+    if (i.qty == null) return ['', text];
+    var NUM = '(?:\\d+\\/\\d+|\\d+(?:[.,]\\d+)?|[½¼¾⅓⅔])';
+    var rest = text.replace(new RegExp('^\\s*' + NUM + '(?:\\s+\\d+\\/\\d+)?(?:\\s*(?:a|-|–)\\s*' + NUM + ')?\\s*'), '');
+    if (rest === text) return ['', text];
+    var qty = scaled(i, k);
+    var w = U.norm(rest.split(/\s+/)[0] || '');
+    if (i.unit && i.unit !== 'unidad') {
+      var lab = U.norm(U.unitLabel(i.unit, i.qty) || ''), un = U.norm(i.unit);
+      var long = { cda: 'cuchara', cdita: 'cucharadit', g: 'gram', kg: 'kilo', ml: 'mili', l: 'litro' }[un];
+      if (w && (w.slice(0, 3) === lab.slice(0, 3) || w.slice(0, 3) === un.slice(0, 3) || (long && w.indexOf(long) === 0))) {
+        rest = rest.replace(/^\S+\s*/, '');
+        var m = /^((?:\S+\s+){0,2}?)de\s+/.exec(rest); if (m) rest = rest.slice(m[0].length);
+      }
+    } else if (/^(chorrit|chorro|puñad|pizca|rodaj|ramit|rama|hoja|taza|vaso|trozo|manojo|atado|lata|paquete|sobre|gota)/.test(w) && /^\S+\s+de\s+/.test(rest)) {
+      qty += ' ' + rest.split(/\s+/)[0];
+      rest = rest.replace(/^\S+\s+de\s+/, '');
+    }
+    rest = rest.replace(/^de\s+/, '');
+    if (!rest) return ['', text];
+    return [qty, rest.charAt(0).toUpperCase() + rest.slice(1)];
   }
   function detail(id) {
     var p = A.P(), r = L.recipe(id, p);
@@ -169,37 +196,46 @@
     var ph = curPhase();
     var hits = L.recipeAllergyHits(r, p);
     var h = [K.back('#/cocina/recetas', 'Recetas')];
-    h.push('<article class="recipe"><section class="recipe-hero"><header class="recipe-h"><p class="rc-cat">' + esc(L.categoryLabel(r.category)) + (own ? ' · receta propia' : '') + '</p><h1 class="serif">' + esc(r.title) + '</h1>' +
-      '<div class="recipe-meta">' + (t.total ? '<span>' + I('reloj', 'sm') + (r.timeEstimated ? 'aprox. ' : '') + U.fmtMin(t.total) + (t.active && t.active !== t.total ? ' (' + U.fmtMin(t.active) + ' activos)' : '') + '</span>' : '') +
-      (t.wait ? '<span>' + I('frasco', 'sm') + 'espera ' + U.fmtMin(t.wait) + '</span>' : '') + (r.method ? '<span>' + I('olla', 'sm') + esc(r.method) + '</span>' : '') +
-      (r.servings ? '<span>' + I('personas', 'sm') + U.plural(r.servings, 'porción', 'porciones') + (r.servingsEstimated ? ' aprox.' : '') + '</span>' : '') + (cooked ? '<span>' + I('check', 'sm') + 'Cocinada ' + U.plural(cooked, 'vez', 'veces') + '</span>' : '') + '</div>' +
-      '<div class="rc-tags mt-s">' + K.allergenTags(r, p) + (ph && !recipeFits(r, ph) ? '<span class="tag warn">' + I('info', 'sm') + 'No es de la fase actual</span>' : '') +
-      U.arr(r.tags).filter(function (x) { return /friolento|caluroso|crudo|cocido|batch|fermento/.test(x); }).map(function (x) { return '<span class="tag">' + esc(x.replace('-ok', ': bien').replace('-', ' ')) + '</span>'; }).join('') + '</div>' +
-      (r.allergens && r.allergens.length && !hits.any ? '<p class="meta mt-s">Contiene: ' + esc(r.allergens.map(function (a) { return L.allergenLabel(a).toLowerCase(); }).join(', ')) + (r.mayContain && r.mayContain.length ? ' · opcionales: ' + esc(r.mayContain.map(function (a) { return L.allergenLabel(a).toLowerCase(); }).join(', ')) : '') + '</p>' : '') +
-      '</header>' +
-      '<div class="btn-row mt"><button class="btn primary" data-action="cook" data-r="' + esc(id) + '">' + I('play', 'sm') + 'Cocinar paso a paso</button>' +
-      '<button class="btn fav-btn' + (fav ? ' on' : '') + '" data-action="fav" data-r="' + esc(id) + '" aria-pressed="' + fav + '">' + I('estrella', 'sm') + (fav ? 'Favorita' : 'Guardar') + '</button>' +
-      '<button class="btn" data-action="planSheet" data-r="' + esc(id) + '">' + I('calendario', 'sm') + 'Al plan</button>' +
-      '<button class="btn" data-action="logMealSheet" data-r="' + esc(id) + '">' + I('check', 'sm') + 'Comí esto hoy</button></div></section>');
-    var mult = [[0.5, '×½'], [1, '×1'], [2, '×2'], [3, '×3']];
-    h.push('<div class="grid2 mt"><section class="card"><div class="card-h"><h2>Ingredientes</h2><div class="seg" role="group" aria-label="Cantidad">' + mult.map(function (m) { return '<button data-action="scale" data-r="' + esc(id) + '" data-k="' + m[0] + '" aria-pressed="' + (k === m[0]) + '">' + m[1] + '</button>'; }).join('') + '</div></div>' +
+    // v2.4: cabecera centrada, una sola barra verde y el resto de las acciones como texto.
+    var meta = [];
+    if (t.total) meta.push((r.timeEstimated ? 'aprox. ' : '') + U.fmtMin(t.total) + (t.active && t.active !== t.total ? ' (' + U.fmtMin(t.active) + ' activos)' : ''));
+    if (t.wait) meta.push('espera ' + U.fmtMin(t.wait));
+    if (r.servings) meta.push(U.plural(r.servings, 'porción', 'porciones') + (r.servingsEstimated ? ' aprox.' : ''));
+    if (r.method) meta.push(r.method);
+    var notes = [];
+    if (r.allergens && r.allergens.length && !hits.any) notes.push('Contiene ' + r.allergens.map(function (a) { return L.allergenLabel(a).toLowerCase(); }).join(', ') + (r.mayContain && r.mayContain.length ? ' · opcionales: ' + r.mayContain.map(function (a) { return L.allergenLabel(a).toLowerCase(); }).join(', ') : ''));
+    if (cooked) notes.push('Cocinada ' + U.plural(cooked, 'vez', 'veces'));
+    U.arr(r.tags).filter(function (x) { return /friolento|caluroso|crudo|cocido|batch|fermento/.test(x); }).forEach(function (x) { notes.push(x.replace('-ok', ': bien').replace('-', ' ')); });
+    h.push('<article class="recipe"><header class="recipe-h c"><p class="rc-cat">' + esc(L.categoryLabel(r.category)) + (own ? ' · receta propia' : '') + '</p><h1 class="disp-h">' + esc(r.title) + '</h1>' +
+      '<p class="meta-row">' + meta.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</p>' +
+      '<p class="rc-tags">' + K.allergenTags(r, p) + (ph && !recipeFits(r, ph) ? '<span class="tag warn">No es de la fase actual</span>' : '') + (notes.length ? '<span class="tag">' + esc(notes.join(' · ')) + '</span>' : '') + '</p>' +
+      '<div class="cta"><button class="btn primary" data-action="cook" data-r="' + esc(id) + '">Cocinar paso a paso</button>' +
+      '<div class="more-acts"><button class="link fav-btn' + (fav ? ' on' : '') + '" data-action="fav" data-r="' + esc(id) + '" aria-pressed="' + fav + '">' + (fav ? 'Favorita' : 'Guardar') + '</button>' +
+      '<button class="link" data-action="planSheet" data-r="' + esc(id) + '">Al plan</button>' +
+      '<button class="link" data-action="ingsToShop" data-r="' + esc(id) + '">A compras</button>' +
+      '<button class="link" data-action="logMealSheet" data-r="' + esc(id) + '">Lo comí hoy</button></div></div></header>');
+    var mult = [[0.5, '½'], [1, '×1'], [2, '×2'], [3, '×3']];
+    var anySug = false;
+    h.push('<section class="r-sec"><div class="sec"><h2>Ingredientes</h2><div class="scale-w" role="group" aria-label="Cantidad">' + mult.map(function (m) { return '<button data-action="scale" data-r="' + esc(id) + '" data-k="' + m[0] + '" aria-pressed="' + (k === m[0]) + '" aria-label="Cantidad ' + m[1] + '">' + m[1] + '</button>'; }).join('') + '</div></div>' +
       (r.servings && k !== 1 ? '<p class="meta">Para ' + U.frac(r.servings * k) + ' porciones.</p>' : '') +
-      '<ul class="list ing-list">' + U.arr(r.ingredients).map(function (i, n) {
+      '<ul class="ings">' + U.arr(r.ingredients).map(function (i, n) {
         var on = !!checks[n];
         var ah = L.textAllergyHits(i.text, i.item, p);
-        return '<li class="' + (on ? 'is-done' : '') + '"><button class="tick sq' + (on ? ' on' : '') + '" data-action="ingChk" data-r="' + esc(id) + '" data-n="' + n + '" aria-pressed="' + on + '" aria-label="Tengo: ' + esc(i.text) + '">' + I('check') + '</button><span class="txt grow">' + ingText(i, k) + (i.suggested ? ' <span class="sug-mark" title="Cantidad sugerida: la guía no la indica">≈ sugerida</span>' : '') + (i.optional ? ' <span class="meta">(opcional)</span>' : '') + (ah.any ? ' <span class="tag alert">' + I('alerta', 'sm') + 'alérgeno</span>' : '') + '</span></li>';
+        var sp = ingSplit(i, k);
+        if (i.suggested) anySug = true;
+        return '<li><button class="ing' + (on ? ' off' : '') + '" data-action="ingChk" data-r="' + esc(id) + '" data-n="' + n + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Ya lo tengo: ' : 'Tachar: ') + esc(i.text) + '"><span class="q">' + esc(sp[0]) + (i.suggested && sp[0] ? '<sup>*</sup>' : '') + '</span>' +
+          '<span class="n">' + (sp[0] ? esc(sp[1]) : ingText(i, k)) + (i.suggested && !sp[0] ? '<sup>*</sup>' : '') + (i.optional ? ' <span class="meta">(opcional)</span>' : '') + (ah.any ? ' <span class="alert-txt">alérgeno</span>' : '') + '</span></button></li>';
       }).join('') + '</ul>' +
-      '<div class="btn-row mt"><button class="btn sm" data-action="ingsToShop" data-r="' + esc(id) + '">' + I('compras', 'sm') + 'Agregar a compras</button></div></section>' +
-      '<section class="card"><h2 class="mb">Preparación</h2><ol class="steps">' + U.arr(r.steps).map(function (s, n) {
-        return '<li><p>' + esc(s.text) + (s.editorial ? ' <span class="tag" title="Paso o dato que no está en la guía">sugerencia</span>' : '') + '</p>' + (s.timer ? '<button class="btn sm" data-action="timerStep" data-r="' + esc(id) + '" data-n="' + n + '">' + I('timer', 'sm') + 'Temporizador ' + U.fmtDuration(s.timer) + '</button>' : '') + '</li>';
-      }).join('') + '</ol>' + (r.tip ? '<p class="note">' + I('hoja', 'sm') + ' ' + esc(r.tip) + '</p>' : '') + (r.note ? '<p class="note mt-s">' + I('info', 'sm') + ' ' + esc(r.note) + '</p>' : '') + (r.editorialNote ? '<p class="note mt-s">' + I('info', 'sm') + ' ' + esc(r.editorialNote) + '</p>' : '') +
-      (U.arr(r.ingredients).some(function (i) { return i.suggested; }) ? '<p class="meta mt-s">≈ sugerida: cantidad propuesta por la app; la guía no la indica.</p>' : '') +
-      (r.source ? '<p class="meta mt-s">Fuente: ' + esc(r.source) + '</p>' : '') + '</section></div>');
-    h.push('<section class="card mt"><div class="card-h"><h2>Tu nota</h2><div class="stars" role="group" aria-label="Valoración">' + [1, 2, 3, 4, 5].map(function (n) { return '<button class="' + (n <= rating ? 'on' : '') + '" data-action="rate" data-r="' + esc(id) + '" data-v="' + n + '" aria-pressed="' + (n <= rating) + '" aria-label="' + n + ' de 5">' + I('estrella', 'sm') + '</button>'; }).join('') + '</div></div>' +
-      '<textarea class="input" id="rnote" data-bind="rnote" data-r="' + esc(id) + '" rows="3" placeholder="Variantes, qué le cambiarías, con qué la acompañaste…">' + esc(p.recipeLog.notes[id] || '') + '</textarea>' +
-      '<div class="btn-row mt">' + (own ? '<a class="btn sm" href="#/cocina/editar/' + encodeURIComponent(id) + '">' + I('editar', 'sm') + 'Editar</a><button class="btn sm danger" data-action="delRecipe" data-r="' + esc(id) + '">' + I('borrar', 'sm') + 'Borrar</button>' : '') +
-      '<a class="btn sm" href="#/cocina/nueva/' + encodeURIComponent(id) + '">' + I('copiar', 'sm') + 'Duplicar como propia</a>' +
-      (U.arr(A.dx().prep && A.dx().prep.ferments).some(function (f) { return f.recipe === id; }) ? '<button class="btn sm" data-action="startFerment" data-r="' + esc(id) + '">' + I('frasco', 'sm') + 'Empecé un frasco hoy</button>' : '') + '</div></section>');
+      (anySug ? '<p class="fn"><sup>*</sup> Cantidad sugerida: la guía no la indica.</p>' : '') + '</section>' +
+      '<section class="r-sec"><div class="sec"><h2>Preparación</h2></div><ol class="steps-t">' + U.arr(r.steps).map(function (s, n) {
+        return '<li><b>' + (n + 1) + '</b><div><p>' + esc(s.text) + (s.editorial ? ' <span class="meta" title="Paso o dato que no está en la guía">(sugerencia)</span>' : '') + '</p>' + (s.timer ? '<button class="timer-l" data-action="timerStep" data-r="' + esc(id) + '" data-n="' + n + '">' + I('reloj', 'sm') + 'Temporizador de ' + U.fmtDuration(s.timer) + '</button>' : '') + '</div></li>';
+      }).join('') + '</ol>' + (r.tip ? '<p class="calm-note">' + I('hoja', 'sm') + '<span>' + esc(r.tip) + '</span></p>' : '') + (r.note ? '<p class="calm-note">' + I('info', 'sm') + '<span>' + esc(r.note) + '</span></p>' : '') + (r.editorialNote ? '<p class="calm-note">' + I('info', 'sm') + '<span>' + esc(r.editorialNote) + '</span></p>' : '') +
+      (r.source ? '<p class="meta mt">Fuente: ' + esc(r.source) + '</p>' : '') + '</section>');
+    h.push('<section class="r-sec"><div class="sec"><h2>Tu nota</h2><div class="stars" role="group" aria-label="Valoración">' + [1, 2, 3, 4, 5].map(function (n) { return '<button class="' + (n <= rating ? 'on' : '') + '" data-action="rate" data-r="' + esc(id) + '" data-v="' + n + '" aria-pressed="' + (n <= rating) + '" aria-label="' + n + ' de 5">' + I('estrella', 'sm') + '</button>'; }).join('') + '</div></div>' +
+      '<textarea class="input" id="rnote" data-bind="rnote" data-r="' + esc(id) + '" rows="2" placeholder="Variantes, qué le cambiarías, con qué la acompañaste…">' + esc(p.recipeLog.notes[id] || '') + '</textarea>' +
+      '<div class="more-acts">' + (own ? '<a class="link" href="#/cocina/editar/' + encodeURIComponent(id) + '">Editar</a><button class="link danger" data-action="delRecipe" data-r="' + esc(id) + '">Borrar</button>' : '') +
+      '<a class="link" href="#/cocina/nueva/' + encodeURIComponent(id) + '">Duplicar como propia</a>' +
+      (U.arr(A.dx().prep && A.dx().prep.ferments).some(function (f) { return f.recipe === id; }) ? '<button class="link" data-action="startFerment" data-r="' + esc(id) + '">Empecé un frasco hoy</button>' : '') + '</div></section></article>');
     return h.join('');
   }
   A.actions.scale = function (el) { A.ui.scale = A.ui.scale || {}; A.ui.scale[el.dataset.r] = +el.dataset.k; A.render(); };
@@ -250,7 +286,7 @@
   A.actions.logMealSheet = function (el) {
     var r = L.recipe(el.dataset.r, A.P());
     if (!A.ED() || L.clock(A.ED(), A.PROG(), A.today()).status === 'nodate') { A.toast('Primero empezá un programa en Hoy.'); return; }
-    A.openSheet({ title: 'Registrar en tus comidas de hoy', body: '<p>' + esc(r.title) + '</p><div class="chips">' + L.slots().map(function (s) { return '<button class="chip" data-action="logMeal" data-r="' + esc(r.id) + '" data-slot="' + s.id + '">' + esc(s.label) + '</button>'; }).join('') + '</div>' });
+    A.openSheet({ title: 'Lo comí hoy', body: '<p class="muted">' + esc(r.title) + '</p><p class="lab">¿En qué momento?</p><ul class="list">' + L.slots().map(function (s) { return '<li><button class="li" data-action="logMeal" data-r="' + esc(r.id) + '" data-slot="' + s.id + '"><span class="grow">' + esc(s.label) + '</span>' + I('chev', 'sm chev') + '</button></li>'; }).join('') + '</ul>' });
   };
   A.actions.logMeal = function (el) {
     var r = L.recipe(el.dataset.r, A.P());
@@ -260,13 +296,14 @@
     var id = el.dataset.r, r = L.recipe(id, A.P()), today = A.today();
     var days = []; for (var i = 0; i < 10; i++) days.push(U.addDays(today, i));
     A.ui.planPick = { r: id, date: today, slot: (r.slots && r.slots[0]) || 'almuerzo' };
-    A.openSheet({ title: 'Agregar al plan', body: planPickBody(), foot: '<button class="btn primary" data-action="planPickSave">Agregar</button>' });
+    A.openSheet({ title: 'Agregar al plan', body: planPickBody(), foot: '<button class="btn primary wide" data-action="planPickSave">Agregar</button>' });
   };
   function planPickBody() {
     var pp = A.ui.planPick, today = A.today(), days = [];
     for (var i = 0; i < 10; i++) days.push(U.addDays(today, i));
-    return '<p><b>' + esc(L.recipe(pp.r, A.P()).title) + '</b></p><p class="label">Día</p><div class="chips">' + days.map(function (d) { return '<button class="chip' + (pp.date === d ? ' on' : '') + '" data-action="planPick" data-k="date" data-v="' + d + '" aria-pressed="' + (pp.date === d) + '">' + (d === today ? 'Hoy' : U.fmtDate(d, 'day')) + '</button>'; }).join('') + '</div>' +
-      '<p class="label mt">Momento</p><div class="chips">' + L.slots().map(function (s) { return '<button class="chip' + (pp.slot === s.id ? ' on' : '') + '" data-action="planPick" data-k="slot" data-v="' + s.id + '" aria-pressed="' + (pp.slot === s.id) + '">' + esc(s.label) + '</button>'; }).join('') + '</div>';
+    return '<p class="muted c">' + esc(L.recipe(pp.r, A.P()).title) + '</p>' +
+      '<div class="g"><p class="lab c">Día</p>' + K.opts(days.map(function (d) { var w = U.fmtDate(d, 'day').split(' '); return [d, d === today ? 'Hoy' : U.cap(w[0]), w.slice(1).join(' ') || U.fmtDate(d, 'short')]; }), pp.date, 'planPick', 'Día', 'data-k="date"') + '</div>' +
+      '<div class="g"><p class="lab c">Momento</p>' + K.opts(L.slots().map(function (s) { return [s.id, s.label]; }), pp.slot, 'planPick', 'Momento', 'data-k="slot"') + '</div>';
   }
   A.actions.planPick = function (el) { A.ui.planPick[el.dataset.k] = el.dataset.v; document.querySelector('#sheet .sheet-b').innerHTML = planPickBody(); };
   A.actions.planPickSave = function () {
@@ -306,7 +343,7 @@
     var body;
     if (c.step >= n) {
       body = '<p class="cook-step-n">Terminaste</p><p class="cook-text">¡Buen provecho! ' + esc(r.title) + ' quedó anotada como cocinada.</p>' +
-        '<div class="btn-row">' + L.slots().map(function (s) { return '<button class="btn" data-action="cookLog" data-slot="' + s.id + '">' + I('check', 'sm') + 'Comí esto en ' + esc(s.label.toLowerCase()) + '</button>'; }).join('') + '</div>';
+        '<p class="lab">¿Lo comiste? Anotalo en</p><div class="opts left">' + L.slots().map(function (s) { return '<button data-action="cookLog" data-slot="' + s.id + '">' + esc(s.label) + '</button>'; }).join('') + '</div>';
     } else {
       var s = steps[c.step];
       var txt = esc(s.text);
@@ -314,16 +351,16 @@
       used.forEach(function (i) { var ing = i.item && L.ingredient(i.item); if (!ing) return; L.ingredientNames(ing).forEach(function (nm) { if (nm && nm.length > 2) { var re = new RegExp('(^|[^\\wáéíóúñ])(' + nm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')(?=$|[^\\wáéíóúñ])', 'i'); txt = txt.replace(re, '$1<mark>$2</mark>'); } }); });
       body = '<p class="cook-step-n">Paso ' + (c.step + 1) + ' de ' + n + '</p><p class="cook-text">' + txt + '</p>' +
         (used.length ? '<p class="label">Ingredientes de este paso</p><ul class="list">' + used.map(function (i) { return '<li class="li">' + I('hoja', 'sm') + '<span class="grow">' + ingText(i, k) + '</span></li>'; }).join('') + '</ul>' : '') +
-        (s.timer ? '<button class="btn primary mt" data-action="cookTimer">' + I('timer', 'sm') + 'Temporizador ' + U.fmtDuration(s.timer) + '</button>' : '') +
+        (s.timer ? '<button class="timer-l" data-action="cookTimer">' + I('reloj', 'sm') + 'Temporizador de ' + U.fmtDuration(s.timer) + '</button>' : '') +
         (c.step === 0 && r.tip ? '<p class="note mt">' + esc(r.tip) + '</p>' : '') +
         (c.step === 0 ? '<details class="mt"><summary>Todos los ingredientes</summary><ul class="list">' + U.arr(r.ingredients).map(function (i) { return '<li class="li"><span class="grow">' + ingText(i, k) + '</span></li>'; }).join('') + '</ul></details>' : '');
     }
-    var wl = A.wake.supported() ? '<button class="wake' + (A.wake.active() ? ' on' : '') + ' btn ghost sm" data-action="cookWake" aria-pressed="' + A.wake.active() + '"><span class="dot"></span>' + (A.wake.active() ? 'Pantalla siempre encendida' : 'Mantener pantalla encendida') + '</button>' : '<span class="meta">La pantalla puede apagarse (este navegador no permite evitarlo)</span>';
+    var wl = A.wake.supported() ? '<button class="wake' + (A.wake.active() ? ' on' : '') + ' link" data-action="cookWake" aria-pressed="' + A.wake.active() + '"><span class="dot"></span>' + (A.wake.active() ? 'Pantalla siempre encendida' : 'Mantener pantalla encendida') + '</button>' : '<span class="meta">La pantalla puede apagarse (este navegador no permite evitarlo)</span>';
     d.innerHTML = '<div class="cook"><div class="cook-top"><button class="icon-btn" data-action="closeDialog" data-dlg="cook" aria-label="Salir del modo cocina">' + I('cerrar') + '</button><h2 class="cook-title">' + esc(r.title) + '</h2>' + wl + '</div>' +
       '<div class="cook-progress" role="progressbar" aria-valuemin="0" aria-valuemax="' + n + '" aria-valuenow="' + Math.min(c.step, n) + '"><i style="width:' + Math.round(Math.min(c.step, n) / n * 100) + '%"></i></div>' +
       '<div class="cook-body" aria-live="polite">' + body + '</div><div class="cook-timers" aria-label="Temporizadores"></div>' +
-      '<div class="cook-nav"><button class="btn" data-action="cookPrev"' + (c.step === 0 ? ' disabled' : '') + '>' + I('chev-izq') + 'Anterior</button>' +
-      (c.step < n ? '<button class="btn primary" data-action="cookNext">' + (c.step === n - 1 ? 'Terminar' : 'Siguiente') + I('chev') + '</button>' : '<button class="btn primary" data-action="closeDialog" data-dlg="cook">Cerrar</button>') + '</div></div>';
+      '<div class="cook-nav"><button class="link" data-action="cookPrev"' + (c.step === 0 ? ' disabled' : '') + '>‹ Anterior</button>' +
+      (c.step < n ? '<button class="btn primary" data-action="cookNext">' + (c.step === n - 1 ? 'Terminar' : 'Siguiente') + '</button>' : '<button class="btn primary" data-action="closeDialog" data-dlg="cook">Cerrar</button>') + '</div></div>';
     A.timers.paint();
   }
   A.actions.cookPrev = function () { if (A.ui.cook.step > 0) { A.ui.cook.step--; paintCook(); } };
@@ -368,7 +405,7 @@
       return true;
     }).sort(function (a, b) { return a.name.localeCompare(b.name, 'es'); });
     if (!q && !cat) list = quickIngredients().map(function (id) { return L.ingredient(id); });
-    return (!q && !cat ? '<p class="meta">Los más usados en las recetas:</p>' : '') + '<div class="ing-grid">' + list.map(function (i) { var on = have.has(i.id); return '<button class="chip' + (on ? ' on' : '') + '" data-action="fridgeToggle" data-i="' + esc(i.id) + '" aria-pressed="' + on + '">' + (on ? I('check', 'sm') : '') + esc(i.name) + '</button>'; }).join('') + (list.length ? '' : '<p class="muted">Nada con ese nombre.</p>') + '</div>';
+    return (!q && !cat ? '<p class="meta">Los más usados en las recetas:</p>' : '') + '<div class="ing-grid">' + list.map(function (i) { var on = have.has(i.id); return '<button class="chip' + (on ? ' on' : '') + '" data-action="fridgeToggle" data-i="' + esc(i.id) + '" aria-pressed="' + on + '">' + esc(i.name) + '</button>'; }).join('') + (list.length ? '' : '<p class="muted">Nada con ese nombre.</p>') + '</div>';
   }
   function fridge() {
     var p = A.P(), have = p.fridge;
@@ -379,7 +416,7 @@
     function item(x) {
       var miss = x.missing.length ? '<p class="meta">Te ' + (x.missing.length === 1 ? 'falta' : 'faltan') + ' ' + x.missing.length + ': ' + esc(x.missing.map(function (m) { return m.name; }).join(', ')) + '</p>' : '';
       return '<li class="li"><span class="score num" aria-label="' + x.score + ' por ciento">' + x.score + '</span><span class="grow"><a href="#/cocina/receta/' + encodeURIComponent(x.recipe.id) + '"><b>' + esc(x.recipe.title) + '</b></a>' + miss + '</span>' +
-        (x.missing.length ? '<button class="btn sm" data-action="fridgeMissing" data-r="' + esc(x.recipe.id) + '">' + I('compras', 'sm') + '<span class="sr-only">Agregar faltantes de ' + esc(x.recipe.title) + ' a Compras</span><span aria-hidden="true">Agregar faltantes</span></button>' : '<button class="btn sm primary" data-action="cook" data-r="' + esc(x.recipe.id) + '">' + I('play', 'sm') + 'Cocinar</button>') + '</li>';
+        (x.missing.length ? '<button class="link" data-action="fridgeMissing" data-r="' + esc(x.recipe.id) + '"><span class="sr-only">Agregar faltantes de ' + esc(x.recipe.title) + ' a Compras</span><span aria-hidden="true">A compras</span></button>' : '<button class="link go" data-action="cook" data-r="' + esc(x.recipe.id) + '">Cocinar</button>') + '</li>';
     }
     return '<p class="muted">Marcá lo que tenés y te mostramos qué cocinar. Los básicos de alacena (' + esc(pantry.join(', ') || 'sal, aceite, agua') + ') se cuentan siempre.</p>' +
       '<section class="toolbar-card mt-s">' +
@@ -387,7 +424,7 @@
       '<div class="chips scroll mt-s"><button class="chip' + (!A.ui.fcat ? ' on' : '') + '" data-action="fCat" data-c="">Más usados</button>' + cats.map(function (c) { var on = A.ui.fcat === c; return '<button class="chip' + (on ? ' on' : '') + '" data-action="fCat" data-c="' + esc(c) + '" aria-pressed="' + on + '">' + esc(((U.arr(L.tx().ingredientCategories).filter(function (x) { return x.id === c; })[0]) || {}).label || U.cap(c.replace(/_/g, ' '))) + '</button>'; }).join('') + '</div>' +
       '<div data-part="fing" class="mt-s">' + fridgeIngredients() + '</div>' +
       '</section>' +
-      (have.length ? '<p class="meta mt-s">Tenés ' + U.plural(have.length, 'ingrediente marcado', 'ingredientes marcados') + ' · <button class="btn ghost sm" data-action="fridgeClear">Vaciar</button></p>' : '') +
+      (have.length ? '<p class="meta mt-s">Tenés ' + U.plural(have.length, 'ingrediente marcado', 'ingredientes marcados') + ' · <button class="link" data-action="fridgeClear">Vaciar</button></p>' : '') +
       '<div class="tier-h"><h2>Listas para cocinar</h2><span class="meta">' + ready.length + '</span></div>' + (ready.length ? '<ul class="list card">' + ready.map(item).join('') + '</ul>' : '<p class="muted">Todavía ninguna. Marcá más ingredientes.</p>') +
       '<div class="tier-h"><h2>Te falta poco</h2><span class="meta">' + near.length + '</span></div>' + (near.length ? '<ul class="list card">' + near.map(item).join('') + '</ul>' : '<p class="muted">Ninguna a 1 o 2 ingredientes.</p>');
   }
@@ -435,7 +472,7 @@
   A.actions.planMove = function (el) {
     var d = el.dataset.d, s = el.dataset.s, n = +el.dataset.n, rid = A.P().plan[d][s][n];
     A.ui.planPick = { r: rid, date: d, slot: s, move: { date: d, slot: s, i: n } };
-    A.openSheet({ title: 'Mover a…', body: planPickBody(), foot: '<button class="btn primary" data-action="planPickSave">Mover</button>' });
+    A.openSheet({ title: 'Mover a…', body: planPickBody(), foot: '<button class="btn primary wide" data-action="planPickSave">Mover</button>' });
   };
   A.actions.planAddSheet = function (el) {
     A.ui.planAdd = { d: el.dataset.d, s: el.dataset.s };
@@ -514,7 +551,7 @@
     }).join('') + '</ul></section>' : '<div class="banner info">' + I('calendario') + '<div class="grow">Cuando planifiques comidas, acá aparece qué poner en remojo y a qué hora.</div><a class="btn sm" href="#/cocina/plan">Ir al plan</a></div>';
     return top + '<h2 class="section-title">Todas las reglas</h2><div class="grid-cards">' + list.map(function (s) {
       return '<section class="card" id="s-' + esc(s.id) + '"><h3>' + esc(s.name) + '</h3><p class="recipe-meta mt-s"><span>' + I('reloj', 'sm') + esc(s.label || (s.minH + ' a ' + s.optH + ' h')) + '</span>' + (s.medium ? '<span>' + I('agua', 'sm') + esc(s.medium) + '</span>' : '') + '</p>' +
-        '<p class="mt-s"><span class="tag ' + (s.discardWater ? 'clay' : 'accent') + '">' + I(s.discardWater ? 'borrar' : 'check', 'sm') + (s.discardWater ? 'Descartar el agua' : 'No descartar el agua') + '</span></p>' +
+        '<p class="mt-s"><span class="tag ' + (s.discardWater ? 'clay' : 'accent') + '">' + (s.discardWater ? 'Descartar el agua' : 'No descartar el agua') + '</span></p>' +
         (s.purpose ? '<p class="meta">' + esc(s.purpose) + '</p>' : '') + (s.why ? '<p class="meta">' + esc(s.why) + '</p>' : '') + (s.alerts ? '<p class="note">' + esc(s.alerts) + '</p>' : '') + (s.note ? '<p class="meta">' + esc(s.note) + '</p>' : '') + (s.hoursEditorial ? '<p class="meta">Las horas son una referencia; la guía dice «la noche anterior».</p>' : '') + '</section>';
     }).join('') + '</div>';
   }
@@ -547,7 +584,7 @@
       '<fieldset class="field"><legend class="label">Alérgenos</legend><div class="chips">' + algs.map(function (a) { var on = U.arr(r.allergens).indexOf(a.id) > -1; return '<label class="chip soft"><input type="checkbox" name="al" value="' + a.id + '"' + (on ? ' checked' : '') + '> ' + esc(a.label) + '</label>'; }).join('') + '</div><p class="meta">Se marcan solos al guardar según los ingredientes reconocidos; revisalos.</p></fieldset>' +
       '<fieldset class="field"><legend class="label">Momentos</legend><div class="chips">' + L.slots().map(function (s) { var on = U.arr(r.slots).indexOf(s.id) > -1; return '<label class="chip soft"><input type="checkbox" name="slot" value="' + s.id + '"' + (on ? ' checked' : '') + '> ' + esc(s.label) + '</label>'; }).join('') + '</div></fieldset>' +
       '<fieldset class="field"><legend class="label">Tipo</legend><div class="chips">' + [['cocido', 'Cocida'], ['crudo', 'Cruda'], ['rapida', 'Rápida'], ['batch', 'Para batch']].map(function (t) { var on = U.arr(r.tags).indexOf(t[0]) > -1; return '<label class="chip soft"><input type="checkbox" name="tag" value="' + t[0] + '"' + (on ? ' checked' : '') + '> ' + t[1] + '</label>'; }).join('') + '</div></fieldset>' +
-      '<button class="btn primary">' + I('check', 'sm') + 'Guardar receta</button></form>';
+      '<button class="btn primary wide mt">Guardar receta</button></form>';
   }
   A.binds.ingsPreview = U.debounce(function (el) {
     var lines = el.value.split('\n').filter(function (x) { return x.trim(); });

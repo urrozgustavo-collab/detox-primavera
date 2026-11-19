@@ -1,10 +1,24 @@
 # 🌿 Detox Primavera — Estado del Proyecto & Guía de Continuidad
 
-> **Última actualización:** 18 de noviembre de 2026  
-> **Versión Actual:** `v2.3.0` — organización «Un paso a la vez» (rama git `rediseno-v2`, sin publicar todavía)  
+> **Última actualización:** 19 de noviembre de 2026  
+> **Versión Actual:** `v2.4.0` — «texto y líneas finas» en una columna central (rama git `rediseno-v2`, sin publicar todavía)  
 > **Versión anterior publicada:** `v1.4.2` (rama `main`, GitHub Pages)  
 
 ---
+
+## v2.4.0 — «Texto y líneas finas» en una columna central (19/11/2026)
+
+Gustavo aprobó las maquetas `rediseno-v2/maquetas/maquetas-centro.html` (computadora) y `maquetas-detalle.html` (detalles «después»). Cambia solo la presentación; funciones, rutas, datos guardados (`detox2_state`, `schema: 2`), migración v1, sincronización y modo claro/oscuro quedan igual (103 tests en verde). Detalle de cada decisión en `rediseno-v2/DECISIONES.md` (prefijo `[v2.4]`).
+
+- **Letra Geist** para todo el texto, incrustada dentro del HTML (sin internet; el armado verifica su huella SHA-256). Los títulos grandes siguen en Segoe UI Variable Display.
+- **Computadora:** todo en una sola columna central angosta (620 px; 700 en Compras), con los costados vacíos y mucho aire. La barra de arriba (marca · Hoy/Cocina/Vos con puntito coral · buscar) ocupa el mismo ancho centrado. La receta se abre sola, con «‹ Recetas» para volver (se fue la vista lista + receta lado a lado).
+- **Paneles centrados** en la computadora (fondo apagado y un poco desenfocado); en el celular siguen subiendo desde abajo.
+- **Botón principal = barra verde** (una sola por pantalla); lo demás, texto gris debajo o al lado.
+- **Sin tildes ni casillas:** lo marcado lleva un punto verde; ingredientes y compras hechos se tachan suave. Sin píldoras, chips ni recuadros con fondo: renglones separados por líneas finas.
+- **Opciones como palabras:** categorías de recetas en texto + un único «Filtrar» (panel con «Mostrar» y «Ordenar por»), filtros activos como frase con ✕; fecha de inicio, orden y porciones en palabras con puntito coral; energía y ánimo como fila de números 1–5; señales y digestión como palabras con punto verde; semáforo con un grupo por vez (Libre · Con moderación · Evitar).
+- **Celular:** mismo sistema; la barra de abajo pasa a ser plana con línea fina (sin cápsula).
+- **Tamaño:** el HTML queda en ≈740 KB (la fuente suma ≈93 KB): supera el tope de 600 KB del contrato; ver la última decisión `[v2.4]`.
+- Archivos: `v2/build.py` (fuente y versión), `v2/src/styles/tokens.css`, `sutil.css` (se quitaron panel lateral y columnas dobles), `texto.css` (nueva), `v2/src/app/00-util.js`, `30-core.js`, `31-kit.js`, `40-hoy.js`, `41-cocina.js`, `42-compras.js`, `43-guia.js`, `44-progreso.js`, `45-programas.js`, `46-ajustes.js`, `47-search.js`, `48-vos.js`, `v2/tests/fuente.test.js` (nuevo), `v2/README.md`.
 
 ## v2.3.0 — Organización «A · Un paso a la vez» (18/11/2026)
 

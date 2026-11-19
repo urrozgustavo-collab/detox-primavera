@@ -2,7 +2,7 @@
 (function (root) {
   'use strict';
   var A = root.DXApp = root.DXApp || {};
-  A.version = (root.DX_BUILD && root.DX_BUILD.version) || '2.3.0';
+  A.version = (root.DX_BUILD && root.DX_BUILD.version) || '2.4.0';
   A.logic = A.logic || {};
   var U = A.util = {};
 

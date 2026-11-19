@@ -44,7 +44,7 @@
       '<a class="btn" href="#/programas/nuevo/' + encodeURIComponent(x.id) + '">' + I('copiar', 'sm') + 'Duplicar y modificar</a><button class="btn" data-action="exportProgram" data-p="' + esc(x.id) + '">' + I('descargar', 'sm') + 'Exportar</button>' +
       (own ? '<a class="btn" href="#/programas/editar/' + encodeURIComponent(x.id) + '">' + I('editar', 'sm') + 'Editar</a><button class="btn danger" data-action="delProgram" data-p="' + esc(x.id) + '">' + I('borrar', 'sm') + 'Borrar</button>' : '') + '</div></section>' +
       '<h2 class="section-title">Fases</h2><div class="stack">' + U.arr(x.phases).map(function (ph) { return '<section class="card"><h3>' + esc(ph.name) + '</h3>' + (ph.desc ? '<p class="mt-s">' + esc(ph.desc) + '</p>' : '') + (U.arr(ph.tips).length ? '<ul class="list">' + ph.tips.map(function (t) { return '<li class="li">' + I('hoja', 'sm') + '<span class="grow">' + esc(t.text || t) + '</span></li>'; }).join('') + '</ul>' : '') + '</section>'; }).join('') + '</div>' +
-      '<h2 class="section-title">Hábitos diarios</h2><section class="card"><ul class="list">' + U.arr(x.habits).map(function (h) { return '<li class="li">' + I('check', 'sm') + '<span class="grow"><b>' + esc(h.text) + '</b>' + (h.tip ? '<span class="meta">' + esc(h.tip) + '</span>' : '') + '</span></li>'; }).join('') + (U.arr(x.habits).length ? '' : '<li class="li muted">Sin hábitos.</li>') + '</ul></section>' +
+      '<h2 class="section-title">Hábitos diarios</h2><section class="card"><ul class="list">' + U.arr(x.habits).map(function (h) { return '<li class="li"><span class="grow"><b>' + esc(h.text) + '</b>' + (h.tip ? '<span class="meta">' + esc(h.tip) + '</span>' : '') + '</span></li>'; }).join('') + (U.arr(x.habits).length ? '' : '<li class="li muted">Sin hábitos.</li>') + '</ul></section>' +
       (U.arr(x.prepHabits).length ? '<h2 class="section-title">Preparación</h2><section class="card"><ul class="list">' + x.prepHabits.map(function (h) { return '<li class="li">' + I('amanecer', 'sm') + '<span class="grow">' + esc(h.text) + '</span></li>'; }).join('') + '</ul></section>' : '') +
       (x.source ? '<p class="meta mt">' + esc(x.source) + '</p>' : '');
   }
@@ -52,20 +52,24 @@
   A.actions.startSheet = function (el) {
     var x = L.program(el.dataset.p, A.P()), today = A.today();
     A.ui.st = { p: x.id, date: today, mode: x.defaultStartMode || (U.arr(x.startModes)[0] || {}).id };
-    A.openSheet({ title: 'Empezar ' + x.name, body: startBody(), foot: '<button class="btn primary" data-action="startConfirm">' + I('planta', 'sm') + 'Empezar</button>' });
+    A.openSheet({ title: 'Empezar ' + x.name, body: startBody(), foot: '<button class="btn primary wide" data-action="startConfirm">Empezar</button><button class="link" data-action="closeDialog" data-dlg="sheet">Después</button>' });
   };
   function startBody() {
     var st = A.ui.st, x = L.program(st.p, A.P()), today = A.today();
     var opts = U.startChoices(today);
     var ed = A.ED();
     var running = ed && (ed.status === 'active' || ed.status === 'planned');
-    return '<p class="label">Fecha de inicio</p><div class="chips">' + opts.map(function (o) { return '<button class="chip' + (st.date === o[1] ? ' on' : '') + '" data-action="stSet" data-k="date" data-v="' + o[1] + '" aria-pressed="' + (st.date === o[1]) + '">' + o[0] + ' <span class="meta">' + U.fmtDate(o[1], 'short') + '</span></button>'; }).join('') + '</div>' +
-      '<input type="date" class="input mt-s" data-change="stDate" value="' + st.date + '" aria-label="Otra fecha">' +
-      (U.arr(x.startModes).length > 1 ? '<p class="label mt">Cómo empezar</p>' + x.startModes.map(function (m) { return '<label class="check"><input type="radio" name="stm" data-change="stMode" value="' + esc(m.id) + '"' + (st.mode === m.id ? ' checked' : '') + '><span>' + esc(m.label) + '</span></label>'; }).join('') : '') +
+    // v2.4: fecha como palabras (puntito coral) y forma de empezar como renglones con punto verde.
+    var dateOpts = opts.map(function (o) { return [o[1], U.cap(o[0].replace('Próximo ', '')), U.fmtDate(o[1], 'short')]; });
+    if (!opts.some(function (o) { return o[1] === st.date; })) dateOpts.push([st.date, 'Otra', U.fmtDate(st.date, 'short')]);
+    return '<p class="muted c">' + U.plural(x.days, 'día') + (x.source ? ' · ' + esc(String(x.source).split('.')[0]) : '') + '</p>' +
+      '<div class="g"><p class="lab c">Fecha de inicio</p>' + K.opts(dateOpts, st.date, 'stSet', 'Fecha de inicio', 'data-k="date"') +
+      '<label class="field other-date"><span>Otra fecha</span><input type="date" class="input" data-change="stDate" value="' + st.date + '" aria-label="Otra fecha"></label></div>' +
+      (U.arr(x.startModes).length > 1 ? '<div class="g"><p class="lab">Cómo empezar</p><div class="choices">' + x.startModes.map(function (m) { return K.choice(st.mode === m.id, 'stSet', 'data-k="mode" data-v="' + esc(m.id) + '"', m.label, m.id === x.defaultStartMode && !/recomend/i.test(m.label) ? 'Recomendado por la guía' : ''); }).join('') + '</div></div>' : '') +
       (running ? '<div class="banner mt">' + I('info') + '<div class="grow">Tenés en curso <b>' + esc((A.PROG() || {}).name || '') + '</b>. Al empezar, esa edición se archiva con todos sus datos (la ves en Progreso › Historial).</div></div>' : '');
   }
   A.actions.stSet = function (el) { A.ui.st[el.dataset.k] = el.dataset.v; document.querySelector('#sheet .sheet-b').innerHTML = startBody(); };
-  A.changes.stDate = function (el) { if (U.isValidISO(el.value)) A.ui.st.date = el.value; };
+  A.changes.stDate = function (el) { if (U.isValidISO(el.value)) { A.ui.st.date = el.value; document.querySelector('#sheet .sheet-b').innerHTML = startBody(); } };
   A.changes.stMode = function (el) { A.ui.st.mode = el.value; };
   A.actions.startConfirm = function () {
     var st = A.ui.st;
@@ -128,7 +132,7 @@
       '<label class="field"><span>Color</span><select class="input" name="theme">' + Object.keys(SEASONS).map(function (k) { return '<option value="' + k + '"' + (x.theme === k ? ' selected' : '') + '>' + SEASONS[k] + '</option>'; }).join('') + '</select></label>' +
       '<fieldset class="field"><legend class="label">Hábitos de la guía</legend>' + lib.map(function (h) { return '<label class="check"><input type="checkbox" name="hab" value="' + esc(h.id) + '"' + (have.indexOf(h.id) > -1 || (!base && !editId) ? ' checked' : '') + '><span>' + esc(h.text) + '</span></label>'; }).join('') + '</fieldset>' +
       '<label class="field"><span>Hábitos propios (uno por línea)</span><textarea class="input" name="own" rows="3" placeholder="Ej.: Caminar 30 minutos">' + esc(extra) + '</textarea></label>' +
-      '<button class="btn primary">' + I('check', 'sm') + 'Guardar programa</button></form>';
+      '<button class="btn primary wide mt">Guardar programa</button></form>';
   }
   A.actions.saveProgram = function (f) {
     var el = f.elements;

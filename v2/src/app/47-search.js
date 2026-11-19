@@ -35,7 +35,7 @@
     var m = function (txt) { return U.matchQuery(txt, q); };
     var add = function (group, label, meta, go) { out.push({ group: group, label: label, meta: meta, go: go }); };
     L.allRecipes(p).forEach(function (r) { if (m(r.title + ' ' + U.arr(r.ingredients).map(function (i) { return i.text; }).join(' ') + ' ' + (r.tags || []).join(' '))) add('Recetas', r.title, L.categoryLabel(r.category), nav('/cocina/receta/' + r.id)); });
-    U.arr(dx.foods).forEach(function (f) { if (m([f.name, f.category].concat(f.synonyms || []).join(' '))) add('¿Puedo comer…?', f.name, L.statusLabel(f.status), nav('/guia/semaforo', 'f-' + f.id, function () { A.ui.fdq = ''; A.ui.fdst = ''; A.ui.foodOpen = f.id; })); });
+    U.arr(dx.foods).forEach(function (f) { if (m([f.name, f.category].concat(f.synonyms || []).join(' '))) add('¿Puedo comer…?', f.name, L.statusLabel(f.status), nav('/guia/semaforo', 'f-' + f.id, function () { A.ui.fdq = ''; A.ui.fdst = f.status; A.ui.foodOpen = f.id; })); });
     U.arr(dx.ingredients).forEach(function (g) { if (m([g.name].concat(g.synonyms || []).join(' '))) add('Ingredientes', g.name, 'Ver en la heladera', nav('/cocina/heladera', null, function () { A.ui.fq = g.name; A.ui.fcat = ''; })); });
     U.arr(dx.sos).forEach(function (s) { if (m(s.symptom + ' ' + (s.cause || '') + ' ' + U.arr(s.steps).map(function (x) { return x.text; }).join(' '))) add('SOS', s.symptom, 'Protocolo', nav('/guia/sos/' + s.id)); });
     U.arr(dx.herbs).forEach(function (h) { if (m(h.name + ' ' + U.arr(h.properties).join(' '))) add('Herbario', h.name, 'Ficha', nav('/guia/herbario/' + h.id)); });
@@ -96,7 +96,7 @@
       if (!o.mode) o.mode = prog.defaultStartMode;
       var t = A.today(), opts = U.startChoices(t).concat([['Después', '']]);
       return dots + '<label class="field"><span>Programa</span><select class="input" id="onb-prog">' + progs.map(function (x) { return '<option value="' + esc(x.id) + '"' + (x.id === prog.id ? ' selected' : '') + '>' + esc(x.name) + ' · ' + x.days + ' días</option>'; }).join('') + '</select></label>' +
-        '<p class="label">¿Cuándo empezás?</p><div class="chips">' + opts.map(function (x) { return '<button class="chip' + (o.date === x[1] ? ' on' : '') + '" data-action="onbDate" data-d="' + x[1] + '" aria-pressed="' + (o.date === x[1]) + '">' + x[0] + (x[1] ? ' <span class="meta">' + U.fmtDate(x[1], 'short') + '</span>' : '') + '</button>'; }).join('') + '</div>' +
+        '<p class="lab c">¿Cuándo empezás?</p><div class="opts" role="group" aria-label="Fecha de inicio">' + opts.map(function (x) { return '<button data-action="onbDate" data-d="' + x[1] + '" aria-pressed="' + (o.date === x[1]) + '">' + x[0] + (x[1] ? '<small>' + U.fmtDate(x[1], 'short') + '</small>' : '') + '</button>'; }).join('') + '</div>' +
         (U.arr(prog.startModes).length > 1 && o.date ? '<p class="label mt">Cómo empezar</p>' + prog.startModes.map(function (m) { return '<label class="check"><input type="radio" name="onbm" data-change="onbMode" value="' + esc(m.id) + '"' + (o.mode === m.id ? ' checked' : '') + '><span>' + esc(m.label) + '</span></label>'; }).join('') : '');
     }
     return dots + '<p>Opcional: así te avisamos de alérgenos y contraindicaciones. Lo podés cambiar en Ajustes.</p><p class="label">Alergias e intolerancias</p><div class="chips">' +
