@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maquetas de calma</title>
+<style>
+/* ---------- página de comparación ---------- */
+:root { --pg-bg:#ECEAE7; --pg-ink:#1E1C1A; --pg-mut:#615C57; --pg-line:#D2CEC9; --pg-sel:#1E1C1A; --pg-selink:#fff; }
+@media (prefers-color-scheme: dark) { :root { --pg-bg:#1E1D1C; --pg-ink:#EEEBE7; --pg-mut:#A49E98; --pg-line:#3A3836; --pg-sel:#EEEBE7; --pg-selink:#1E1D1C; } }
+* { box-sizing:border-box; }
+html,body { margin:0; }
+body { background:var(--pg-bg); color:var(--pg-ink); font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+.pg-top { position:sticky; top:0; z-index:5; background:var(--pg-bg); border-bottom:1px solid var(--pg-line); padding:12px 16px; display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; }
+.pg-top h1 { font-size:16px; margin:0 8px 0 0; font-weight:650; }
+.pg-seg { display:flex; gap:4px; flex-wrap:wrap; }
+.pg-seg button { font:inherit; font-size:14px; border:1px solid var(--pg-line); background:transparent; color:var(--pg-ink); border-radius:999px; padding:6px 13px; cursor:pointer; }
+.pg-seg button[aria-pressed="true"] { background:var(--pg-sel); color:var(--pg-selink); border-color:var(--pg-sel); }
+.pg-seg button:focus-visible { outline:2px solid var(--pg-ink); outline-offset:2px; }
+.pg-intro { max-width:780px; padding:16px 16px 0; color:var(--pg-mut); margin:0; }
+.pg-intro b { color:var(--pg-ink); }
+.pg-desc { padding:14px 16px 0; max-width:980px; }
+.pg-desc h2 { font-size:21px; margin:0 0 4px; }
+.pg-desc p { margin:0 0 8px; color:var(--pg-mut); max-width:72ch; }
+.map { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px 22px; margin:12px 0 0; padding:0; list-style:none; max-width:980px; }
+.map li { font-size:13.5px; color:var(--pg-mut); line-height:1.45; }
+.map li b { display:block; color:var(--pg-ink); font-size:14px; }
+.stage { display:flex; gap:30px; overflow-x:auto; padding:22px 16px 40px; scroll-snap-type:x mandatory; }
+.stage > figure { margin:0; flex:0 0 auto; scroll-snap-align:start; }
+.stage figcaption { font-size:13px; color:var(--pg-mut); margin:0 0 8px 4px; }
+.cmp-h { padding:0 16px; font-size:18px; margin:6px 0 0; }
+
+/* ---------- teléfono y paleta «Primavera sutil», ahora más silenciosa ---------- */
+.phone {
+  --bg:#FBF8F6; --surface:#FFFFFF; --soft:#F4EEEA; --ink:#2B2623; --ink-2:#514944; --muted:#7A6F69; --faint:#B5AAA3; --line:#EFE8E3;
+  --accent:#4A6B55; --accent-soft:#E7EEE9; --accent-ink:#FFFFFF; --coral:#C9542F; --coral-soft:#FBE9E2; --water:#5A93B0;
+  --tab:rgba(255,255,255,.82);
+  width:360px; height:740px; border-radius:36px; overflow:hidden; position:relative; display:flex; flex-direction:column;
+  background:var(--bg); color:var(--ink);
+  font-family:"Segoe UI Variable Text","SF Pro Text",-apple-system,system-ui,Roboto,sans-serif;
+  box-shadow:0 0 0 9px #121110, 0 22px 50px rgba(0,0,0,.22);
+}
+.phone.dark {
+  --bg:#161312; --surface:#201B19; --soft:#28221F; --ink:#F2EAE5; --ink-2:#D2C7C1; --muted:#A0948E; --faint:#6B605B; --line:#2C2623;
+  --accent:#93BEA0; --accent-soft:#24322A; --accent-ink:#12201A; --coral:#EE8C6B; --coral-soft:#3B2720; --water:#82B9D3;
+  --tab:rgba(32,27,25,.84);
+}
+.phone .scroll { flex:1; overflow-y:auto; padding:0 24px 110px; scrollbar-width:none; }
+.phone .scroll::-webkit-scrollbar { display:none; }
+.phone svg.i { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+.phone svg.i.s { width:18px; height:18px; }
+.status { height:32px; display:flex; justify-content:space-between; align-items:center; padding:0 26px; font-size:12px; font-weight:600; flex:none; }
+.top { display:flex; align-items:center; justify-content:space-between; padding:10px 24px 0; flex:none; color:var(--muted); font-size:14px; }
+.top .acts { display:flex; gap:16px; align-items:center; }
+.av { width:30px; height:30px; border-radius:50%; background:var(--accent-soft); color:var(--accent); display:grid; place-items:center; font-size:13px; font-weight:600; }
+.muted { color:var(--muted); }
+.disp { font-family:"Segoe UI Variable Display","SF Pro Display",-apple-system,system-ui,sans-serif; }
+
+/* barra flotante */
+.dock { position:absolute; left:50%; bottom:22px; transform:translateX(-50%); display:flex; gap:4px; padding:6px; border-radius:999px; background:var(--tab); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:0 8px 28px rgba(40,25,18,.12), 0 0 0 1px var(--line); }
+.phone.dark .dock { box-shadow:0 8px 28px rgba(0,0,0,.4), 0 0 0 1px var(--line); }
+.dock a { display:flex; align-items:center; gap:7px; padding:10px 16px; border-radius:999px; color:var(--muted); font-size:14px; text-decoration:none; }
+.dock a.on { background:var(--ink); color:var(--bg); font-weight:600; }
+.dock.icons a { padding:11px 15px; }
+.dock.icons a span { display:none; }
+.dock.icons a.on span { display:inline; }
+
+/* piezas comunes */
+.seg21 { display:flex; gap:3px; margin-top:14px; }
+.seg21 i { flex:1; height:4px; border-radius:2px; background:var(--soft); }
+.seg21 i.ok { background:var(--accent); opacity:.75; } .seg21 i.g { background:var(--faint); opacity:.6; } .seg21 i.now { background:var(--coral); }
+.circ { width:24px; height:24px; border-radius:50%; border:1.5px solid var(--faint); display:grid; place-items:center; flex:none; }
+.circ.on { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+.circ.on svg { width:14px; height:14px; stroke-width:2.6; }
+.lrow { display:flex; align-items:center; gap:14px; min-height:52px; border-bottom:1px solid var(--line); font-size:15.5px; }
+.lrow:last-child { border-bottom:0; }
+.lrow .t { flex:1; line-height:1.35; }
+.lrow.done .t { color:var(--muted); }
+.lrow .v { color:var(--muted); font-size:14px; white-space:nowrap; }
+.lrow .chev { color:var(--faint); }
+.lab { font-size:13px; color:var(--muted); margin:30px 0 4px; }
+.plus { width:34px; height:34px; border-radius:50%; background:var(--soft); display:grid; place-items:center; color:var(--ink-2); flex:none; }
+.pill { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:12px 22px; border-radius:999px; font-size:15px; font-weight:600; }
+.pill.pri { background:var(--ink); color:var(--bg); }
+.pill.ghost { color:var(--muted); font-weight:500; }
+.dots5 { display:flex; gap:10px; }
+.dots5 i { width:28px; height:28px; border-radius:50%; background:var(--soft); display:grid; place-items:center; font-style:normal; font-size:12px; color:var(--muted); }
+.dots5 i.on { background:var(--accent); color:var(--accent-ink); font-weight:600; }
+.chips { display:flex; gap:6px; flex-wrap:wrap; }
+.chip { font-size:13.5px; padding:7px 13px; border-radius:999px; background:var(--soft); color:var(--ink-2); }
+.chip.on { background:var(--ink); color:var(--bg); }
+.search { display:flex; align-items:center; gap:10px; background:var(--soft); border-radius:14px; padding:12px 14px; color:var(--muted); font-size:15px; }
+.tabs-t { display:flex; gap:20px; font-size:15px; color:var(--muted); margin:18px 0 6px; }
+.tabs-t b { color:var(--ink); font-weight:600; position:relative; }
+.tabs-t b::after { content:""; position:absolute; left:0; right:0; bottom:-7px; height:2px; border-radius:1px; background:var(--coral); }
+.rrow { display:flex; align-items:center; gap:14px; padding:13px 0; border-bottom:1px solid var(--line); }
+.rrow .ph { width:46px; height:46px; border-radius:14px; background:var(--soft); display:grid; place-items:center; color:var(--accent); flex:none; }
+.rrow .t { flex:1; font-size:15.5px; line-height:1.3; }
+.rrow .t small { display:block; color:var(--muted); font-size:13px; margin-top:2px; }
+.heat { display:grid; grid-template-columns:repeat(7,1fr); gap:9px; }
+.heat i { aspect-ratio:1; border-radius:50%; background:var(--soft); }
+.heat i.ok { background:var(--accent); opacity:.8; } .heat i.g { background:var(--faint); opacity:.5; }
+.heat i.now { background:transparent; box-shadow:inset 0 0 0 2px var(--coral); }
+.spark { width:100%; height:64px; display:block; }
+.spark path { fill:none; stroke:var(--accent); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.sheet-wrap { position:absolute; inset:0; background:rgba(30,20,15,.28); display:flex; align-items:flex-end; }
+.phone.dark .sheet-wrap { background:rgba(0,0,0,.5); }
+.sheet { width:100%; background:var(--surface); border-radius:28px 28px 0 0; padding:10px 24px 30px; }
+.grab { width:38px; height:4px; border-radius:2px; background:var(--line); margin:0 auto 18px; }
+
+/* ======== A · Un paso a la vez ======== */
+.focus { margin-top:26px; background:var(--surface); border-radius:28px; padding:30px 26px 22px; text-align:center; box-shadow:0 1px 0 var(--line), 0 0 0 1px var(--line); }
+.focus .k { font-size:13px; color:var(--coral); }
+.focus .q { font-size:24px; line-height:1.25; margin:10px 0 24px; font-weight:400; letter-spacing:-.01em; }
+.focus .acts { display:flex; justify-content:center; gap:6px; }
+.focus .more { font-size:13px; color:var(--muted); margin-top:16px; }
+.dots6 { display:flex; justify-content:center; gap:7px; margin-top:14px; }
+.dots6 i { width:7px; height:7px; border-radius:50%; background:var(--soft); }
+.dots6 i.on { background:var(--accent); } .dots6 i.now { background:var(--coral); }
+.quiet { margin-top:22px; }
+
+/* ======== B · Lista serena ======== */
+.bighead .d { font-size:58px; font-weight:250; letter-spacing:-.04em; line-height:1; margin-top:18px; }
+.bighead .d span { font-size:17px; color:var(--muted); letter-spacing:0; margin-left:6px; font-weight:400; }
+.bighead .p { font-size:14px; color:var(--coral); margin-top:8px; }
+
+/* ======== C · Momentos del día ======== */
+.greet { font-size:28px; font-weight:300; letter-spacing:-.02em; margin-top:18px; line-height:1.15; }
+.greet + p { margin:6px 0 0; color:var(--muted); font-size:14px; }
+.tl { position:relative; margin-top:26px; padding-left:26px; }
+.tl::before { content:""; position:absolute; left:7px; top:8px; bottom:8px; width:1.5px; background:var(--line); }
+.mo { position:relative; padding-bottom:22px; }
+.mo::before { content:""; position:absolute; left:-25px; top:6px; width:13px; height:13px; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 1.5px var(--faint); }
+.mo.done::before { background:var(--accent); box-shadow:none; }
+.mo.now::before { background:var(--coral); box-shadow:0 0 0 5px var(--coral-soft); }
+.mo h4 { margin:0; font-size:16px; font-weight:600; display:flex; justify-content:space-between; }
+.mo h4 small { font-weight:400; color:var(--muted); font-size:13px; }
+.mo p { margin:3px 0 0; font-size:14px; color:var(--muted); }
+.mo .card { background:var(--surface); border-radius:22px; padding:6px 16px; margin-top:10px; box-shadow:0 0 0 1px var(--line); }
+.cook-entry { display:flex; align-items:center; gap:14px; padding:18px; border-radius:22px; background:var(--surface); box-shadow:0 0 0 1px var(--line); margin-top:10px; font-size:16px; }
+.cook-entry .t { flex:1; }
+.cook-entry .t small { display:block; font-size:13px; color:var(--muted); }
+.cook-entry .ic { width:42px; height:42px; border-radius:50%; background:var(--accent-soft); color:var(--accent); display:grid; place-items:center; }
+.sentence { font-size:24px; font-weight:300; line-height:1.35; letter-spacing:-.01em; margin-top:16px; }
+.sentence b { font-weight:500; }
+</style>
+</head>
+<body>
+<div class="pg-top">
+  <h1>Detox · maquetas de calma</h1>
+  <div class="pg-seg" id="selDir" role="group" aria-label="Propuesta">
+    <button data-v="a" aria-pressed="true">A · Un paso a la vez</button>
+    <button data-v="b" aria-pressed="false">B · Lista serena</button>
+    <button data-v="c" aria-pressed="false">C · Momentos del día</button>
+  </div>
+  <div class="pg-seg" id="selMode" role="group" aria-label="Tema">
+    <button data-v="light" aria-pressed="true">Claro</button>
+    <button data-v="dark" aria-pressed="false">Oscuro</button>
+  </div>
+</div>
+<p class="pg-intro">Mantengo la paleta que elegiste (Primavera sutil), pero esta vez cambia <b>la organización</b>: qué se ve en cada pantalla, qué queda guardado un toque más adentro y cuántas pestañas hay. Las tres conservan <b>todas</b> las funciones; abajo de cada una está el mapa de dónde vive cada cosa.</p>
+<div class="pg-desc" id="desc"></div>
+<div class="stage" id="stage"></div>
+<h2 class="cmp-h">Las tres pantallas Hoy, juntas</h2>
+<div class="stage" id="cmp"></div>
+
+<script>
+const IC = {
+  hoy:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M5.6 5.6 7 7M17 17l1.4 1.4M3 12h2M19 12h2M5.6 18.4 7 17M17 7l1.4-1.4"/>',
+  cocina:'<path d="M4 11h16v2a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6z"/><path d="M9 8c0-1.4.8-1.6.8-3M14 8c0-1.4.8-1.6.8-3"/>',
+  compras:'<path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+  vos:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/>',
+  mas:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+  buscar:'<circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/>',
+  check:'<path d="m5 12 4.5 4.5L19 7"/>',
+  chev:'<path d="m9 6 6 6-6 6"/>',
+  plus:'<path d="M12 6v12M6 12h12"/>',
+  agua:'<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+  hoja:'<path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19 13 11"/>',
+  heladera:'<rect x="6" y="3" width="12" height="18" rx="2"/><path d="M6 10h12M9 6v2M9 13v3"/>',
+  plan:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+  share:'<path d="M12 4v11M8 8l4-4 4 4"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/>',
+  frasco:'<path d="M8 3h8M9 3v3l-3 4v10h12V10l-3-4V3"/>'
+};
+const ic = (n, c='i') => `<svg class="${c}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
+const status = '<div class="status"><span>9:41</span><span>●●● 82%</span></div>';
+const seg21 = () => `<div class="seg21" aria-label="Día 9 de 21">${Array.from({length:21},(_,i)=>`<i class="${i<8?(i===3?'g':'ok'):i===8?'now':''}"></i>`).join('')}</div>`;
+const circ = d => `<span class="circ ${d?'on':''}">${d?ic('check'):''}</span>`;
+const dock = (items, on, icons) => `<nav class="dock ${icons?'icons':''}">${items.map(([k,l])=>`<a class="${k===on?'on':''}">${ic(k)}<span>${l}</span></a>`).join('')}</nav>`;
+const heat = () => `<div class="heat">${Array.from({length:21},(_,i)=>`<i class="${i<8?(i===3?'g':'ok'):i===8?'now':''}"></i>`).join('')}</div>`;
+const spark = () => '<svg class="spark" viewBox="0 0 300 64" preserveAspectRatio="none"><path d="M4 50 C40 48, 60 46, 80 38 S 130 34, 160 26 S 220 20, 250 14 S 285 10, 296 8"/></svg>';
+const habits = [['Agua tibia con limón en ayunas',1],['Infusión depurativa, 2 a 4 tazas',1],['Masticar cada bocado, comer sentado',0],['Sin café, mate ni té negro',0],['Agua tibia a sorbitos todo el día',0],['Un plato abundante en verdes',0]];
+
+/* ---------- A · Un paso a la vez ---------- */
+const A = {
+  name:'A · Un paso a la vez',
+  desc:'Hoy muestra una sola cosa: el próximo hábito, grande, con «Hecho» y «Hoy no». Debajo, tres renglones tranquilos (agua, comidas, cómo te sentís) que se abren en una hoja al tocarlos. Solo tres pestañas: Hoy, Cocina y Vos. Es la más calma: nunca ves una lista larga si no la pedís.',
+  map:[['Hoy','próximo hábito · agua · comidas y sugerencias · cómo te sentís · para mañana (aparece solo de noche) · días anteriores deslizando la línea de 21'],
+       ['Cocina','recetas · plan semanal · compras · heladera · batch y remojos · métodos (todo en pestañas de texto arriba)'],
+       ['Vos','avance y mapa de días · diario y gráficos · logros · guía (semáforo, SOS, herbario, taller) · programas · ajustes, copia y sincronización'],
+       ['Siempre','buscar arriba a la derecha · cambiar de persona tocando el avatar']],
+  hoy:() => `${status}<div class="top"><span>Día 9 de 21</span><span class="acts">${ic('buscar')}<span class="av">G</span></span></div>
+  <div class="scroll">${seg21()}
+    <div class="focus"><div class="k">Ahora</div><div class="q disp">Masticar cada bocado y comer sentado</div>
+      <div class="acts"><span class="pill pri">${ic('check','i s')}Hecho</span><span class="pill ghost">Hoy no</span></div>
+      <div class="dots6"><i class="on"></i><i class="on"></i><i class="now"></i><i></i><i></i><i></i></div>
+      <div class="more">2 de 6 · ver todos</div></div>
+    <div class="quiet">
+      <div class="lrow">${ic('agua')}<span class="t">Agua</span><span class="v">750 de 2000 ml</span><span class="plus">${ic('plus','i s')}</span></div>
+      <div class="lrow">${ic('cocina')}<span class="t">Comidas<br><small class="muted" style="font-size:13px">Almuerzo sugerido: bowl de yamaní</small></span><span class="chev">${ic('chev','i s')}</span></div>
+      <div class="lrow">${ic('hoja')}<span class="t">¿Cómo te sentís?</span><span class="chev">${ic('chev','i s')}</span></div>
+    </div></div>${dock([['hoy','Hoy'],['cocina','Cocina'],['vos','Vos']],'hoy')}`,
+  s2:() => `${status}<div class="top"><span></span><span class="acts"><span class="av">G</span></span></div>
+  <div class="scroll"><div class="disp" style="font-size:32px;font-weight:300;margin-top:12px;letter-spacing:-.02em">Cocina</div>
+    <div class="tabs-t"><b>Recetas</b><span>Plan</span><span>Compras</span><span>Heladera</span></div>
+    <div class="search" style="margin-top:16px">${ic('buscar','i s')}Buscar receta o ingrediente</div>
+    <div class="chips" style="margin-top:12px"><span class="chip on">Para hoy</span><span class="chip">Sopas</span><span class="chip">Platos</span><span class="chip">Dips</span></div>
+    ${[['Caldo détox alcalinizante','35 min · apto friolentos'],['Bowl de yamaní con crucíferas','25 min · aún no la probaste'],['Guiso de mung y calabaza','40 min · hace 5 días'],['Hummus de mung','15 min · dip'],['Nituke de manzana','20 min · desayuno']].map(([t,m])=>`<div class="rrow"><span class="ph">${ic('hoja','i s')}</span><span class="t">${t}<small>${m}</small></span></div>`).join('')}
+  </div>${dock([['hoy','Hoy'],['cocina','Cocina'],['vos','Vos']],'cocina')}`,
+  s3:() => `${status}<div class="top"><span></span><span class="acts"><span class="av">G</span></span></div>
+  <div class="scroll"><div class="sentence disp">Vas por el <b>día 9</b>.<br>Cumpliste <b>todos</b> los días hasta hoy.</div>
+    <div class="lab">Tus 21 días</div>${heat()}
+    <div class="lab">Energía</div>${spark()}
+    <div class="lab">Más</div>
+    ${['Diario','Logros','Guía: semáforo, SOS, herbario','Programas','Ajustes y copia de seguridad'].map(t=>`<div class="lrow"><span class="t">${t}</span><span class="chev">${ic('chev','i s')}</span></div>`).join('')}
+  </div>${dock([['hoy','Hoy'],['cocina','Cocina'],['vos','Vos']],'vos')}`,
+  s4:() => `${A.hoy()}<div class="sheet-wrap"><div class="sheet"><div class="grab"></div>
+    <div class="disp" style="font-size:22px;font-weight:400">¿Cómo te sentís hoy?</div>
+    <div class="lab" style="margin-top:20px">Energía</div><div class="dots5">${[1,2,3,4,5].map(n=>`<i class="${n===4?'on':''}">${n}</i>`).join('')}</div>
+    <div class="lab">Digestión</div><div class="chips"><span class="chip">Liviana</span><span class="chip on">Óptima</span><span class="chip">Lenta</span><span class="chip">Gases</span></div>
+    <div class="lab">Señales</div><div class="chips"><span class="chip on">Ninguna</span><span class="chip">Cefalea leve</span><span class="chip">Sed</span><span class="chip">+ Otra</span></div>
+    <div style="margin-top:26px;text-align:right"><span class="pill pri">Guardar</span></div></div></div>`,
+  labels:['Hoy','Cocina','Vos','Al tocar «¿Cómo te sentís?»']
+};
+
+/* ---------- B · Lista serena ---------- */
+const B = {
+  name:'B · Lista serena',
+  desc:'Hoy es una sola lista tipográfica, sin tarjetas ni anillos: número del día grande y liviano, hábitos, agua, comidas y cómo te sentís, cada uno en un renglón. Todo a la vista pero sin ruido, como una agenda de papel. Cuatro pestañas solo con íconos (el nombre aparece en la activa): Hoy, Cocina, Compras y Más.',
+  map:[['Hoy','línea de 21 días · hábitos · agua · comidas por momento con sugerencia · cómo te sentís (5 puntos en el mismo renglón) · para mañana'],
+       ['Cocina','buscador · categorías · recetas; desde arriba: heladera, plan, batch, remojos y métodos'],
+       ['Compras','lista por comercio, «ya tenés», compartir'],
+       ['Más','progreso y gráficos · diario · logros · guía · programas · ajustes y copia']],
+  hoy:() => `${status}<div class="top"><span>Miércoles 18</span><span class="acts">${ic('buscar')}<span class="av">G</span></span></div>
+  <div class="scroll"><div class="bighead"><div class="d disp">Día 9<span>de 21</span></div><div class="p">Menú depurativo</div></div>${seg21()}
+    <div class="lab">Hábitos · 2 de 6</div>
+    ${habits.map(([t,d])=>`<div class="lrow ${d?'done':''}">${circ(d)}<span class="t">${t}</span></div>`).join('')}
+    <div class="lab">Agua</div>
+    <div class="lrow"><span class="t">750 <span class="muted">de 2000 ml</span></span><span class="plus">${ic('plus','i s')}</span></div>
+    <div class="lab">Comidas</div>
+    <div class="lrow done">${circ(1)}<span class="t">Nituke de manzana</span><span class="v">desayuno</span></div>
+    <div class="lrow">${circ(0)}<span class="t">Bowl de yamaní <span class="muted">· sugerida</span></span><span class="v">almuerzo</span></div>
+    <div class="lrow"><span class="plus">${ic('plus','i s')}</span><span class="t muted">Merienda o cena</span></div>
+    <div class="lab">Cómo te sentís</div>
+    <div class="lrow"><span class="t">Energía</span><div class="dots5">${[1,2,3,4,5].map(n=>`<i class="${n===4?'on':''}" style="width:24px;height:24px;font-size:11px">${n}</i>`).join('')}</div></div>
+    <div class="lrow"><span class="t">Digestión y señales</span><span class="v">Óptima</span><span class="chev">${ic('chev','i s')}</span></div>
+    <div class="lab">Para mañana</div>
+    <div class="lrow">${ic('frasco')}<span class="t">Remojá los porotos mung esta noche</span></div>
+  </div>${dock([['hoy','Hoy'],['cocina','Cocina'],['compras','Compras'],['mas','Más']],'hoy',true)}`,
+  s2:() => `${status}<div class="top"><span></span><span class="acts"><span class="av">G</span></span></div>
+  <div class="scroll"><div class="bighead"><div class="d disp" style="font-size:40px">Cocina</div></div>
+    <div class="search" style="margin-top:18px">${ic('buscar','i s')}Buscar receta o ingrediente</div>
+    <div class="lrow" style="margin-top:8px">${ic('heladera')}<span class="t">Con lo que tengo</span><span class="v">3 listas</span><span class="chev">${ic('chev','i s')}</span></div>
+    <div class="lrow">${ic('plan')}<span class="t">Plan de la semana</span><span class="v">5 comidas</span><span class="chev">${ic('chev','i s')}</span></div>
+    <div class="lab">Recetas</div>
+    ${[['Caldo détox alcalinizante','35 min'],['Bowl de yamaní con crucíferas','25 min'],['Guiso de mung y calabaza','40 min'],['Hummus de mung','15 min'],['Nituke de manzana','20 min']].map(([t,m])=>`<div class="lrow"><span class="t">${t}</span><span class="v">${m}</span></div>`).join('')}
+  </div>${dock([['hoy','Hoy'],['cocina','Cocina'],['compras','Compras'],['mas','Más']],'cocina',true)}`,
+  s3:() => `${status}<div class="top"><span></span><span class="acts">${ic('share')}<span class="av">G</span></span></div>
+  <div class="scroll"><div class="bighead"><div class="d disp" style="font-size:40px">Compras</div><div class="p" style="color:var(--muted)">12 pendientes esta semana</div></div>
+    <div class="lab">Verdulería</div>
+    ${[['Apio',0,'2 pencas'],['Puerros',0,'2'],['Manzanas',1,'1 kg'],['Zanahorias',0,'4']].map(([t,d,q])=>`<div class="lrow ${d?'done':''}">${circ(d)}<span class="t">${t}</span><span class="v">${q}</span></div>`).join('')}
+    <div class="lab">Dietética</div>
+    ${[['Porotos mung',0,'500 g'],['Arroz yamaní',0,'1 kg'],['Alga kombu',1,'1 paquete']].map(([t,d,q])=>`<div class="lrow ${d?'done':''}">${circ(d)}<span class="t">${t}</span><span class="v">${q}</span></div>`).join('')}
+  </div>${dock([['hoy','Hoy'],['cocina','Cocina'],['compras','Compras'],['mas','Más']],'compras',true)}`,
+  s4:() => `${status}<div class="top"><span></span><span class="acts"><span class="av">G</span></span></div>
+  <div class="scroll"><div class="bighead"><div class="d disp" style="font-size:40px">Más</div></div>
+    <div class="lab">Tu avance</div>
+    <div class="lrow"><span class="t">Constancia</span><span class="v" style="color:var(--ink);font-size:16px">100 %</span></div>
+    <div class="lrow"><span class="t">Racha</span><span class="v" style="color:var(--ink);font-size:16px">8 días</span></div>
+    <div style="margin:14px 0 4px">${heat()}</div>
+    <div class="lab">Todo lo demás</div>
+    ${['Diario y gráficos','Logros','Semáforo de alimentos','SOS y herbario','Programas','Ajustes y copia de seguridad'].map(t=>`<div class="lrow"><span class="t">${t}</span><span class="chev">${ic('chev','i s')}</span></div>`).join('')}
+  </div>${dock([['hoy','Hoy'],['cocina','Cocina'],['compras','Compras'],['mas','Más']],'mas',true)}`,
+  labels:['Hoy','Cocina','Compras','Más']
+};
+
+/* ---------- C · Momentos del día ---------- */
+const C = {
+  name:'C · Momentos del día',
+  desc:'Hoy se ordena como el día mismo: mañana, mediodía, tarde y noche. Solo el momento actual queda abierto; lo pasado se resume en una línea y lo que viene espera cerrado. Cada hábito y comida aparece cuando corresponde (el limón a la mañana, cómo te sentís y el remojo a la noche). Tres pestañas: Hoy, Cocina y Vos.',
+  map:[['Hoy','línea del día con 4 momentos · hábitos y comidas en su momento · agua al mediodía y la tarde · cómo te sentís y «para mañana» a la noche · días anteriores tocando «Día 9»'],
+       ['Cocina','tres entradas grandes: con lo que tengo, plan de la semana, buscar receta · compras desde el plan · batch, remojos y métodos al final'],
+       ['Vos','tu avance contado en una frase · mapa de 21 días · energía · diario, logros, guía, programas y ajustes'],
+       ['Siempre','buscar arriba · cambiar de persona tocando el avatar']],
+  hoy:() => `${status}<div class="top"><span>Día 9 · Menú depurativo</span><span class="acts">${ic('buscar')}<span class="av">G</span></span></div>
+  <div class="scroll"><div class="greet disp">Buen mediodía, Gus</div><p>Vas muy bien: 2 de 6 hábitos y el desayuno listo.</p>
+    <div class="tl">
+      <div class="mo done"><h4>Mañana <small>listo</small></h4><p>Limón en ayunas · infusión · nituke de manzana</p></div>
+      <div class="mo now"><h4>Mediodía <small>ahora</small></h4>
+        <div class="card">
+          <div class="lrow">${circ(0)}<span class="t">Almuerzo<br><small class="muted" style="font-size:13px">Sugerido: bowl de yamaní con crucíferas</small></span></div>
+          <div class="lrow">${circ(0)}<span class="t">Un plato abundante en verdes</span></div>
+          <div class="lrow">${ic('agua')}<span class="t">Agua <span class="muted">750 de 2000 ml</span></span><span class="plus">${ic('plus','i s')}</span></div>
+        </div></div>
+      <div class="mo"><h4>Tarde <small>merienda · infusión</small></h4></div>
+      <div class="mo"><h4>Noche <small>cena · cómo te sentís · remojo</small></h4></div>
+    </div></div>${dock([['hoy','Hoy'],['cocina','Cocina'],['vos','Vos']],'hoy')}`,
+  s2:() => `${status}<div class="top"><span></span><span class="acts"><span class="av">G</span></span></div>
+  <div class="scroll"><div class="greet disp" style="font-size:30px">¿Qué cocinamos?</div>
+    <div class="cook-entry"><span class="ic">${ic('heladera')}</span><span class="t">Con lo que tengo<small>3 recetas listas, 5 casi</small></span>${ic('chev','i s')}</div>
+    <div class="cook-entry"><span class="ic">${ic('plan')}</span><span class="t">Plan de la semana<small>5 comidas · compras al día</small></span>${ic('chev','i s')}</div>
+    <div class="cook-entry"><span class="ic">${ic('buscar')}</span><span class="t">Buscar receta<small>105 recetas de la guía</small></span>${ic('chev','i s')}</div>
+    <div class="lab">Sugeridas para hoy</div>
+    ${[['Bowl de yamaní con crucíferas','25 min · aún no la probaste'],['Caldo détox alcalinizante','35 min · apto friolentos'],['Guiso de mung y calabaza','40 min']].map(([t,m])=>`<div class="rrow"><span class="ph">${ic('hoja','i s')}</span><span class="t">${t}<small>${m}</small></span></div>`).join('')}
+    <div class="lab">También</div><div class="lrow"><span class="t">Compras · batch · remojos · métodos</span><span class="chev">${ic('chev','i s')}</span></div>
+  </div>${dock([['hoy','Hoy'],['cocina','Cocina'],['vos','Vos']],'cocina')}`,
+  s3:A.s3,
+  s4:() => `${status}<div class="top"><span>Día 9 · Menú depurativo</span><span class="acts">${ic('buscar')}<span class="av">G</span></span></div>
+  <div class="scroll"><div class="greet disp">Buenas noches, Gus</div><p>Un último repaso antes de dormir.</p>
+    <div class="tl">
+      <div class="mo done"><h4>Mañana <small>listo</small></h4></div>
+      <div class="mo done"><h4>Mediodía <small>listo</small></h4></div>
+      <div class="mo done"><h4>Tarde <small>listo</small></h4></div>
+      <div class="mo now"><h4>Noche <small>ahora</small></h4>
+        <div class="card">
+          <div class="lrow">${circ(1)}<span class="t">Cena: caldo détox</span></div>
+          <div class="lrow"><span class="t">Energía</span><div class="dots5">${[1,2,3,4,5].map(n=>`<i class="${n===4?'on':''}" style="width:24px;height:24px;font-size:11px">${n}</i>`).join('')}</div></div>
+          <div class="lrow"><span class="t">Digestión y señales</span><span class="chev">${ic('chev','i s')}</span></div>
+          <div class="lrow">${ic('frasco')}<span class="t">Remojá los porotos mung para mañana</span></div>
+        </div></div>
+    </div></div>${dock([['hoy','Hoy'],['cocina','Cocina'],['vos','Vos']],'hoy')}`,
+  labels:['Hoy (mediodía)','Cocina','Vos','Hoy (a la noche)']
+};
+
+const D = { a:A, b:B, c:C };
+let S = 'a', M = 'light';
+const phone = html => `<div class="phone ${M==='dark'?'dark':''}">${html}</div>`;
+function render() {
+  const d = D[S];
+  document.getElementById('desc').innerHTML = `<h2>${d.name}</h2><p>${d.desc}</p><ul class="map">${d.map.map(([k,v])=>`<li><b>${k}</b>${v}</li>`).join('')}</ul>`;
+  document.getElementById('stage').innerHTML = [d.hoy,d.s2,d.s3,d.s4].map((f,i)=>`<figure><figcaption>${d.labels[i]}</figcaption>${phone(f())}</figure>`).join('');
+  document.getElementById('cmp').innerHTML = ['a','b','c'].map(k=>`<figure><figcaption>${D[k].name}</figcaption>${phone(D[k].hoy())}</figure>`).join('');
+}
+function seg(id, fn) { document.getElementById(id).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; [...e.currentTarget.children].forEach(x=>x.setAttribute('aria-pressed', x===b)); fn(b.dataset.v); render(); }); }
+seg('selDir', v => S = v); seg('selMode', v => M = v);
+render();
+</script>
+</body>
+</html>
