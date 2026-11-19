@@ -1,0 +1,140 @@
+/* Capa estética «Primavera sutil» (v2.2, elegida por Gustavo el 18/11/2026).
+   Se carga después de base/components/screens y los vuelve minimalistas:
+   sin sombras ni degradés, sin mayúsculas sostenidas, sin cajas de colores;
+   tarjetas blancas con borde finísimo, verde oliva para lo hecho y coral solo
+   para la fase, el día actual y los hitos. */
+
+body { letter-spacing: 0; font-feature-settings: normal; line-height: 1.55; }
+h1, h2, .serif { font-weight: 600; letter-spacing: -0.02em; }
+h3, h4 { font-weight: 600; letter-spacing: -0.01em; }
+.num { font-weight: 600; }
+
+/* ---------- esqueleto ---------- */
+.topbar { background: color-mix(in srgb, var(--paper) 92%, transparent); }
+.topbar.scrolled { box-shadow: none; }
+.topbar .title b { font-weight: 600; font-size: var(--fs-16); }
+.tabbar { background: color-mix(in srgb, var(--surface) 94%, transparent); box-shadow: none; }
+.tabbar a[aria-current="page"] { color: var(--ink); }
+.tabbar a[aria-current="page"]::before { width: 4px; height: 4px; top: auto; bottom: 7px; border-radius: 50%; background: var(--bloom); }
+@media (min-width: 960px) {
+  .rail { background: var(--paper); }
+  .rail .brand b { font-weight: 600; }
+  .rail a.nav[aria-current="page"] { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
+  .rail .nav-search.btn { box-shadow: none; }
+}
+
+/* ---------- tarjetas y bloques ---------- */
+.card { border: 1px solid var(--line); box-shadow: none; padding: 18px; }
+.card.tint { background: var(--accent-soft); border-color: transparent; box-shadow: none; }
+.card.bloom { background: var(--bloom-soft); border-color: transparent; box-shadow: none; }
+.card-h h2, .card-h h3 { font-weight: 600; font-size: var(--fs-17); }
+.page-h h1 { font-size: var(--fs-36); font-weight: 500; letter-spacing: -0.025em; }
+.page-h h1::after { display: none; }
+.toolbar-card, .recipe-hero, .report { box-shadow: none; background: var(--surface); }
+.note { background: var(--surface-2); border-color: transparent; }
+.banner { border-color: transparent; }
+
+/* ---------- botones, chips, segmentos ---------- */
+.btn { box-shadow: none; font-weight: 600; }
+.btn:hover { transform: none; background: var(--surface-2); border-color: var(--line-strong); }
+.btn.primary { border-color: var(--accent); box-shadow: none; }
+.btn.primary:hover { filter: brightness(1.06); transform: none; }
+.chip { border-color: transparent; background: var(--surface-2); }
+.chip:hover { border-color: var(--line-strong); }
+.chip[aria-pressed="true"], .chip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; box-shadow: none; }
+.chip.soft { background: var(--surface-2); border-color: transparent; }
+.chip.soft[aria-pressed="true"], .chip.soft.on { background: var(--bloom-soft); color: var(--bloom-text); border-color: transparent; }
+.tag { font-weight: 500; letter-spacing: 0; }
+.seg { background: var(--surface-2); border-color: transparent; }
+.seg [aria-pressed="true"], .seg [aria-current="page"], .seg [aria-selected="true"] { box-shadow: 0 0 0 1px var(--line); }
+.badge { background: var(--bloom); }
+.input, select.input, textarea.input { box-shadow: none; }
+.search.big .input { box-shadow: none; }
+.tick { box-shadow: none; border-color: var(--line-strong); }
+
+/* ---------- Hoy ---------- */
+.hero-card { background: transparent; border: 0; padding: 6px 0 2px; }
+.hero-date { text-transform: none; letter-spacing: 0; font-size: var(--fs-14); font-weight: 400; }
+.day-num { font-size: clamp(2.6rem, 9vw, 3.5rem); font-weight: 500; letter-spacing: -0.035em; margin-bottom: 8px; }
+.day-num .num { font-weight: 500; letter-spacing: -0.035em; }
+.day-num small { font-size: var(--fs-18); font-weight: 400; font-family: var(--f-text); letter-spacing: 0; }
+.hero-plant .meta { text-transform: none; letter-spacing: 0; font-weight: 400; }
+@media (max-width: 420px) { .hero-plant svg { width: 78px; height: 91px; } }
+.phase-chip { background: transparent; border: 0; padding: 0; color: var(--bloom-text); font-weight: 600; }
+.phase-chip svg { display: none; }
+.phase-chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--bloom); }
+.phase-chip.ph-monodieta { background: transparent; color: var(--pollen-text); }
+.phase-chip.ph-monodieta::before { background: var(--pollen); }
+.phase-chip.ph-previa { background: transparent; color: var(--muted); }
+.phase-chip.ph-previa::before { background: var(--line-strong); }
+
+.ds { border: 0; background: transparent; box-shadow: none; border-radius: 10px; }
+.ds:hover { transform: none; box-shadow: none; background: var(--surface-2); }
+.ds small { text-transform: none; font-weight: 400; }
+.ds b { font-weight: 500; }
+.ds-complete { background: transparent; color: var(--accent-text); }
+.ds.today { border: 0; box-shadow: inset 0 -2px 0 var(--bloom); border-radius: 10px 10px 2px 2px; }
+.ds.on { background: var(--bloom); color: #fff; border: 0; box-shadow: none; }
+.ds.on small, .ds.on b { color: #fff; }
+.ds.on i::before { background: #fff; border-color: #fff; }
+:root[data-theme="dark"] .ds.on, :root[data-theme="dark"] .ds.on small, :root[data-theme="dark"] .ds.on b { color: #1E1210; }
+
+.ring-card { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px 18px; }
+.ring-card .ring { margin: 0; width: 88px !important; height: 88px !important; }
+.ring-card .ring svg { width: 100%; height: 100%; }
+.ring-card .ring .lbl b { font-size: var(--fs-22); }
+.ring-card .ring-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; gap: 6px 14px; }
+.ring-card .done-line, .ring-card .grace-line { grid-column: 1 / -1; margin: 0; }
+.ring .track { stroke: var(--surface-2); }
+.ring .lbl b { font-weight: 600; }
+.ring-stat, .ring-stats .ring-stat:nth-child(n) { background: transparent; border: 0; padding: 2px 0; text-align: left; }
+.ring-stat b { font-weight: 600; font-size: 1.3rem; }
+.ring-stat span { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: var(--fs-12); }
+.done-line { color: var(--accent-text); }
+
+.habits { gap: 0; }
+.habit, .habit.is-done { border: 0; border-radius: 0; background: transparent; padding: 2px 0; }
+.list.habits > li + li { border-top: 1px solid var(--line); }
+.habit-main { padding: 6px 2px; }
+.habit-main:hover:not([disabled]) { background: transparent; }
+.habit-tip { background: var(--surface-2); margin-left: 40px; }
+
+.water .glass .gw { fill: color-mix(in srgb, var(--accent) 28%, transparent); }
+.water-num b { font-weight: 600; }
+
+.slot-h h3 { font-weight: 600; }
+.slot .chips .chip.sug { background: transparent; border-color: var(--line); }
+.scale .sc { box-shadow: none; border-color: transparent; background: var(--surface-2); }
+.scale .sc:hover { transform: none; border-color: var(--line-strong); }
+.sc.on { background: var(--accent); border-color: var(--accent); box-shadow: none; }
+.sc.on small { color: var(--accent-ink); }
+.quote { border-left: 2px solid var(--bloom); }
+.quote blockquote { font-style: normal; }
+
+/* ---------- Cocina ---------- */
+.rcard, .grid-cards > .rcard:nth-child(n) { border-top: 1px solid var(--line); box-shadow: none; }
+.rcard:hover { transform: none; box-shadow: none; border-color: var(--line-strong); }
+.rc-cat { text-transform: none; letter-spacing: 0; font-weight: 500; font-size: var(--fs-12); }
+.rc-t { font-weight: 600; }
+.recipe-h h1 { font-weight: 500; letter-spacing: -0.025em; }
+.steps li::before { background: transparent; color: var(--accent-text); font-weight: 600; width: 24px; justify-content: start; }
+.steps li { padding-left: 32px; }
+.cook-text mark { background: var(--bloom-soft); }
+.wd { box-shadow: none; }
+.wd.today { border-color: var(--bloom); box-shadow: none; }
+.score { font-weight: 600; }
+
+/* ---------- Guía, Progreso ---------- */
+.stat, .stats .stat:nth-child(n) { border: 1px solid var(--line); border-top: 1px solid var(--line); box-shadow: none; }
+.stat b { font-weight: 600; }
+.stat span { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.heatmap .hm { border-color: transparent; background: var(--surface-2); font-weight: 500; }
+.hm-grace { border-style: dashed !important; background: var(--bloom-soft) !important; border-color: var(--bloom) !important; color: var(--bloom-text) !important; }
+.hm-today { border: 2px solid var(--bloom) !important; }
+.bdg { box-shadow: none; }
+.chart .l2 { stroke: var(--bloom); }
+
+/* ---------- avisos y diálogos ---------- */
+.timer-pill { box-shadow: var(--shadow-md); }
+dialog::backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; }
+.empty h3 { font-weight: 600; }

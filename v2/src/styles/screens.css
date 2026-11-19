@@ -13,14 +13,14 @@
 .page-h p { color: var(--ink-2); margin-top: 6px; }
 kbd { font-family: inherit; font-size: var(--fs-12); border: 1px solid var(--line-strong); border-radius: 6px; padding: 1px 6px; }
 
-/* ---------- planta collage botánico (portada Isabel Caparra) ---------- */
-.plant .pl-blob { fill: var(--sage); opacity: .88; }
-.plant .pl-loop { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; }
-.plant .pl-amber { fill: var(--pollen); }
-.plant .pl-cinnamon { fill: var(--clay); }
-.plant .pl-berry { fill: var(--bloom); }
-.plant .pl-euca { fill: var(--accent); }
-.plant .pl-speck { fill: var(--accent); }
+/* ---------- ramita de línea fina («Primavera sutil») ---------- */
+.plant .pl-ground { stroke: var(--line-strong); stroke-width: 1.4; stroke-linecap: round; fill: none; }
+.plant .pl-line { stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; fill: none; }
+.plant .pl-leaf { stroke: var(--accent); stroke-width: 1.5; stroke-linejoin: round; fill: color-mix(in srgb, var(--accent) 10%, transparent); }
+.plant .pl-seed { stroke: var(--clay); stroke-width: 1.5; fill: color-mix(in srgb, var(--clay) 14%, transparent); }
+.plant .pl-bud { stroke: var(--bloom); stroke-width: 1.5; fill: color-mix(in srgb, var(--bloom) 18%, transparent); }
+.plant .pl-petal { stroke: var(--bloom); stroke-width: 1.4; fill: color-mix(in srgb, var(--bloom) 14%, transparent); }
+.plant .pl-heart { fill: var(--bloom); }
 .hero-plant.grew svg { animation: grow 900ms var(--ease); transform-origin: 50% 100%; }
 @keyframes grow { from { opacity: .2; transform: scale(.94); } }
 

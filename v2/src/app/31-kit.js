@@ -20,45 +20,31 @@
   K.plant = function (stage, size, label) {
     size = size || 140;
     var parts = [];
-    // Mancha orgánica salvia piedra + lazo botánico eucalipto (collage portada Isabel Caparra)
-    parts.push('<path class="pl-blob" d="M36 22 C49 16, 67 25, 76 34 C86 43, 82 55, 68 58 C78 66, 75 84, 62 91 C48 98, 34 86, 36 70 C24 67, 22 52, 32 46 C27 36, 28 26, 36 22Z"/>');
-    parts.push('<path class="pl-loop" d="M52 80 C68 62, 95 66, 98 88 C100 109, 77 124, 58 119 C43 116, 38 96, 52 80Z"/>');
-    // Base de semillas canela (siempre visible, crece con el avance)
-    parts.push('<path class="pl-cinnamon" d="M24 112 C21 107, 27 102, 30 106 C32 110, 27 115, 24 112Z"/>');
-    parts.push('<path class="pl-cinnamon" d="M35 120 C32 115, 38 110, 41 114 C43 118, 38 123, 35 120Z"/>');
-    parts.push('<ellipse class="pl-euca" cx="22" cy="100" rx="4" ry="1.5" transform="rotate(-14 22 100)"/>');
+    // «Primavera sutil»: una sola ramita de trazo fino que crece por etapas; el coral aparece solo al florecer.
+    parts.push('<path class="pl-ground" d="M34 128 H86"/>');
     if (stage === 0) {
-      parts.push('<path class="pl-cinnamon" d="M56 105 C52 98, 63 93, 68 100 C71 106, 61 111, 56 105Z"/>');
-      parts.push('<path class="pl-euca" d="M63 97 C64 91, 69 87, 73 88 C71 94, 67 98, 63 97Z"/>');
+      parts.push('<path class="pl-seed" d="M54 124 C54 117, 66 117, 66 124 Z"/>');
+      parts.push('<path class="pl-line" d="M60 118 C60 113, 62 110, 65 108"/>');
     }
     if (stage >= 1) {
-      // Cintas curvas mandarina/ocre
-      parts.push('<path class="pl-amber" d="M38 58 C45 55, 51 67, 57 83 C63 98, 72 108, 79 112 C74 116, 62 110, 53 96 C44 82, 36 65, 38 58Z"/>');
-      parts.push('<path class="pl-amber" d="M49 54 C56 52, 62 64, 68 79 C74 93, 83 102, 90 105 C85 109, 73 103, 64 90 C55 76, 47 61, 49 54Z"/>');
+      var top = [100, 100, 74, 52, 38][stage];
+      parts.push('<path class="pl-line" d="M60 128 C60 ' + (top + 30) + ', 59 ' + (top + 12) + ', 60 ' + top + '"/>');
+      parts.push('<path class="pl-leaf" d="M60 110 C50 110, 42 104, 40 96 C49 95, 57 100, 60 110 Z"/>');
     }
     if (stage >= 2) {
-      // Hojas lanceoladas color canela
-      parts.push('<path class="pl-cinnamon" d="M62 60 C60 46, 62 35, 67 27 C69 39, 69 50, 62 60Z"/>');
-      parts.push('<path class="pl-cinnamon" d="M68 62 C70 46, 76 34, 86 24 C84 38, 77 52, 68 62Z"/>');
-      parts.push('<path class="pl-cinnamon" d="M72 67 C77 54, 85 45, 95 39 C90 52, 82 61, 72 67Z"/>');
+      parts.push('<path class="pl-leaf" d="M60 96 C70 95, 78 88, 80 80 C71 80, 63 86, 60 96 Z"/>');
+      parts.push('<path class="pl-leaf" d="M60 84 C52 83, 46 77, 45 70 C52 70, 58 75, 60 84 Z"/>');
     }
     if (stage >= 3) {
-      // Primer fruto terracota + hojas verde eucalipto
-      parts.push('<path class="pl-euca" d="M84 58 C78 51, 78 41, 84 36 C90 42, 90 52, 84 58Z"/>');
-      parts.push('<path class="pl-euca" d="M87 58 C93 52, 102 52, 106 58 C99 63, 91 63, 87 58Z"/>');
-      parts.push('<path class="pl-berry" d="M76 62 C82 56, 94 58, 96 68 C97 79, 88 89, 78 86 C71 84, 70 69, 76 62Z"/>');
-      parts.push('<circle class="pl-speck" cx="81" cy="70" r="2.1"/>');
-      parts.push('<circle class="pl-speck" cx="87" cy="78" r="1.9"/>');
+      parts.push('<path class="pl-leaf" d="M60 68 C67 66, 73 60, 74 53 C67 54, 62 59, 60 68 Z"/>');
+      if (stage === 3) parts.push('<path class="pl-bud" d="M60 52 C55 46, 57 40, 60 37 C63 40, 65 46, 60 52 Z"/>');
     }
     if (stage >= 4) {
-      // Racimo completo de frutos terracota y follaje eucalipto
-      parts.push('<path class="pl-euca" d="M98 46 C96 39, 101 32, 108 32 C107 40, 104 45, 98 46Z"/>');
-      parts.push('<path class="pl-berry" d="M92 48 C100 44, 111 49, 111 59 C110 68, 100 72, 92 67 C86 63, 87 51, 92 48Z"/>');
-      parts.push('<circle class="pl-speck" cx="98" cy="56" r="2"/>');
-      parts.push('<path class="pl-euca" d="M100 72 C95 66, 97 59, 104 59 C106 65, 105 70, 100 72Z"/>');
-      parts.push('<path class="pl-berry" d="M93 73 C101 70, 111 76, 110 86 C109 96, 98 100, 91 93 C86 87, 87 76, 93 73Z"/>');
-      parts.push('<circle class="pl-speck" cx="98" cy="83" r="2"/>');
-      parts.push('<circle class="pl-speck" cx="104" cy="89" r="1.8"/>');
+      parts.push('<path class="pl-leaf" d="M60 58 C53 57, 48 52, 47 46 C53 46, 58 50, 60 58 Z"/>');
+      [0, 72, 144, 216, 288].forEach(function (a) {
+        parts.push('<ellipse class="pl-petal" cx="60" cy="27" rx="4.6" ry="8.5" transform="rotate(' + a + ' 60 36)"/>');
+      });
+      parts.push('<circle class="pl-heart" cx="60" cy="36" r="3.4"/>');
     }
     return '<svg class="plant stage-' + stage + '" viewBox="0 0 120 140" width="' + size + '" height="' + Math.round(size * 140 / 120) + '" role="img" aria-label="' + esc(label || ('Tu planta: ' + K.STAGE_NAMES[stage])) + '">' + parts.join('') + '</svg>';
   };

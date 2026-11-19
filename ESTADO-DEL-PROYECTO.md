@@ -1,10 +1,18 @@
 # 🌿 Detox Primavera — Estado del Proyecto & Guía de Continuidad
 
-> **Última actualización:** 16 de noviembre de 2026  
-> **Versión Actual:** `v2.1.0` — rediseño «Collage Botánico de Isabel Caparra» sobre `v2.0.0` (rama git `rediseno-v2`, sin publicar todavía)  
+> **Última actualización:** 18 de noviembre de 2026  
+> **Versión Actual:** `v2.2.0` — estética minimalista «Primavera sutil» (rama git `rediseno-v2`, sin publicar todavía)  
 > **Versión anterior publicada:** `v1.4.2` (rama `main`, GitHub Pages)  
 
 ---
+
+## v2.2.0 — Estética «Primavera sutil» (18/11/2026)
+
+Gustavo pidió una estética mucho más minimalista que la v2.1 sin perder funciones. Se armaron 4 maquetas (`rediseno-v2/maquetas/maquetas-minimalistas.html`) y eligió **C · Primavera sutil**. Cambios (solo visuales; lógica, datos y 101 tests intactos):
+- Paleta nueva en `v2/src/styles/tokens.css`: blanco rosado `#FCF8F6`, tinta cálida, verde oliva `#446650` para lo hecho y coral `#C9542F` solo para la fase, el día actual y los hitos; modo oscuro equivalente.
+- Capa `v2/src/styles/sutil.css` (se carga después de las demás): sin sombras ni degradés, sin mayúsculas sostenidas, sin cajas de colores; tarjetas blancas con borde finísimo; hábitos como lista; resumen del día con anillo + cifras en dos columnas.
+- La planta de Hoy pasa a ser una ramita de trazo fino que crece por etapas y florece en coral (`K.plant` en `31-kit.js`).
+- Ícono, color de la barra del celular y manifest con la paleta nueva.
 
 ## v2.1.0 — Rediseño estético y ergonómico (16/11/2026)
 

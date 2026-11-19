@@ -1,62 +1,57 @@
-/* Tokens del diseño «Collage Botánico de Isabel Caparra» (portadas págs. 1, 26 y 40 de la guía). */
+/* Tokens del diseño «Primavera sutil» (v2.2): blanco rosado, tinta cálida, verde oliva para lo hecho
+   y coral del collage de la guía solo como acento puntual (fase, día actual, hitos). Sin sombras. */
 :root {
-  --paper: #FADFD0; --surface: #FFF7F2; --surface-2: #F2D3C2;
-  --sage: #C9CEC3; --sage-soft: #E5E8E0;
-  --line: #E3C3B2; --line-strong: #CFA995;
-  --ink: #222221; --ink-2: #433934; --muted: #63534B;
-  --accent: #446650; --accent-ink: #FFFFFF; --accent-soft: #DCE6DE; --accent-text: #2E4B38;
-  --bloom: #D4512A; --bloom-soft: #FADBD0; --bloom-text: #943214;
-  --pollen: #E68A20; --pollen-soft: #FCE6C5; --pollen-text: #754206;
-  --clay: #9A5D24; --clay-soft: #F3E0CC; --clay-text: #6E3F12;
-  --ok: #3B6E4C; --warn: #B76E14; --danger: #B83B24;
-  --warn-soft: #FCE8C8; --warn-text: #734308; --danger-soft: #FADAD3; --danger-text: #8C2715;
+  --paper: #FCF8F6; --surface: #FFFFFF; --surface-2: #F6EFEB;
+  --sage: #E5EDE7; --sage-soft: #F3F6F2;
+  --line: #EFE5DF; --line-strong: #D9CBC3;
+  --ink: #2A2421; --ink-2: #4E4540; --muted: #776B65;
+  --accent: #446650; --accent-ink: #FFFFFF; --accent-soft: #E5EDE7; --accent-text: #38563F;
+  --bloom: #C9542F; --bloom-soft: #FBE7DF; --bloom-text: #9A3B1C;
+  --pollen: #B87A1E; --pollen-soft: #F8EBD6; --pollen-text: #6E4808;
+  --clay: #9A5D24; --clay-soft: #F4E6D8; --clay-text: #6E3F12;
+  --ok: #446650; --warn: #B76E14; --danger: #B83B24;
+  --warn-soft: #FBEEDB; --warn-text: #734308; --danger-soft: #FBE3DD; --danger-text: #8C2715;
 
-  --border-subtle: color-mix(in srgb, var(--ink) 10%, transparent);
-  --border-ctl: color-mix(in srgb, var(--ink) 16%, transparent);
-  --shadow-xs: 0 1px 2px rgba(45, 28, 18, .05);
-  --shadow: 0 2px 6px rgba(45, 28, 18, .05), 0 10px 26px -6px rgba(45, 28, 18, .06);
-  --shadow-md: 0 6px 16px -3px rgba(45, 28, 18, .09), 0 14px 34px -8px rgba(45, 28, 18, .08);
-  --shadow-pop: 0 16px 46px -8px rgba(35, 22, 14, .24), 0 4px 12px rgba(35, 22, 14, .09);
-  --shadow-btn: 0 1px 2px rgba(45, 28, 18, .07), inset 0 1px 0 rgba(255, 255, 255, .65);
-  --shadow-primary: 0 3px 10px -1px color-mix(in srgb, var(--accent) 38%, transparent), inset 0 1px 0 rgba(255, 255, 255, .2);
-  --scrim: rgba(30, 22, 18, .44);
+  --border-subtle: var(--line);
+  --border-ctl: var(--line-strong);
+  --shadow-xs: none;
+  --shadow: none;
+  --shadow-md: 0 4px 16px -6px rgba(60, 40, 30, .10);
+  --shadow-pop: 0 18px 48px -10px rgba(40, 26, 20, .22), 0 2px 8px rgba(40, 26, 20, .06);
+  --shadow-btn: none;
+  --shadow-primary: none;
+  --scrim: rgba(36, 28, 24, .38);
 
-  --f-display: "Montserrat", "Inter", "Segoe UI Variable Display", "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "Calibri", Helvetica, Arial, sans-serif;
-  --f-text: "IBM Plex Sans", "Segoe UI Variable Text", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Calibri", Helvetica, Arial, sans-serif;
+  --f-display: "Avenir Next", "Avenir", "Montserrat", "Segoe UI Variable Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --f-text: "Avenir Next", "Avenir", "Montserrat", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --fs-12: .75rem; --fs-14: .875rem; --fs-16: 1rem; --fs-17: 1.0625rem; --fs-18: 1.125rem; --fs-22: 1.375rem;
-  --fs-28: 1.75rem; --fs-36: 2.25rem; --fs-52: 3.15rem;
+  --fs-28: 1.75rem; --fs-36: 2.125rem; --fs-52: 3.5rem;
 
-  --r-card: 20px; --r-ctl: 11px; --r-sm: 8px; --r-pill: 999px;
+  --r-card: 16px; --r-ctl: 10px; --r-sm: 8px; --r-pill: 999px;
   --ease: cubic-bezier(.2, .7, .2, 1); --t-fast: 160ms; --t-med: 240ms;
-  --gutter: 18px; --rail: 248px; --maxw: 1120px;
-  --tabbar-h: 64px;
+  --gutter: 18px; --rail: 240px; --maxw: 1080px;
+  --tabbar-h: 62px;
   color-scheme: light;
 }
-:root[data-program-theme="otono"] { --accent: #9A5D24; --accent-soft: #F3E0CC; --accent-text: #6E3F12; }
-:root[data-program-theme="invierno"] { --accent: #3E5C76; --accent-soft: #DCE5EE; --accent-text: #304B62; }
-:root[data-program-theme="verano"] { --accent: #2F7A78; --accent-soft: #D7EBE9; --accent-text: #226361; }
+:root[data-program-theme="otono"] { --accent: #8A5A2B; --accent-soft: #F3E6D8; --accent-text: #6E4520; }
+:root[data-program-theme="invierno"] { --accent: #3E5C76; --accent-soft: #E1E8EF; --accent-text: #304B62; }
+:root[data-program-theme="verano"] { --accent: #2F6F6C; --accent-soft: #DDECEA; --accent-text: #245A57; }
 
 :root[data-theme="dark"] {
-  --paper: #171413; --surface: #221D1B; --surface-2: #2D2623;
-  --sage: #393E37; --sage-soft: #282C26;
-  --line: #38302C; --line-strong: #4A3F3A;
-  --ink: #F7EAE2; --ink-2: #D5C5BC; --muted: #A8988F;
-  --accent: #8BB899; --accent-ink: #111D15; --accent-soft: #243529; --accent-text: #A8D1B5;
-  --bloom: #F07C58; --bloom-soft: #3D231B; --bloom-text: #F8A58B;
-  --pollen: #F4B04F; --pollen-soft: #3B2C16; --pollen-text: #F9CA84;
+  --paper: #181413; --surface: #211C1A; --surface-2: #2A2421;
+  --sage: #25342A; --sage-soft: #1F2622;
+  --line: #2E2724; --line-strong: #4A3F3A;
+  --ink: #F3E9E4; --ink-2: #D3C6BF; --muted: #A3958E;
+  --accent: #8DB89A; --accent-ink: #13201A; --accent-soft: #25342A; --accent-text: #A6CFB2;
+  --bloom: #EE8A68; --bloom-soft: #3E2A22; --bloom-text: #F2A588;
+  --pollen: #E6B05C; --pollen-soft: #3A2D18; --pollen-text: #F1C98A;
   --clay: #DF9B62; --clay-soft: #3A281B; --clay-text: #EBB68A;
-  --ok: #8BB899; --warn: #F4B04F; --danger: #F28673;
-  --warn-soft: #3B2C16; --warn-text: #F9CA84; --danger-soft: #3D211D; --danger-text: #F7A899;
+  --ok: #8DB89A; --warn: #E6B05C; --danger: #F28673;
+  --warn-soft: #3A2D18; --warn-text: #F1C98A; --danger-soft: #3D211D; --danger-text: #F7A899;
 
-  --border-subtle: color-mix(in srgb, var(--ink) 11%, transparent);
-  --border-ctl: color-mix(in srgb, var(--ink) 19%, transparent);
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, .28);
-  --shadow: 0 2px 10px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .03);
-  --shadow-md: 0 8px 28px rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .04);
-  --shadow-pop: 0 16px 48px rgba(0, 0, 0, .58), inset 0 1px 0 rgba(255, 255, 255, .05);
-  --shadow-btn: 0 1px 2px rgba(0, 0, 0, .32), inset 0 1px 0 rgba(255, 255, 255, .05);
-  --shadow-primary: 0 2px 10px color-mix(in srgb, var(--accent) 25%, transparent), inset 0 1px 0 rgba(255, 255, 255, .2);
-  --scrim: rgba(0, 0, 0, .66);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, .35);
+  --shadow-pop: 0 18px 48px rgba(0, 0, 0, .55);
+  --scrim: rgba(0, 0, 0, .62);
   color-scheme: dark;
 }
 :root[data-theme="dark"][data-program-theme="otono"] { --accent: #E0A877; --accent-soft: #3A2A1C; --accent-text: #EBBB90; }

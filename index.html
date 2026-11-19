@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Detox de Primavera</title>
 <meta name="description" content="Programa de alimentación consciente de 21 días: hábitos, recetas, compras y diario. Funciona sin conexión.">
-<meta name="theme-color" content="#FADFD0" id="meta-theme">
+<meta name="theme-color" content="#FCF8F6" id="meta-theme">
 <meta name="color-scheme" content="light dark">
-<meta name="generator" content="Detox de Primavera v2.1.0 (2026-11-16 19:02)">
+<meta name="generator" content="Detox de Primavera v2.2.0 (2026-11-18 21:18)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23446650'/%3E%3Cpath d='M32 54V30' stroke='%23FADFD0' stroke-width='3.5' stroke-linecap='round'/%3E%3Cpath d='M32 36c-9 0-15-6-15-15 9 0 15 6 15 15z' fill='%23E68A20'/%3E%3Cpath d='M32 30c0-9 6-15 15-15 0 9-6 15-15 15z' fill='%23FADFD0'/%3E%3Ccircle cx='32' cy='13' r='4' fill='%23D4512A'/%3E%3C/svg%3E">
 <script>
 /* Tema antes de pintar (evita el destello). */
@@ -20,65 +20,60 @@
 </script>
 <style>
 /* ==== tokens.css ==== */
-/* Tokens del diseño «Collage Botánico de Isabel Caparra» (portadas págs. 1, 26 y 40 de la guía). */
+/* Tokens del diseño «Primavera sutil» (v2.2): blanco rosado, tinta cálida, verde oliva para lo hecho
+   y coral del collage de la guía solo como acento puntual (fase, día actual, hitos). Sin sombras. */
 :root {
-  --paper: #FADFD0; --surface: #FFF7F2; --surface-2: #F2D3C2;
-  --sage: #C9CEC3; --sage-soft: #E5E8E0;
-  --line: #E3C3B2; --line-strong: #CFA995;
-  --ink: #222221; --ink-2: #433934; --muted: #63534B;
-  --accent: #446650; --accent-ink: #FFFFFF; --accent-soft: #DCE6DE; --accent-text: #2E4B38;
-  --bloom: #D4512A; --bloom-soft: #FADBD0; --bloom-text: #943214;
-  --pollen: #E68A20; --pollen-soft: #FCE6C5; --pollen-text: #754206;
-  --clay: #9A5D24; --clay-soft: #F3E0CC; --clay-text: #6E3F12;
-  --ok: #3B6E4C; --warn: #B76E14; --danger: #B83B24;
-  --warn-soft: #FCE8C8; --warn-text: #734308; --danger-soft: #FADAD3; --danger-text: #8C2715;
+  --paper: #FCF8F6; --surface: #FFFFFF; --surface-2: #F6EFEB;
+  --sage: #E5EDE7; --sage-soft: #F3F6F2;
+  --line: #EFE5DF; --line-strong: #D9CBC3;
+  --ink: #2A2421; --ink-2: #4E4540; --muted: #776B65;
+  --accent: #446650; --accent-ink: #FFFFFF; --accent-soft: #E5EDE7; --accent-text: #38563F;
+  --bloom: #C9542F; --bloom-soft: #FBE7DF; --bloom-text: #9A3B1C;
+  --pollen: #B87A1E; --pollen-soft: #F8EBD6; --pollen-text: #6E4808;
+  --clay: #9A5D24; --clay-soft: #F4E6D8; --clay-text: #6E3F12;
+  --ok: #446650; --warn: #B76E14; --danger: #B83B24;
+  --warn-soft: #FBEEDB; --warn-text: #734308; --danger-soft: #FBE3DD; --danger-text: #8C2715;
 
-  --border-subtle: color-mix(in srgb, var(--ink) 10%, transparent);
-  --border-ctl: color-mix(in srgb, var(--ink) 16%, transparent);
-  --shadow-xs: 0 1px 2px rgba(45, 28, 18, .05);
-  --shadow: 0 2px 6px rgba(45, 28, 18, .05), 0 10px 26px -6px rgba(45, 28, 18, .06);
-  --shadow-md: 0 6px 16px -3px rgba(45, 28, 18, .09), 0 14px 34px -8px rgba(45, 28, 18, .08);
-  --shadow-pop: 0 16px 46px -8px rgba(35, 22, 14, .24), 0 4px 12px rgba(35, 22, 14, .09);
-  --shadow-btn: 0 1px 2px rgba(45, 28, 18, .07), inset 0 1px 0 rgba(255, 255, 255, .65);
-  --shadow-primary: 0 3px 10px -1px color-mix(in srgb, var(--accent) 38%, transparent), inset 0 1px 0 rgba(255, 255, 255, .2);
-  --scrim: rgba(30, 22, 18, .44);
+  --border-subtle: var(--line);
+  --border-ctl: var(--line-strong);
+  --shadow-xs: none;
+  --shadow: none;
+  --shadow-md: 0 4px 16px -6px rgba(60, 40, 30, .10);
+  --shadow-pop: 0 18px 48px -10px rgba(40, 26, 20, .22), 0 2px 8px rgba(40, 26, 20, .06);
+  --shadow-btn: none;
+  --shadow-primary: none;
+  --scrim: rgba(36, 28, 24, .38);
 
-  --f-display: "Montserrat", "Inter", "Segoe UI Variable Display", "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "Calibri", Helvetica, Arial, sans-serif;
-  --f-text: "IBM Plex Sans", "Segoe UI Variable Text", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Calibri", Helvetica, Arial, sans-serif;
+  --f-display: "Avenir Next", "Avenir", "Montserrat", "Segoe UI Variable Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --f-text: "Avenir Next", "Avenir", "Montserrat", "Segoe UI Variable Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --fs-12: .75rem; --fs-14: .875rem; --fs-16: 1rem; --fs-17: 1.0625rem; --fs-18: 1.125rem; --fs-22: 1.375rem;
-  --fs-28: 1.75rem; --fs-36: 2.25rem; --fs-52: 3.15rem;
+  --fs-28: 1.75rem; --fs-36: 2.125rem; --fs-52: 3.5rem;
 
-  --r-card: 20px; --r-ctl: 11px; --r-sm: 8px; --r-pill: 999px;
+  --r-card: 16px; --r-ctl: 10px; --r-sm: 8px; --r-pill: 999px;
   --ease: cubic-bezier(.2, .7, .2, 1); --t-fast: 160ms; --t-med: 240ms;
-  --gutter: 18px; --rail: 248px; --maxw: 1120px;
-  --tabbar-h: 64px;
+  --gutter: 18px; --rail: 240px; --maxw: 1080px;
+  --tabbar-h: 62px;
   color-scheme: light;
 }
-:root[data-program-theme="otono"] { --accent: #9A5D24; --accent-soft: #F3E0CC; --accent-text: #6E3F12; }
-:root[data-program-theme="invierno"] { --accent: #3E5C76; --accent-soft: #DCE5EE; --accent-text: #304B62; }
-:root[data-program-theme="verano"] { --accent: #2F7A78; --accent-soft: #D7EBE9; --accent-text: #226361; }
+:root[data-program-theme="otono"] { --accent: #8A5A2B; --accent-soft: #F3E6D8; --accent-text: #6E4520; }
+:root[data-program-theme="invierno"] { --accent: #3E5C76; --accent-soft: #E1E8EF; --accent-text: #304B62; }
+:root[data-program-theme="verano"] { --accent: #2F6F6C; --accent-soft: #DDECEA; --accent-text: #245A57; }
 
 :root[data-theme="dark"] {
-  --paper: #171413; --surface: #221D1B; --surface-2: #2D2623;
-  --sage: #393E37; --sage-soft: #282C26;
-  --line: #38302C; --line-strong: #4A3F3A;
-  --ink: #F7EAE2; --ink-2: #D5C5BC; --muted: #A8988F;
-  --accent: #8BB899; --accent-ink: #111D15; --accent-soft: #243529; --accent-text: #A8D1B5;
-  --bloom: #F07C58; --bloom-soft: #3D231B; --bloom-text: #F8A58B;
-  --pollen: #F4B04F; --pollen-soft: #3B2C16; --pollen-text: #F9CA84;
+  --paper: #181413; --surface: #211C1A; --surface-2: #2A2421;
+  --sage: #25342A; --sage-soft: #1F2622;
+  --line: #2E2724; --line-strong: #4A3F3A;
+  --ink: #F3E9E4; --ink-2: #D3C6BF; --muted: #A3958E;
+  --accent: #8DB89A; --accent-ink: #13201A; --accent-soft: #25342A; --accent-text: #A6CFB2;
+  --bloom: #EE8A68; --bloom-soft: #3E2A22; --bloom-text: #F2A588;
+  --pollen: #E6B05C; --pollen-soft: #3A2D18; --pollen-text: #F1C98A;
   --clay: #DF9B62; --clay-soft: #3A281B; --clay-text: #EBB68A;
-  --ok: #8BB899; --warn: #F4B04F; --danger: #F28673;
-  --warn-soft: #3B2C16; --warn-text: #F9CA84; --danger-soft: #3D211D; --danger-text: #F7A899;
+  --ok: #8DB89A; --warn: #E6B05C; --danger: #F28673;
+  --warn-soft: #3A2D18; --warn-text: #F1C98A; --danger-soft: #3D211D; --danger-text: #F7A899;
 
-  --border-subtle: color-mix(in srgb, var(--ink) 11%, transparent);
-  --border-ctl: color-mix(in srgb, var(--ink) 19%, transparent);
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, .28);
-  --shadow: 0 2px 10px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .03);
-  --shadow-md: 0 8px 28px rgba(0, 0, 0, .42), inset 0 1px 0 rgba(255, 255, 255, .04);
-  --shadow-pop: 0 16px 48px rgba(0, 0, 0, .58), inset 0 1px 0 rgba(255, 255, 255, .05);
-  --shadow-btn: 0 1px 2px rgba(0, 0, 0, .32), inset 0 1px 0 rgba(255, 255, 255, .05);
-  --shadow-primary: 0 2px 10px color-mix(in srgb, var(--accent) 25%, transparent), inset 0 1px 0 rgba(255, 255, 255, .2);
-  --scrim: rgba(0, 0, 0, .66);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, .35);
+  --shadow-pop: 0 18px 48px rgba(0, 0, 0, .55);
+  --scrim: rgba(0, 0, 0, .62);
   color-scheme: dark;
 }
 :root[data-theme="dark"][data-program-theme="otono"] { --accent: #E0A877; --accent-soft: #3A2A1C; --accent-text: #EBBB90; }
@@ -520,14 +515,14 @@ canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 90; 
 .page-h p { color: var(--ink-2); margin-top: 6px; }
 kbd { font-family: inherit; font-size: var(--fs-12); border: 1px solid var(--line-strong); border-radius: 6px; padding: 1px 6px; }
 
-/* ---------- planta collage botánico (portada Isabel Caparra) ---------- */
-.plant .pl-blob { fill: var(--sage); opacity: .88; }
-.plant .pl-loop { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; }
-.plant .pl-amber { fill: var(--pollen); }
-.plant .pl-cinnamon { fill: var(--clay); }
-.plant .pl-berry { fill: var(--bloom); }
-.plant .pl-euca { fill: var(--accent); }
-.plant .pl-speck { fill: var(--accent); }
+/* ---------- ramita de línea fina («Primavera sutil») ---------- */
+.plant .pl-ground { stroke: var(--line-strong); stroke-width: 1.4; stroke-linecap: round; fill: none; }
+.plant .pl-line { stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; fill: none; }
+.plant .pl-leaf { stroke: var(--accent); stroke-width: 1.5; stroke-linejoin: round; fill: color-mix(in srgb, var(--accent) 10%, transparent); }
+.plant .pl-seed { stroke: var(--clay); stroke-width: 1.5; fill: color-mix(in srgb, var(--clay) 14%, transparent); }
+.plant .pl-bud { stroke: var(--bloom); stroke-width: 1.5; fill: color-mix(in srgb, var(--bloom) 18%, transparent); }
+.plant .pl-petal { stroke: var(--bloom); stroke-width: 1.4; fill: color-mix(in srgb, var(--bloom) 14%, transparent); }
+.plant .pl-heart { fill: var(--bloom); }
 .hero-plant.grew svg { animation: grow 900ms var(--ease); transform-origin: 50% 100%; }
 @keyframes grow { from { opacity: .2; transform: scale(.94); } }
 
@@ -854,6 +849,148 @@ html[data-text="large"] .tabbar a { font-size: 11px; }
 @media (min-width: 960px) { .topbar [data-action="openSearch"] { display: none; } }
 .btn-row > *, .row > .btn { min-width: 0; }
 
+/* ==== sutil.css ==== */
+/* Capa estética «Primavera sutil» (v2.2, elegida por Gustavo el 18/11/2026).
+   Se carga después de base/components/screens y los vuelve minimalistas:
+   sin sombras ni degradés, sin mayúsculas sostenidas, sin cajas de colores;
+   tarjetas blancas con borde finísimo, verde oliva para lo hecho y coral solo
+   para la fase, el día actual y los hitos. */
+
+body { letter-spacing: 0; font-feature-settings: normal; line-height: 1.55; }
+h1, h2, .serif { font-weight: 600; letter-spacing: -0.02em; }
+h3, h4 { font-weight: 600; letter-spacing: -0.01em; }
+.num { font-weight: 600; }
+
+/* ---------- esqueleto ---------- */
+.topbar { background: color-mix(in srgb, var(--paper) 92%, transparent); }
+.topbar.scrolled { box-shadow: none; }
+.topbar .title b { font-weight: 600; font-size: var(--fs-16); }
+.tabbar { background: color-mix(in srgb, var(--surface) 94%, transparent); box-shadow: none; }
+.tabbar a[aria-current="page"] { color: var(--ink); }
+.tabbar a[aria-current="page"]::before { width: 4px; height: 4px; top: auto; bottom: 7px; border-radius: 50%; background: var(--bloom); }
+@media (min-width: 960px) {
+  .rail { background: var(--paper); }
+  .rail .brand b { font-weight: 600; }
+  .rail a.nav[aria-current="page"] { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
+  .rail .nav-search.btn { box-shadow: none; }
+}
+
+/* ---------- tarjetas y bloques ---------- */
+.card { border: 1px solid var(--line); box-shadow: none; padding: 18px; }
+.card.tint { background: var(--accent-soft); border-color: transparent; box-shadow: none; }
+.card.bloom { background: var(--bloom-soft); border-color: transparent; box-shadow: none; }
+.card-h h2, .card-h h3 { font-weight: 600; font-size: var(--fs-17); }
+.page-h h1 { font-size: var(--fs-36); font-weight: 500; letter-spacing: -0.025em; }
+.page-h h1::after { display: none; }
+.toolbar-card, .recipe-hero, .report { box-shadow: none; background: var(--surface); }
+.note { background: var(--surface-2); border-color: transparent; }
+.banner { border-color: transparent; }
+
+/* ---------- botones, chips, segmentos ---------- */
+.btn { box-shadow: none; font-weight: 600; }
+.btn:hover { transform: none; background: var(--surface-2); border-color: var(--line-strong); }
+.btn.primary { border-color: var(--accent); box-shadow: none; }
+.btn.primary:hover { filter: brightness(1.06); transform: none; }
+.chip { border-color: transparent; background: var(--surface-2); }
+.chip:hover { border-color: var(--line-strong); }
+.chip[aria-pressed="true"], .chip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; box-shadow: none; }
+.chip.soft { background: var(--surface-2); border-color: transparent; }
+.chip.soft[aria-pressed="true"], .chip.soft.on { background: var(--bloom-soft); color: var(--bloom-text); border-color: transparent; }
+.tag { font-weight: 500; letter-spacing: 0; }
+.seg { background: var(--surface-2); border-color: transparent; }
+.seg [aria-pressed="true"], .seg [aria-current="page"], .seg [aria-selected="true"] { box-shadow: 0 0 0 1px var(--line); }
+.badge { background: var(--bloom); }
+.input, select.input, textarea.input { box-shadow: none; }
+.search.big .input { box-shadow: none; }
+.tick { box-shadow: none; border-color: var(--line-strong); }
+
+/* ---------- Hoy ---------- */
+.hero-card { background: transparent; border: 0; padding: 6px 0 2px; }
+.hero-date { text-transform: none; letter-spacing: 0; font-size: var(--fs-14); font-weight: 400; }
+.day-num { font-size: clamp(2.6rem, 9vw, 3.5rem); font-weight: 500; letter-spacing: -0.035em; margin-bottom: 8px; }
+.day-num .num { font-weight: 500; letter-spacing: -0.035em; }
+.day-num small { font-size: var(--fs-18); font-weight: 400; font-family: var(--f-text); letter-spacing: 0; }
+.hero-plant .meta { text-transform: none; letter-spacing: 0; font-weight: 400; }
+@media (max-width: 420px) { .hero-plant svg { width: 78px; height: 91px; } }
+.phase-chip { background: transparent; border: 0; padding: 0; color: var(--bloom-text); font-weight: 600; }
+.phase-chip svg { display: none; }
+.phase-chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--bloom); }
+.phase-chip.ph-monodieta { background: transparent; color: var(--pollen-text); }
+.phase-chip.ph-monodieta::before { background: var(--pollen); }
+.phase-chip.ph-previa { background: transparent; color: var(--muted); }
+.phase-chip.ph-previa::before { background: var(--line-strong); }
+
+.ds { border: 0; background: transparent; box-shadow: none; border-radius: 10px; }
+.ds:hover { transform: none; box-shadow: none; background: var(--surface-2); }
+.ds small { text-transform: none; font-weight: 400; }
+.ds b { font-weight: 500; }
+.ds-complete { background: transparent; color: var(--accent-text); }
+.ds.today { border: 0; box-shadow: inset 0 -2px 0 var(--bloom); border-radius: 10px 10px 2px 2px; }
+.ds.on { background: var(--bloom); color: #fff; border: 0; box-shadow: none; }
+.ds.on small, .ds.on b { color: #fff; }
+.ds.on i::before { background: #fff; border-color: #fff; }
+:root[data-theme="dark"] .ds.on, :root[data-theme="dark"] .ds.on small, :root[data-theme="dark"] .ds.on b { color: #1E1210; }
+
+.ring-card { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px 18px; }
+.ring-card .ring { margin: 0; width: 88px !important; height: 88px !important; }
+.ring-card .ring svg { width: 100%; height: 100%; }
+.ring-card .ring .lbl b { font-size: var(--fs-22); }
+.ring-card .ring-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; gap: 6px 14px; }
+.ring-card .done-line, .ring-card .grace-line { grid-column: 1 / -1; margin: 0; }
+.ring .track { stroke: var(--surface-2); }
+.ring .lbl b { font-weight: 600; }
+.ring-stat, .ring-stats .ring-stat:nth-child(n) { background: transparent; border: 0; padding: 2px 0; text-align: left; }
+.ring-stat b { font-weight: 600; font-size: 1.3rem; }
+.ring-stat span { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: var(--fs-12); }
+.done-line { color: var(--accent-text); }
+
+.habits { gap: 0; }
+.habit, .habit.is-done { border: 0; border-radius: 0; background: transparent; padding: 2px 0; }
+.list.habits > li + li { border-top: 1px solid var(--line); }
+.habit-main { padding: 6px 2px; }
+.habit-main:hover:not([disabled]) { background: transparent; }
+.habit-tip { background: var(--surface-2); margin-left: 40px; }
+
+.water .glass .gw { fill: color-mix(in srgb, var(--accent) 28%, transparent); }
+.water-num b { font-weight: 600; }
+
+.slot-h h3 { font-weight: 600; }
+.slot .chips .chip.sug { background: transparent; border-color: var(--line); }
+.scale .sc { box-shadow: none; border-color: transparent; background: var(--surface-2); }
+.scale .sc:hover { transform: none; border-color: var(--line-strong); }
+.sc.on { background: var(--accent); border-color: var(--accent); box-shadow: none; }
+.sc.on small { color: var(--accent-ink); }
+.quote { border-left: 2px solid var(--bloom); }
+.quote blockquote { font-style: normal; }
+
+/* ---------- Cocina ---------- */
+.rcard, .grid-cards > .rcard:nth-child(n) { border-top: 1px solid var(--line); box-shadow: none; }
+.rcard:hover { transform: none; box-shadow: none; border-color: var(--line-strong); }
+.rc-cat { text-transform: none; letter-spacing: 0; font-weight: 500; font-size: var(--fs-12); }
+.rc-t { font-weight: 600; }
+.recipe-h h1 { font-weight: 500; letter-spacing: -0.025em; }
+.steps li::before { background: transparent; color: var(--accent-text); font-weight: 600; width: 24px; justify-content: start; }
+.steps li { padding-left: 32px; }
+.cook-text mark { background: var(--bloom-soft); }
+.wd { box-shadow: none; }
+.wd.today { border-color: var(--bloom); box-shadow: none; }
+.score { font-weight: 600; }
+
+/* ---------- Guía, Progreso ---------- */
+.stat, .stats .stat:nth-child(n) { border: 1px solid var(--line); border-top: 1px solid var(--line); box-shadow: none; }
+.stat b { font-weight: 600; }
+.stat span { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.heatmap .hm { border-color: transparent; background: var(--surface-2); font-weight: 500; }
+.hm-grace { border-style: dashed !important; background: var(--bloom-soft) !important; border-color: var(--bloom) !important; color: var(--bloom-text) !important; }
+.hm-today { border: 2px solid var(--bloom) !important; }
+.bdg { box-shadow: none; }
+.chart .l2 { stroke: var(--bloom); }
+
+/* ---------- avisos y diálogos ---------- */
+.timer-pill { box-shadow: var(--shadow-md); }
+dialog::backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; }
+.empty h3 { font-weight: 600; }
+
 /* ==== print.css ==== */
 /* Impresión: solo el informe (.print-root), tipografía serif, sin fondos. */
 @media print {
@@ -959,7 +1096,7 @@ html[data-text="large"] .tabbar a { font-size: 11px; }
 <dialog id="cook" class="full" aria-label="Modo cocina"></dialog>
 <noscript><p style="padding:24px">Esta app necesita JavaScript activado.</p></noscript>
 <script>
-window.DX_BUILD = {"version": "2.1.0", "date": "2026-11-16 19:02", "fixture": false};
+window.DX_BUILD = {"version": "2.2.0", "date": "2026-11-18 21:18", "fixture": false};
 
 /* ==== src/app/01-inflate.js ==== */
 /* Detox v2 — descompresor DEFLATE crudo (RFC 1951), propio y sin dependencias (estilo «puff»).
@@ -1087,7 +1224,7 @@ try { (0, eval)(window.DXInflate.text('1L1ZkxzZcS74zl8R90FWmVJmYe2FWcORAWg00RKah
 (function (root) {
   'use strict';
   var A = root.DXApp = root.DXApp || {};
-  A.version = (root.DX_BUILD && root.DX_BUILD.version) || '2.1.0';
+  A.version = (root.DX_BUILD && root.DX_BUILD.version) || '2.2.0';
   A.logic = A.logic || {};
   var U = A.util = {};
 
@@ -3505,45 +3642,31 @@ try { (0, eval)(window.DXInflate.text('1L1ZkxzZcS74zl8R90FWmVJmYe2FWcORAWg00RKah
   K.plant = function (stage, size, label) {
     size = size || 140;
     var parts = [];
-    // Mancha orgánica salvia piedra + lazo botánico eucalipto (collage portada Isabel Caparra)
-    parts.push('<path class="pl-blob" d="M36 22 C49 16, 67 25, 76 34 C86 43, 82 55, 68 58 C78 66, 75 84, 62 91 C48 98, 34 86, 36 70 C24 67, 22 52, 32 46 C27 36, 28 26, 36 22Z"/>');
-    parts.push('<path class="pl-loop" d="M52 80 C68 62, 95 66, 98 88 C100 109, 77 124, 58 119 C43 116, 38 96, 52 80Z"/>');
-    // Base de semillas canela (siempre visible, crece con el avance)
-    parts.push('<path class="pl-cinnamon" d="M24 112 C21 107, 27 102, 30 106 C32 110, 27 115, 24 112Z"/>');
-    parts.push('<path class="pl-cinnamon" d="M35 120 C32 115, 38 110, 41 114 C43 118, 38 123, 35 120Z"/>');
-    parts.push('<ellipse class="pl-euca" cx="22" cy="100" rx="4" ry="1.5" transform="rotate(-14 22 100)"/>');
+    // «Primavera sutil»: una sola ramita de trazo fino que crece por etapas; el coral aparece solo al florecer.
+    parts.push('<path class="pl-ground" d="M34 128 H86"/>');
     if (stage === 0) {
-      parts.push('<path class="pl-cinnamon" d="M56 105 C52 98, 63 93, 68 100 C71 106, 61 111, 56 105Z"/>');
-      parts.push('<path class="pl-euca" d="M63 97 C64 91, 69 87, 73 88 C71 94, 67 98, 63 97Z"/>');
+      parts.push('<path class="pl-seed" d="M54 124 C54 117, 66 117, 66 124 Z"/>');
+      parts.push('<path class="pl-line" d="M60 118 C60 113, 62 110, 65 108"/>');
     }
     if (stage >= 1) {
-      // Cintas curvas mandarina/ocre
-      parts.push('<path class="pl-amber" d="M38 58 C45 55, 51 67, 57 83 C63 98, 72 108, 79 112 C74 116, 62 110, 53 96 C44 82, 36 65, 38 58Z"/>');
-      parts.push('<path class="pl-amber" d="M49 54 C56 52, 62 64, 68 79 C74 93, 83 102, 90 105 C85 109, 73 103, 64 90 C55 76, 47 61, 49 54Z"/>');
+      var top = [100, 100, 74, 52, 38][stage];
+      parts.push('<path class="pl-line" d="M60 128 C60 ' + (top + 30) + ', 59 ' + (top + 12) + ', 60 ' + top + '"/>');
+      parts.push('<path class="pl-leaf" d="M60 110 C50 110, 42 104, 40 96 C49 95, 57 100, 60 110 Z"/>');
     }
     if (stage >= 2) {
-      // Hojas lanceoladas color canela
-      parts.push('<path class="pl-cinnamon" d="M62 60 C60 46, 62 35, 67 27 C69 39, 69 50, 62 60Z"/>');
-      parts.push('<path class="pl-cinnamon" d="M68 62 C70 46, 76 34, 86 24 C84 38, 77 52, 68 62Z"/>');
-      parts.push('<path class="pl-cinnamon" d="M72 67 C77 54, 85 45, 95 39 C90 52, 82 61, 72 67Z"/>');
+      parts.push('<path class="pl-leaf" d="M60 96 C70 95, 78 88, 80 80 C71 80, 63 86, 60 96 Z"/>');
+      parts.push('<path class="pl-leaf" d="M60 84 C52 83, 46 77, 45 70 C52 70, 58 75, 60 84 Z"/>');
     }
     if (stage >= 3) {
-      // Primer fruto terracota + hojas verde eucalipto
-      parts.push('<path class="pl-euca" d="M84 58 C78 51, 78 41, 84 36 C90 42, 90 52, 84 58Z"/>');
-      parts.push('<path class="pl-euca" d="M87 58 C93 52, 102 52, 106 58 C99 63, 91 63, 87 58Z"/>');
-      parts.push('<path class="pl-berry" d="M76 62 C82 56, 94 58, 96 68 C97 79, 88 89, 78 86 C71 84, 70 69, 76 62Z"/>');
-      parts.push('<circle class="pl-speck" cx="81" cy="70" r="2.1"/>');
-      parts.push('<circle class="pl-speck" cx="87" cy="78" r="1.9"/>');
+      parts.push('<path class="pl-leaf" d="M60 68 C67 66, 73 60, 74 53 C67 54, 62 59, 60 68 Z"/>');
+      if (stage === 3) parts.push('<path class="pl-bud" d="M60 52 C55 46, 57 40, 60 37 C63 40, 65 46, 60 52 Z"/>');
     }
     if (stage >= 4) {
-      // Racimo completo de frutos terracota y follaje eucalipto
-      parts.push('<path class="pl-euca" d="M98 46 C96 39, 101 32, 108 32 C107 40, 104 45, 98 46Z"/>');
-      parts.push('<path class="pl-berry" d="M92 48 C100 44, 111 49, 111 59 C110 68, 100 72, 92 67 C86 63, 87 51, 92 48Z"/>');
-      parts.push('<circle class="pl-speck" cx="98" cy="56" r="2"/>');
-      parts.push('<path class="pl-euca" d="M100 72 C95 66, 97 59, 104 59 C106 65, 105 70, 100 72Z"/>');
-      parts.push('<path class="pl-berry" d="M93 73 C101 70, 111 76, 110 86 C109 96, 98 100, 91 93 C86 87, 87 76, 93 73Z"/>');
-      parts.push('<circle class="pl-speck" cx="98" cy="83" r="2"/>');
-      parts.push('<circle class="pl-speck" cx="104" cy="89" r="1.8"/>');
+      parts.push('<path class="pl-leaf" d="M60 58 C53 57, 48 52, 47 46 C53 46, 58 50, 60 58 Z"/>');
+      [0, 72, 144, 216, 288].forEach(function (a) {
+        parts.push('<ellipse class="pl-petal" cx="60" cy="27" rx="4.6" ry="8.5" transform="rotate(' + a + ' 60 36)"/>');
+      });
+      parts.push('<circle class="pl-heart" cx="60" cy="36" r="3.4"/>');
     }
     return '<svg class="plant stage-' + stage + '" viewBox="0 0 120 140" width="' + size + '" height="' + Math.round(size * 140 / 120) + '" role="img" aria-label="' + esc(label || ('Tu planta: ' + K.STAGE_NAMES[stage])) + '">' + parts.join('') + '</svg>';
   };
@@ -5983,7 +6106,7 @@ try { (0, eval)(window.DXInflate.text('1L1ZkxzZcS74zl8R90FWmVJmYe2FWcORAWg00RKah
     if (d.textScale > 1) h.setAttribute('data-text', 'large'); else h.removeAttribute('data-text');
     if (d.reduceMotion) h.setAttribute('data-motion', 'reduce'); else h.removeAttribute('data-motion');
     var m = document.getElementById('meta-theme');
-    if (m) m.setAttribute('content', t === 'dark' ? '#171413' : '#FADFD0');
+    if (m) m.setAttribute('content', t === 'dark' ? '#181413' : '#FCF8F6');
   };
 
   function lsGet(k) { try { return root.localStorage.getItem(k); } catch (e) { return null; } }

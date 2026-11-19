@@ -22,7 +22,7 @@ import struct
 import sys
 from pathlib import Path
 
-VERSION = "2.1.0"
+VERSION = "2.2.0"
 NL = chr(10)
 V2 = Path(__file__).resolve().parent
 ROOT = V2.parent
@@ -83,12 +83,12 @@ def safe_js(text, name):
     return "\n/* ==== " + name + " ==== */\n" + text
 
 
-ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#446650"/><path d="M32 54V30" stroke="#FADFD0" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M32 36c-9 0-15-6-15-15 9 0 15 6 15 15z" fill="#E68A20"/><path d="M32 30c0-9 6-15 15-15 0 9-6 15-15 15z" fill="#FADFD0"/><circle cx="32" cy="13" r="4" fill="#D4512A"/></svg>"""
+ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#446650"/><path d="M32 54V30" stroke="#FCF8F6" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M32 36c-9 0-15-6-15-15 9 0 15 6 15 15z" fill="#DCE8DF"/><path d="M32 30c0-9 6-15 15-15 0 9-6 15-15 15z" fill="#FCF8F6"/><circle cx="32" cy="13" r="4" fill="#C9542F"/></svg>"""
 
 
 def png_icon(size):
     """Rasteriza el icono de la planta (mismo dibujo que icon.svg) a PNG RGBA, solo con stdlib."""
-    bg = (0x44, 0x66, 0x50); paper = (0xFA, 0xDF, 0xD0); soft = (0xE6, 0x8A, 0x20); bloom = (0xD4, 0x51, 0x2A)
+    bg = (0x44, 0x66, 0x50); paper = (0xFC, 0xF8, 0xF6); soft = (0xDC, 0xE8, 0xDF); bloom = (0xC9, 0x54, 0x2F)
     ss = 3  # supermuestreo para bordes suaves
     k = 64.0 / size
 
@@ -213,7 +213,7 @@ def main():
             "start_url": "./",
             "scope": "./",
             "display": "standalone",
-            "background_color": "#FADFD0",
+            "background_color": "#FCF8F6",
             "theme_color": "#446650",
             "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"},
                       {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},

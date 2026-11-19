@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maquetas minimalistas</title>
+<style>
+/* ---------- Página de comparación (neutra, no compite con las maquetas) ---------- */
+:root { --pg-bg:#E9E9E7; --pg-ink:#1D1D1B; --pg-mut:#62625E; --pg-line:#CFCFCB; --pg-sel:#1D1D1B; --pg-selink:#FFFFFF; }
+@media (prefers-color-scheme: dark) { :root:not([data-pg="light"]) { --pg-bg:#1F1F1E; --pg-ink:#EDEDEA; --pg-mut:#A3A39E; --pg-line:#3A3A38; --pg-sel:#EDEDEA; --pg-selink:#1F1F1E; } }
+* { box-sizing:border-box; }
+html,body { margin:0; }
+body { background:var(--pg-bg); color:var(--pg-ink); font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+.pg-top { position:sticky; top:0; z-index:5; background:var(--pg-bg); border-bottom:1px solid var(--pg-line); padding:14px 16px; display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; }
+.pg-top h1 { font-size:17px; margin:0 12px 0 0; font-weight:650; }
+.pg-seg { display:flex; gap:4px; flex-wrap:wrap; }
+.pg-seg button { font:inherit; font-size:14px; border:1px solid var(--pg-line); background:transparent; color:var(--pg-ink); border-radius:999px; padding:6px 13px; cursor:pointer; }
+.pg-seg button[aria-pressed="true"] { background:var(--pg-sel); color:var(--pg-selink); border-color:var(--pg-sel); }
+.pg-seg button:focus-visible { outline:2px solid var(--pg-ink); outline-offset:2px; }
+.pg-intro { max-width:760px; padding:18px 16px 4px; color:var(--pg-mut); }
+.pg-intro b { color:var(--pg-ink); }
+.pg-desc { padding:6px 16px 0; max-width:900px; }
+.pg-desc h2 { font-size:20px; margin:8px 0 2px; }
+.pg-desc p { margin:0; color:var(--pg-mut); max-width:70ch; }
+.stage { display:flex; gap:28px; overflow-x:auto; padding:18px 16px 36px; scroll-snap-type:x mandatory; }
+.stage > figure { margin:0; flex:0 0 auto; scroll-snap-align:start; }
+.stage figcaption { font-size:13px; color:var(--pg-mut); margin:0 0 8px 4px; }
+.cmp-h { padding:6px 16px 0; font-size:18px; margin:10px 0 0; }
+
+/* ---------- Teléfono ---------- */
+.phone { width:360px; height:740px; border-radius:34px; overflow:hidden; position:relative; display:flex; flex-direction:column;
+  background:var(--bg); color:var(--ink); font-family:var(--font); box-shadow:0 0 0 9px #0f0f0e, 0 18px 40px rgba(0,0,0,.25); }
+.phone .scroll { flex:1; overflow-y:auto; padding:0 var(--pad) 18px; scrollbar-width:none; }
+.phone .scroll::-webkit-scrollbar { display:none; }
+.phone svg.i { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+.status { height:30px; display:flex; justify-content:space-between; align-items:center; padding:0 22px; font-size:12px; font-weight:600; color:var(--ink); flex:none; }
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:6px var(--pad) 4px; flex:none; }
+.topbar .t { font-size:15px; font-weight:600; letter-spacing:-.01em; }
+.topbar .acts { display:flex; gap:14px; align-items:center; color:var(--ink-2); }
+.avatar { width:30px; height:30px; border-radius:50%; background:var(--accent-soft); color:var(--accent-text); display:grid; place-items:center; font-size:13px; font-weight:650; }
+.tabbar { flex:none; display:grid; grid-template-columns:repeat(5,1fr); padding:8px 6px 18px; background:var(--tab-bg); border-top:1px solid var(--tab-line); }
+.tabbar a { display:flex; flex-direction:column; align-items:center; gap:3px; font-size:11px; color:var(--muted); text-decoration:none; }
+.tabbar a.on { color:var(--tab-on); font-weight:600; }
+
+/* bloques comunes */
+.sec { background:var(--card); border-radius:var(--r); padding:var(--card-pad); margin-top:var(--gap); border:var(--card-border); }
+.sec h3 { font-size:var(--h3); font-weight:var(--h3w); margin:0 0 10px; letter-spacing:-.01em; display:flex; justify-content:space-between; align-items:baseline; }
+.sec h3 small { font-size:13px; font-weight:500; color:var(--muted); }
+.muted { color:var(--muted); }
+.row { display:flex; align-items:center; gap:12px; min-height:46px; }
+.row + .row { border-top:var(--row-line); }
+.chk { width:24px; height:24px; border-radius:var(--chk-r); border:1.6px solid var(--chk-line); display:grid; place-items:center; flex:none; }
+.chk.on { background:var(--done); border-color:var(--done); color:var(--done-ink); }
+.chk.on svg { width:15px; height:15px; stroke-width:2.6; }
+.row .txt { flex:1; font-size:15px; line-height:1.3; }
+.row.done .txt { color:var(--muted); }
+.skip { font-size:13px; color:var(--muted); }
+.btn { font:inherit; font-size:14px; font-weight:600; border-radius:var(--btn-r); padding:9px 14px; border:1px solid var(--line); background:transparent; color:var(--ink); display:inline-flex; align-items:center; gap:6px; }
+.btn.pri { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+.btns { display:flex; gap:8px; flex-wrap:wrap; }
+.chip { font-size:13px; padding:5px 11px; border-radius:999px; background:var(--chip-bg); color:var(--ink-2); display:inline-block; }
+.chip.on { background:var(--accent); color:var(--accent-ink); }
+.chips { display:flex; gap:6px; flex-wrap:wrap; }
+
+/* Hoy */
+.hero { padding:14px 0 4px; }
+.hero .date { font-size:13px; color:var(--muted); }
+.hero .day { font-family:var(--font-num); font-size:var(--day-size); font-weight:var(--day-w); line-height:1; letter-spacing:var(--day-track); margin:4px 0 6px; font-variant-numeric:lining-nums; }
+.hero .day span { font-size:20px; font-weight:400; color:var(--muted); letter-spacing:0; margin-left:6px; }
+.phase { font-size:13px; color:var(--accent-text); display:inline-flex; align-items:center; gap:6px; }
+.phase::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--accent); }
+.strip { display:flex; gap:6px; margin-top:14px; }
+.strip div { flex:1; text-align:center; padding:6px 0; border-radius:10px; font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.strip div b { display:block; font-size:15px; color:var(--ink); font-weight:500; }
+.strip div.ok b { color:var(--accent-text); }
+.strip div.now { background:var(--ink); color:var(--bg); }
+.strip div.now b { color:var(--bg); font-weight:650; }
+.segbar { display:none; gap:3px; margin-top:16px; }
+.segbar i { flex:1; height:6px; border-radius:3px; background:var(--track); }
+.segbar i.ok { background:var(--accent); } .segbar i.now { background:var(--ink); } .segbar i.g { background:var(--grace); }
+.summary { display:flex; align-items:center; gap:18px; }
+.ring { width:76px; height:76px; position:relative; flex:none; }
+.ring svg { width:76px; height:76px; transform:rotate(-90deg); }
+.ring circle { fill:none; stroke-width:var(--ring-w); }
+.ring .bgc { stroke:var(--track); } .ring .fg { stroke:var(--accent); stroke-linecap:round; }
+.ring div { position:absolute; inset:0; display:grid; place-items:center; text-align:center; font-size:20px; font-weight:600; line-height:1; }
+.ring div small { display:block; font-size:11px; font-weight:400; color:var(--muted); margin-top:3px; }
+.stats { display:grid; grid-template-columns:1fr 1fr; gap:4px 18px; flex:1; }
+.stats b { font-size:20px; font-weight:600; font-variant-numeric:tabular-nums; display:block; line-height:1.15; }
+.stats span { font-size:12px; color:var(--muted); }
+.water { display:flex; align-items:center; gap:14px; }
+.water .lvl { flex:1; }
+.water .lvl b { font-size:22px; font-weight:600; font-variant-numeric:tabular-nums; }
+.bar { height:6px; background:var(--track); border-radius:3px; margin-top:8px; overflow:hidden; }
+.bar i { display:block; height:100%; width:37%; background:var(--water); border-radius:3px; }
+.meal { padding:8px 0; }
+.meal + .meal { border-top:var(--row-line); }
+.meal .mh { display:flex; justify-content:space-between; font-size:13px; color:var(--muted); margin-bottom:4px; }
+.meal .mh a { color:var(--accent-text); text-decoration:none; font-weight:600; }
+.sugg { font-size:14px; color:var(--ink-2); display:flex; justify-content:space-between; gap:8px; padding:6px 0; }
+.sugg em { font-style:normal; font-size:12px; color:var(--muted); white-space:nowrap; }
+.scale { display:flex; justify-content:space-between; margin:6px 0 12px; }
+.scale span { width:44px; height:44px; border-radius:var(--chk-r2); display:grid; place-items:center; font-size:16px; background:var(--chip-bg); color:var(--ink-2); font-variant-numeric:tabular-nums; }
+.scale span.on { background:var(--accent); color:var(--accent-ink); font-weight:650; }
+.lbl { font-size:13px; color:var(--muted); margin:2px 0 6px; }
+.tomorrow { display:flex; gap:12px; align-items:flex-start; font-size:14px; }
+.tomorrow svg { color:var(--accent-text); margin-top:1px; }
+
+/* Receta */
+.back { font-size:14px; color:var(--accent-text); padding:12px 0 2px; display:flex; align-items:center; gap:4px; }
+.rtitle { font-family:var(--font-num); font-size:var(--rt-size); font-weight:var(--rt-w); letter-spacing:-.015em; line-height:1.12; margin:6px 0 8px; }
+.meta { display:flex; gap:16px; font-size:13px; color:var(--muted); flex-wrap:wrap; }
+.meta span { display:inline-flex; gap:5px; align-items:center; }
+.meta svg.i { width:16px; height:16px; }
+.portions { display:flex; border:1px solid var(--line); border-radius:var(--btn-r); overflow:hidden; }
+.portions span { padding:5px 11px; font-size:13px; color:var(--ink-2); }
+.portions span.on { background:var(--ink); color:var(--bg); font-weight:600; }
+.step { display:flex; gap:12px; padding:10px 0; font-size:15px; line-height:1.45; }
+.step + .step { border-top:var(--row-line); }
+.step b { font-variant-numeric:tabular-nums; color:var(--accent-text); font-weight:650; min-width:16px; }
+.timer { display:inline-flex; align-items:center; gap:4px; font-size:12px; color:var(--accent-text); background:var(--accent-soft); padding:2px 8px; border-radius:999px; margin-top:6px; }
+.timer svg.i { width:14px; height:14px; }
+.cookbar { flex:none; padding:10px var(--pad); display:flex; gap:8px; background:var(--tab-bg); border-top:1px solid var(--tab-line); }
+.cookbar .btn.pri { flex:1; justify-content:center; padding:12px; font-size:15px; }
+
+/* Progreso */
+.ptitle { font-family:var(--font-num); font-size:30px; font-weight:var(--rt-w); margin:12px 0 2px; letter-spacing:-.02em; }
+.kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.kpis b { font-size:24px; font-weight:600; display:block; font-variant-numeric:tabular-nums; }
+.kpis span { font-size:12px; color:var(--muted); }
+.heat { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+.heat i { aspect-ratio:1; border-radius:var(--heat-r); background:var(--track); display:grid; place-items:center; font-style:normal; font-size:11px; color:var(--muted); }
+.heat i.ok { background:var(--accent); color:var(--accent-ink); }
+.heat i.p { background:var(--accent-soft); color:var(--accent-text); }
+.heat i.g { background:var(--grace); color:var(--ink-2); }
+.heat i.now { box-shadow:inset 0 0 0 2px var(--ink); color:var(--ink); font-weight:650; }
+.legend { display:flex; gap:12px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-top:10px; }
+.legend span::before { content:""; display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:5px; vertical-align:-1px; background:var(--c); }
+.chart svg { width:100%; height:120px; display:block; }
+.chart .ln { fill:none; stroke:var(--accent); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.chart .ln2 { fill:none; stroke:var(--chart2); stroke-width:2; stroke-dasharray:4 4; }
+.chart .gl { stroke:var(--track); stroke-width:1; }
+.insight { font-size:14px; line-height:1.45; color:var(--ink-2); }
+
+/* =========================================================
+   A · Hoja en blanco — blanco puro, tinta verde muy oscura, sin tarjetas,
+   el número del día enorme y finísimo es lo único que llama la atención.
+   ========================================================= */
+.phone[data-s="a"] {
+  --bg:#FFFFFF; --card:transparent; --ink:#16231B; --ink-2:#3B4840; --muted:#6B766F; --line:#DCE1DD;
+  --accent:#2E7A4E; --accent-ink:#FFFFFF; --accent-soft:#E7F1EA; --accent-text:#24643F;
+  --done:#2E7A4E; --done-ink:#fff; --chk-line:#AEB8B1; --track:#EDF0EE; --grace:#E3E8E4; --water:#4C8DB0; --chart2:#9AA79F;
+  --chip-bg:#F2F4F2; --tab-bg:#FFFFFF; --tab-line:#EEF1EF; --tab-on:#16231B;
+  --font:"Segoe UI Variable Text","SF Pro Text",-apple-system,system-ui,Roboto,sans-serif;
+  --font-num:"Segoe UI Variable Display","SF Pro Display",-apple-system,system-ui,sans-serif;
+  --pad:22px; --gap:30px; --r:0; --card-pad:0; --card-border:none; --row-line:1px solid #EEF1EF;
+  --h3:13px; --h3w:600; --day-size:96px; --day-w:200; --day-track:-.05em; --rt-size:30px; --rt-w:300;
+  --chk-r:50%; --chk-r2:50%; --btn-r:999px; --ring-w:3; --heat-r:50%;
+}
+.phone[data-s="a"] .sec h3 { color:var(--muted); font-weight:500; }
+.phone[data-s="a"] .sec { border-top:1px solid #EEF1EF; padding-top:16px; }
+.phone[data-s="a"] .hero + .sec { border-top:none; }
+.phone[data-s="a"] .strip div.now { background:transparent; color:var(--ink); box-shadow:inset 0 -2px 0 var(--ink); border-radius:0; }
+.phone[data-s="a"] .strip div.now b { color:var(--ink); }
+.phone[data-s="a"].dark {
+  --bg:#0E1310; --ink:#E9EFEA; --ink-2:#C2CCC5; --muted:#8C978F; --line:#2A332D;
+  --accent:#7CC59A; --accent-ink:#0B1A11; --accent-soft:#1C2B21; --accent-text:#93D3AC;
+  --done:#7CC59A; --done-ink:#0B1A11; --chk-line:#4C5850; --track:#1E2621; --grace:#2A332D; --water:#79B6D6; --chart2:#5E6B63;
+  --chip-bg:#1A211C; --tab-bg:#0E1310; --tab-line:#1E2621; --tab-on:#E9EFEA; --row-line:1px solid #1E2621;
+}
+.phone[data-s="a"].dark .sec { border-top-color:#1E2621; }
+
+/* =========================================================
+   B · Salvia — fondo verde agua muy pálido, tarjetas blancas sin borde ni sombra,
+   todo redondeado. Lo memorable: la barra de 21 tramos arriba de todo.
+   ========================================================= */
+.phone[data-s="b"] {
+  --bg:#E8EFEA; --card:#FFFFFF; --ink:#1E2B24; --ink-2:#405049; --muted:#66756D; --line:#D3DED7;
+  --accent:#4F8069; --accent-ink:#FFFFFF; --accent-soft:#DDEAE2; --accent-text:#3D6955;
+  --done:#4F8069; --done-ink:#fff; --chk-line:#B9C8BF; --track:#E3EBE6; --grace:#D4DFD8; --water:#5B97B5; --chart2:#A9B8AF;
+  --chip-bg:#EEF3F0; --tab-bg:#FFFFFF; --tab-line:#E1E9E4; --tab-on:#3D6955;
+  --font:ui-rounded,"SF Pro Rounded","Nunito","Segoe UI Variable Text",system-ui,sans-serif;
+  --font-num:ui-rounded,"SF Pro Rounded","Nunito","Segoe UI Variable Display",system-ui,sans-serif;
+  --pad:16px; --gap:12px; --r:22px; --card-pad:16px 18px; --card-border:none; --row-line:1px solid #EEF3F0;
+  --h3:16px; --h3w:650; --day-size:44px; --day-w:650; --day-track:-.02em; --rt-size:26px; --rt-w:650;
+  --chk-r:9px; --chk-r2:14px; --btn-r:14px; --ring-w:8; --heat-r:8px;
+}
+.phone[data-s="b"] .segbar { display:flex; }
+.phone[data-s="b"] .strip { display:none; }
+.phone[data-s="b"] .hero { background:var(--card); border-radius:var(--r); padding:16px 18px; margin-top:10px; }
+.phone[data-s="b"] .ring { width:64px; height:64px; } .phone[data-s="b"] .ring svg { width:64px; height:64px; }
+.phone[data-s="b"].dark {
+  --bg:#141A17; --card:#1D2521; --ink:#E6EEE9; --ink-2:#C1CCC5; --muted:#8E9C94; --line:#2C3832;
+  --accent:#86C0A2; --accent-ink:#0F1C15; --accent-soft:#25352C; --accent-text:#9FD0B5;
+  --done:#86C0A2; --done-ink:#0F1C15; --chk-line:#4A5951; --track:#28322D; --grace:#33403A; --water:#7FB8D4; --chart2:#5D6C64;
+  --chip-bg:#242E29; --tab-bg:#1D2521; --tab-line:#28322D; --tab-on:#9FD0B5; --row-line:1px solid #28322D;
+}
+
+/* =========================================================
+   C · Primavera sutil — conserva la identidad del PDF (coral y oliva del collage)
+   pero solo como acentos puntuales sobre blanco rosado; un único dibujo lineal.
+   ========================================================= */
+.phone[data-s="c"] {
+  --bg:#FCF8F6; --card:#FFFFFF; --ink:#2A2421; --ink-2:#4E4540; --muted:#7A6E68; --line:#EDE2DC;
+  --accent:#446650; --accent-ink:#FFFFFF; --accent-soft:#E5EDE7; --accent-text:#38563F;
+  --coral:#C9542F;
+  --done:#446650; --done-ink:#fff; --chk-line:#CDBFB7; --track:#F2EAE5; --grace:#F6DFD4; --water:#4F8FAD; --chart2:#D79B85;
+  --chip-bg:#F6EFEB; --tab-bg:#FFFFFF; --tab-line:#F0E7E2; --tab-on:#2A2421;
+  --font:"Avenir Next","Avenir","Montserrat","Segoe UI Variable Text",system-ui,sans-serif;
+  --font-num:"Avenir Next","Avenir","Montserrat","Segoe UI Variable Display",system-ui,sans-serif;
+  --pad:18px; --gap:14px; --r:16px; --card-pad:14px 16px; --card-border:1px solid #F0E7E2; --row-line:1px solid #F4EDE9;
+  --h3:15px; --h3w:600; --day-size:56px; --day-w:500; --day-track:-.03em; --rt-size:26px; --rt-w:500;
+  --chk-r:50%; --chk-r2:50%; --btn-r:10px; --ring-w:5; --heat-r:6px;
+}
+.phone[data-s="c"] .phase { color:var(--coral); } .phone[data-s="c"] .phase::before { background:var(--coral); }
+.phone[data-s="c"] .hero { display:grid; grid-template-columns:1fr auto; align-items:end; }
+.phone[data-s="c"] .sprig { display:block; }
+.phone[data-s="c"] .strip div.now { background:var(--coral); }
+.phone[data-s="c"] .timer { background:#FBE7DF; color:#9A3B1C; }
+.phone[data-s="c"].dark {
+  --bg:#181413; --card:#211C1A; --ink:#F3E9E4; --ink-2:#D3C6BF; --muted:#A3958E; --line:#352D29;
+  --accent:#8DB89A; --accent-ink:#13201A; --accent-soft:#25342A; --accent-text:#A6CFB2; --coral:#EE8A68;
+  --done:#8DB89A; --done-ink:#13201A; --chk-line:#574B45; --track:#2C2522; --grace:#3E2A22; --water:#7DB5D1; --chart2:#B47B66;
+  --chip-bg:#2A2421; --tab-bg:#211C1A; --tab-line:#2C2522; --tab-on:#F3E9E4; --card-border:1px solid #2C2522; --row-line:1px solid #2C2522;
+}
+.phone[data-s="c"].dark .timer { background:#3E2A22; color:#F2A588; }
+.sprig { display:none; width:58px; height:70px; color:var(--accent); }
+
+/* =========================================================
+   D · Té de noche — oscuro por defecto, carbón oliva cálido, tipografía grande
+   y escasa, un solo verde menta apagado. Para usar de noche o en la cocina con poca luz.
+   ========================================================= */
+.phone[data-s="d"] {
+  --bg:#1B201C; --card:#232A25; --ink:#EEF0E8; --ink-2:#C9CEC2; --muted:#959D90; --line:#343C36;
+  --accent:#B9D7B0; --accent-ink:#1B201C; --accent-soft:#2D3A2F; --accent-text:#C6E2BE;
+  --done:#B9D7B0; --done-ink:#1B201C; --chk-line:#58625A; --track:#2E3630; --grace:#3A433C; --water:#9CC3D9; --chart2:#69736B;
+  --chip-bg:#2A322C; --tab-bg:#1B201C; --tab-line:#2A322C; --tab-on:#EEF0E8;
+  --font:"Segoe UI Variable Text","SF Pro Text",-apple-system,system-ui,sans-serif;
+  --font-num:"Segoe UI Variable Display","SF Pro Display",-apple-system,system-ui,sans-serif;
+  --pad:20px; --gap:12px; --r:18px; --card-pad:16px 18px; --card-border:none; --row-line:1px solid #2E3630;
+  --h3:15px; --h3w:600; --day-size:64px; --day-w:300; --day-track:-.04em; --rt-size:28px; --rt-w:400;
+  --chk-r:50%; --chk-r2:50%; --btn-r:999px; --ring-w:4; --heat-r:50%;
+}
+.phone[data-s="d"].light {
+  --bg:#F3F4EF; --card:#FFFFFF; --ink:#1D231F; --ink-2:#414A43; --muted:#6C756D; --line:#DDE1D9;
+  --accent:#466B45; --accent-ink:#FFFFFF; --accent-soft:#E2EBDF; --accent-text:#3B5B3A;
+  --done:#466B45; --done-ink:#fff; --chk-line:#B7BFB5; --track:#E7EAE3; --grace:#DCE1D7; --water:#4F8DAE; --chart2:#A1AA9F;
+  --chip-bg:#ECEFE8; --tab-bg:#FFFFFF; --tab-line:#E7EAE3; --tab-on:#1D231F; --row-line:1px solid #EDF0EA;
+}
+</style>
+</head>
+<body>
+<div class="pg-top">
+  <h1>Estética de la app: 4 propuestas minimalistas</h1>
+  <div class="pg-seg" id="selStyle" role="group" aria-label="Propuesta">
+    <button data-v="a" aria-pressed="true">A · Hoja en blanco</button>
+    <button data-v="b" aria-pressed="false">B · Salvia</button>
+    <button data-v="c" aria-pressed="false">C · Primavera sutil</button>
+    <button data-v="d" aria-pressed="false">D · Té de noche</button>
+  </div>
+  <div class="pg-seg" id="selMode" role="group" aria-label="Tema">
+    <button data-v="light" aria-pressed="true">Claro</button>
+    <button data-v="dark" aria-pressed="false">Oscuro</button>
+  </div>
+</div>
+
+<p class="pg-intro">Las cuatro tienen <b>las mismas funciones</b> que la app actual (hábitos con «hoy no», agua, comidas con sugerencias, registro de cómo te sentís, para mañana, porciones, temporizadores, mapa de días, gráficos…). Solo cambia cómo se ven. Elegí una letra; también podés mezclar («la B pero con la tipografía de la A»).</p>
+
+<div class="pg-desc" id="desc"></div>
+<div class="stage" id="stage"></div>
+
+<h2 class="cmp-h">Las cuatro juntas (pantalla Hoy)</h2>
+<div class="stage" id="cmp"></div>
+
+<script>
+const IC = {
+  hoy:'<path d="M12 3v2M12 19v2M5.6 5.6 7 7M17 17l1.4 1.4M3 12h2M19 12h2M5.6 18.4 7 17M17 7l1.4-1.4"/><circle cx="12" cy="12" r="4"/>',
+  cocina:'<path d="M4 11h16v2a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6z"/><path d="M8 8c0-1.5 1-1.5 1-3M12 8c0-1.5 1-1.5 1-3M16 8c0-1.5 1-1.5 1-3"/>',
+  compras:'<path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+  guia:'<path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h10"/>',
+  prog:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  buscar:'<circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/>',
+  check:'<path d="m5 12 4.5 4.5L19 7"/>',
+  reloj:'<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
+  olla:'<path d="M4 10h16v3a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6z"/><path d="M2 10h20"/>',
+  persona:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/>',
+  frasco:'<path d="M8 3h8M9 3v3l-3 4v10h12V10l-3-4V3"/>',
+  atras:'<path d="m15 18-6-6 6-6"/>',
+  mas:'<path d="M12 5v14M5 12h14"/>',
+  agua:'<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>'
+};
+const ic = (n, cls='i') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
+const ring = (v, max) => { const r = 32, c = 2*Math.PI*r; return `<div class="ring"><svg viewBox="0 0 76 76"><circle class="bgc" cx="38" cy="38" r="${r}"/><circle class="fg" cx="38" cy="38" r="${r}" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-v/max)}"/></svg><div><span>${v}<small>de ${max}</small></span></div></div>`; };
+const sprig = `<svg class="sprig" viewBox="0 0 58 70" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M29 68V20"/><path d="M29 44c-9-1-15-7-16-15 8 0 15 5 16 15zM29 34c8-1 13-7 14-14-7 0-13 5-14 14zM29 22c-5-2-7-7-7-12 5 1 8 5 7 12z"/><path d="M18 68h22"/></svg>`;
+const status = `<div class="status"><span>9:41</span><span>●●● 82%</span></div>`;
+const tabs = on => `<nav class="tabbar">${[['hoy','Hoy'],['cocina','Cocina'],['compras','Compras'],['guia','Guía'],['prog','Progreso']].map(([k,l])=>`<a class="${k===on?'on':''}">${ic(k)}${l}</a>`).join('')}</nav>`;
+const topb = t => `<div class="topbar"><span class="t">${t}</span><span class="acts">${ic('buscar')}<span class="avatar">G</span></span></div>`;
+
+const habits = [
+  ['Agua tibia con limón en ayunas', 1], ['Infusión depurativa, 2 a 4 tazas', 1],
+  ['Masticar cada bocado y comer sentado', 0], ['Sin café, mate ni té negro', 0],
+  ['Termo de agua tibia a sorbitos', 0], ['Un plato abundante en verdes', 0]
+];
+const days = [[4,'ok'],[5,'ok'],[6,'ok'],[7,'now'],[8,''],[9,''],[10,'']];
+const dn = ['J','V','S','D','L','M','X'];
+
+function hoy() {
+  const seg = Array.from({length:21},(_,i)=>`<i class="${i<6?(i===3?'g':'ok'):i===6?'now':''}"></i>`).join('');
+  return `${status}${topb('Detox de Primavera')}<div class="scroll">
+  <div class="hero"><div>
+    <div class="date">Miércoles 18 de noviembre</div>
+    <div class="day">Día 7<span>de 21</span></div>
+    <div class="phase">Menú depurativo</div>
+    <div class="segbar" aria-label="Día 7 de 21">${seg}</div>
+    <div class="strip">${days.map(([d,c],i)=>`<div class="${c}">${dn[i]}<b>${d}</b></div>`).join('')}</div>
+  </div>${sprig}</div>
+
+  <section class="sec"><div class="summary">${ring(2,6)}<div class="stats">
+    <div><b>100 %</b><span>constancia</span></div><div><b>5 días</b><span>de racha</span></div>
+    <div><b>1</b><span>día de gracia libre</span></div><div><b>1010</b><span>puntos</span></div></div></div></section>
+
+  <section class="sec"><h3>Hábitos de hoy <small>2 de 6</small></h3>
+    ${habits.map(([t,d])=>`<div class="row ${d?'done':''}"><span class="chk ${d?'on':''}">${d?ic('check'):''}</span><span class="txt">${t}</span>${d?'':'<span class="skip">Hoy no</span>'}</div>`).join('')}
+  </section>
+
+  <section class="sec"><h3>Agua <small>meta 2 l</small></h3>
+    <div class="water"><div class="lvl"><b>750</b> <span class="muted">ml</span><div class="bar"><i></i></div></div>
+    <div class="btns"><span class="btn">+250</span><span class="btn">+500</span></div></div>
+  </section>
+
+  <section class="sec"><h3>Comidas <small>Plan</small></h3>
+    <div class="meal"><div class="mh"><span>Desayuno</span><a>Agregar</a></div>
+      <div class="row done"><span class="chk on">${ic('check')}</span><span class="txt">Nituke de manzana</span></div></div>
+    <div class="meal"><div class="mh"><span>Almuerzo</span><a>Agregar</a></div>
+      <div class="sugg"><span>Bowl de yamaní con crucíferas</span><em>Aún no la probaste</em></div>
+      <div class="sugg"><span>Guiso de mung y calabaza</span><em>Hace 5 días</em></div></div>
+    <div class="meal"><div class="mh"><span>Merienda · Cena</span><a>Agregar</a></div>
+      <div class="sugg"><span>Caldo détox alcalinizante</span><em>Bueno si sos friolento</em></div></div>
+  </section>
+
+  <section class="sec"><h3>¿Cómo te sentís?</h3>
+    <div class="lbl">Energía</div><div class="scale">${[1,2,3,4,5].map(n=>`<span class="${n===4?'on':''}">${n}</span>`).join('')}</div>
+    <div class="lbl">Digestión</div><div class="chips"><span class="chip">Liviana</span><span class="chip on">Óptima</span><span class="chip">Lenta</span><span class="chip">Gases</span></div>
+    <div class="lbl" style="margin-top:12px">Señales</div><div class="chips"><span class="chip">Cefalea leve</span><span class="chip">Sed intensa</span><span class="chip on">Ninguna</span><span class="chip">${'+ Otra'}</span></div>
+  </section>
+
+  <section class="sec"><h3>Para mañana</h3>
+    <div class="tomorrow">${ic('frasco')}<span>Dejá en remojo los porotos mung esta noche (8 a 12 h). Descartá el agua antes de cocinarlos.</span></div>
+  </section>
+  </div>${tabs('hoy')}`;
+}
+
+function receta() {
+  const ing = [['4 pencas de apio',1],['2 dientes de ajo enteros',1],['1 a 2 puerros',0],['1 manzana con semillas',0],['1 zanahoria',0],['Un trozo de kombu',0]];
+  return `${status}${topb('Cocina')}<div class="scroll">
+  <div class="back">${ic('atras')}Recetas</div>
+  <div class="rtitle">Caldo détox alcalinizante</div>
+  <div class="meta"><span>${ic('reloj')}35 min</span><span>${ic('persona')}4 porciones</span><span>Contiene apio</span></div>
+  <div class="btns" style="margin-top:14px"><span class="btn">Guardar</span><span class="btn">Al plan</span><span class="btn">A compras</span></div>
+
+  <section class="sec"><h3>Ingredientes <span class="portions"><span>½</span><span class="on">×1</span><span>×2</span><span>×3</span></span></h3>
+    ${ing.map(([t,d])=>`<div class="row ${d?'done':''}"><span class="chk ${d?'on':''}">${d?ic('check'):''}</span><span class="txt">${t}</span></div>`).join('')}
+  </section>
+
+  <section class="sec"><h3>Pasos</h3>
+    <div class="step"><b>1</b><div>Lavá todas las verduras y la manzana. Cortalas en trozos grandes, sin pelar.</div></div>
+    <div class="step"><b>2</b><div>Ponelas en una olla con 2 litros de agua y el kombu. Tapá y cociná a fuego mínimo.<br><span class="timer">${ic('reloj')}Temporizador 35 min</span></div></div>
+    <div class="step"><b>3</b><div>Colá y tomalo tibio a lo largo del día.</div></div>
+  </section>
+  <p class="muted" style="font-size:13px;margin-top:14px">Tip del taller: si sos friolento, sumá una rodaja de jengibre.</p>
+  </div>
+  <div class="cookbar"><span class="btn">Lo comí hoy</span><span class="btn pri">${ic('olla')}Cocinar paso a paso</span></div>`;
+}
+
+function progreso() {
+  const st = i => i<3?'ok':i===3?'g':i<6?'ok':i===6?'now':'';
+  const pts = [2,2,3,3,4,4], pts2 = [3,2,3,4,4,4];
+  const x = i => 10 + i*14.5, y = v => 110 - v*20;
+  const pl = a => a.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
+  return `${status}${topb('Progreso')}<div class="scroll">
+  <div class="ptitle">Tu detox</div><div class="muted" style="font-size:14px">Primavera 2026 · empezaste el 12/11</div>
+  <section class="sec"><div class="kpis"><div><b>100 %</b><span>constancia</span></div><div><b>5</b><span>racha · mejor 5</span></div><div><b>6/21</b><span>días completos</span></div></div></section>
+  <section class="sec"><h3>Mapa de la edición</h3>
+    <div class="heat">${Array.from({length:21},(_,i)=>`<i class="${st(i)}">${i+1}</i>`).join('')}</div>
+    <div class="legend"><span style="--c:var(--accent)">Completo</span><span style="--c:var(--accent-soft)">Parcial</span><span style="--c:var(--grace)">Gracia</span><span style="--c:var(--track)">Por venir</span></div>
+  </section>
+  <section class="sec chart"><h3>Energía y ánimo <small>6 días</small></h3>
+    <svg viewBox="0 0 320 120" preserveAspectRatio="none">${[1,2,3,4,5].map(v=>`<line class="gl" x1="0" x2="320" y1="${y(v)}" y2="${y(v)}"/>`).join('')}
+      <polyline class="ln" points="${pl(pts).replace(/(\d+\.?\d*),/g,(m,a)=>(a*3.1)+',')}"/>
+      <polyline class="ln2" points="${pl(pts2).replace(/(\d+\.?\d*),/g,(m,a)=>(a*3.1)+',')}"/></svg>
+    <div class="legend"><span style="--c:var(--accent)">Energía</span><span style="--c:var(--chart2)">Ánimo</span></div>
+  </section>
+  <section class="sec"><h3>Lo que se ve en tus datos</h3>
+    <p class="insight" style="margin:0">Los días que cumpliste la meta de agua tu energía promedió 3,8; los otros, 2,7 (6 días: es una pista, no una causa).</p>
+  </section>
+  <section class="sec"><h3>Informe y copia</h3><div class="btns"><span class="btn">Ver informe</span><span class="btn">Exportar copia</span></div></section>
+  </div>${tabs('prog')}`;
+}
+
+const DESC = {
+  a:['A · Hoja en blanco','Blanco puro y tinta verde muy oscura. Sin recuadros: las secciones se separan solo con aire y una línea finísima. Lo único que destaca es el número del día, enorme y delgado. La más silenciosa de las cuatro.'],
+  b:['B · Salvia','Fondo verde agua muy pálido con tarjetas blancas sin bordes ni sombras, todo redondeado y amable. Arriba, una barra de 21 tramos muestra el programa entero de un vistazo. Cálida pero ordenada.'],
+  c:['C · Primavera sutil','Conserva la identidad del PDF del taller (el coral y el verde oliva del collage) pero solo como acentos chicos sobre blanco rosado, con un único dibujo de una ramita. Es la más cercana a la actual, ya limpia.'],
+  d:['D · Té de noche','Oscura por defecto: carbón con un tono oliva, letras grandes y un solo verde menta apagado. Pensada para usar de noche o en la cocina con poca luz. También tiene versión clara.']
+};
+let S = 'a', M = 'light';
+function phone(s, scr, mode) {
+  const cls = s==='d' ? (mode==='light'?'light':'') : (mode==='dark'?'dark':'');
+  return `<div class="phone ${cls}" data-s="${s}">${scr()}</div>`;
+}
+function render() {
+  document.getElementById('desc').innerHTML = `<h2>${DESC[S][0]}</h2><p>${DESC[S][1]}</p>`;
+  document.getElementById('stage').innerHTML = [['Hoy',hoy],['Receta',receta],['Progreso',progreso]].map(([n,f])=>`<figure><figcaption>${n}</figcaption>${phone(S,f,M)}</figure>`).join('');
+  document.getElementById('cmp').innerHTML = ['a','b','c','d'].map(s=>`<figure><figcaption>${DESC[s][0]}</figcaption>${phone(s,hoy,M)}</figure>`).join('');
+}
+function seg(id, fn) { document.getElementById(id).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; [...e.currentTarget.children].forEach(x=>x.setAttribute('aria-pressed', x===b)); fn(b.dataset.v); render(); }); }
+seg('selStyle', v => S = v); seg('selMode', v => M = v);
+render();
+</script>
+</body>
+</html>
