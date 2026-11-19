@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fuentes para el texto</title>
+<!-- Solo para comparar en esta maqueta: las fuentes se cargan desde Google Fonts.
+     La que se elija se incorpora después a la app como archivo propio verificado (sin depender de internet). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Figtree:wght@400;500;600&family=Geist:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&family=Manrope:wght@400;500;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root { --pg-bg:#E7E5E2; --pg-ink:#1E1C1A; --pg-mut:#615C57; --pg-line:#CFCBC6; --pg-sel:#1E1C1A; --pg-selink:#fff; }
+@media (prefers-color-scheme: dark) { :root { --pg-bg:#1C1B1A; --pg-ink:#EEEBE7; --pg-mut:#A49E98; --pg-line:#3A3836; --pg-sel:#EEEBE7; --pg-selink:#1C1B1A; } }
+* { box-sizing:border-box; }
+html,body { margin:0; }
+body { background:var(--pg-bg); color:var(--pg-ink); font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+.pg-top { position:sticky; top:0; z-index:5; background:var(--pg-bg); border-bottom:1px solid var(--pg-line); padding:12px 20px; display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; }
+.pg-top h1 { font-size:16px; margin:0 8px 0 0; font-weight:650; }
+.pg-seg { display:flex; gap:4px; }
+.pg-seg button { font:inherit; font-size:14px; border:1px solid var(--pg-line); background:transparent; color:var(--pg-ink); border-radius:999px; padding:6px 13px; cursor:pointer; }
+.pg-seg button[aria-pressed="true"] { background:var(--pg-sel); color:var(--pg-selink); border-color:var(--pg-sel); }
+.pg-intro { max-width:860px; padding:16px 20px 0; color:var(--pg-mut); margin:0; }
+.pg-intro b { color:var(--pg-ink); }
+.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:30px 26px; padding:24px 20px 50px; }
+.card h2 { font-size:18px; margin:0; }
+.card p.note { margin:2px 0 10px; color:var(--pg-mut); font-size:13.5px; min-height:40px; }
+
+.scr {
+  --bg:#FBF8F6; --ink:#2B2623; --ink-2:#514944; --muted:#7A6F69; --faint:#B5AAA3; --line:#ECE4DF; --accent:#4A6B55; --coral:#C9542F;
+  border-radius:24px; background:var(--bg); color:var(--ink); padding:24px 24px 26px; font-size:15.5px; line-height:1.5;
+  box-shadow:0 0 0 1px rgba(0,0,0,.08), 0 14px 34px rgba(0,0,0,.12);
+}
+.scr.dark { --bg:#141110; --ink:#F2EAE5; --ink-2:#D2C7C1; --muted:#A0948E; --faint:#6B605B; --line:#2C2623; --accent:#93BEA0; --coral:#EE8C6B; }
+/* títulos: la fuente que te gustó, fija en todas */
+.disp { font-family:"Segoe UI Variable Display","SF Pro Display",-apple-system,system-ui,sans-serif; }
+.date { font-size:13.5px; color:var(--muted); }
+.big { font-size:46px; font-weight:250; letter-spacing:-.04em; line-height:1; margin:4px 0 4px; }
+.big span { font-size:17px; color:var(--muted); letter-spacing:0; margin-left:6px; font-weight:400; }
+.phase { font-size:14px; color:var(--coral); }
+.focus { margin:20px 0 6px; padding:18px 0 16px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.focus .k { font-size:12.5px; color:var(--coral); }
+.focus .q { font-size:19px; line-height:1.35; margin-top:4px; }
+.row { display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); }
+.row:last-child { border-bottom:0; }
+.row .t small { display:block; color:var(--muted); font-size:13px; margin-top:1px; }
+.row .v { color:var(--muted); font-size:14px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.lab { font-size:12.5px; color:var(--muted); margin:18px 0 4px; }
+.ing { display:grid; grid-template-columns:70px 1fr; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); font-size:15px; }
+.ing:last-child { border-bottom:0; }
+.ing .q { color:var(--muted); font-variant-numeric:tabular-nums; font-size:14px; }
+.para { font-size:15px; color:var(--ink-2); margin:4px 0 0; }
+.sigs { display:flex; flex-wrap:wrap; gap:4px 16px; font-size:15px; color:var(--muted); }
+.sigs b { color:var(--ink); font-weight:600; }
+.sigs b::before { content:""; display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent); margin-right:7px; vertical-align:2px; }
+.nums { font-size:28px; letter-spacing:-.01em; font-variant-numeric:tabular-nums; margin-top:6px; }
+.nums small { font-size:13px; color:var(--muted); margin-left:6px; letter-spacing:0; }
+</style>
+</head>
+<body>
+<div class="pg-top">
+  <h1>Fuente del texto · 7 opciones</h1>
+  <div class="pg-seg" id="selMode" role="group" aria-label="Tema">
+    <button data-v="dark" aria-pressed="true">Oscuro</button>
+    <button data-v="light" aria-pressed="false">Claro</button>
+  </div>
+</div>
+<p class="pg-intro">El <b>título grande queda igual en todas</b> (es la fuente que te gustó); cambia solo la letra del contenido: renglones, ingredientes, cantidades, notas. Todas son de uso libre y, la que elijas, la incorporo a la app como archivo propio para que se vea <b>igual en la compu y en el celular</b> (hoy el celular usa otra letra porque la actual solo existe en Windows).</p>
+<div class="grid" id="grid"></div>
+
+<script>
+const FONTS = [
+  ['Actual · Segoe UI', '"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif', 'La de Windows. Correcta pero genérica, y en el celular se ve otra distinta.'],
+  ['Inter', '"Inter",sans-serif', 'El estándar de las apps modernas: neutra, muy legible en tamaños chicos, números parejos.'],
+  ['Geist', '"Geist",sans-serif', 'Precisa y contemporánea, un poco más geométrica. Sensación de producto «de diseño».'],
+  ['Manrope', '"Manrope",sans-serif', 'Redondeada y abierta, amable sin ser infantil. La más «calma» de la lista.'],
+  ['DM Sans', '"DM Sans",sans-serif', 'Geométrica suave, limpia y liviana; combina muy bien con títulos finos.'],
+  ['Figtree', '"Figtree",sans-serif', 'Cálida y redonda, con buena lectura; un toque más cercano y humano.'],
+  ['Instrument Sans', '"Instrument Sans",sans-serif', 'Elegante y editorial, algo condensada; muy prolija en listas.'],
+  ['IBM Plex Sans', '"IBM Plex Sans",sans-serif', 'Con más carácter técnico y personalidad; la más seria de todas.']
+];
+let M = 'dark';
+function sample(ff) {
+  return `<div class="scr ${M==='dark'?'dark':''}" style="font-family:${ff.replace(/"/g,'&quot;')}">
+    <div class="date">Miércoles 18 de noviembre · hoy</div>
+    <div class="big disp">Día 9<span>de 21</span></div>
+    <div class="phase">Menú depurativo</div>
+    <div class="focus"><div class="k">Ahora</div><div class="q">Masticar al menos 20 veces por bocado y comer sentado</div></div>
+    <div class="row"><span class="t">Agua<small>Te faltan 1250 ml</small></span><span class="v">750 / 2000 ml</span></div>
+    <div class="row"><span class="t">Comidas<small>Almuerzo sugerido: bowl de yamaní con crucíferas</small></span></div>
+    <div class="lab">Ingredientes</div>
+    <div class="ing"><span class="q">1 taza</span><span>Arroz integral yamaní</span></div>
+    <div class="ing"><span class="q">2 tazas</span><span>Agua</span></div>
+    <div class="ing"><span class="q">1 pizca</span><span>Sal marina</span></div>
+    <div class="lab">Señales</div>
+    <div class="sigs"><b>Ninguna</b><span>Cefalea leve</span><span>Sed intensa</span><span>Frío</span></div>
+    <div class="lab">Nota del día</div>
+    <p class="para">Mantenerte hidratado/a ayuda a mitigar los síntomas que pueden surgir en los primeros días.</p>
+    <div class="nums">100 %<small>constancia</small> &nbsp;8<small>días seguidos</small></div>
+  </div>`;
+}
+function render() {
+  document.getElementById('grid').innerHTML = FONTS.map(([n,ff,d])=>`<div class="card"><h2>${n}</h2><p class="note">${d}</p>${sample(ff)}</div>`).join('');
+}
+document.getElementById('selMode').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; [...e.currentTarget.children].forEach(x=>x.setAttribute('aria-pressed', x===b)); M = b.dataset.v; render(); });
+render();
+</script>
+</body>
+</html>

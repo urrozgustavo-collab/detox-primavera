@@ -91,7 +91,7 @@ svg.i { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.
 .radio:last-child { border-bottom:0; }
 .radio .t { flex:1; }
 .radio .t small { display:block; color:var(--muted); font-size:13px; }
-.radio .ok { color:var(--accent); }
+.radio .ok { width:8px; height:8px; border-radius:50%; background:var(--accent); margin-right:4px; }
 .cta { display:flex; justify-content:space-between; align-items:center; margin-top:26px; }
 .btn-pri { background:var(--ink); color:var(--bg); padding:12px 24px; border-radius:999px; font-weight:600; font-size:15px; }
 .btn-txt { color:var(--muted); font-size:15px; }
@@ -102,9 +102,14 @@ svg.i { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.
 .nums-l { text-align:center; font-size:13px; color:var(--muted); }
 .ttog { display:flex; flex-wrap:wrap; gap:6px 18px; font-size:15px; color:var(--muted); margin-top:4px; }
 .ttog b { color:var(--ink); font-weight:600; }
-.ttog b::before { content:"✓ "; color:var(--accent); font-weight:600; }
+.ttog b::before { content:""; display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent); margin-right:7px; vertical-align:2px; }
 .sheet-h { display:flex; justify-content:space-between; align-items:baseline; }
 .grab { width:38px; height:4px; border-radius:2px; background:var(--line); margin:-8px auto 18px; }
+.cta-a { display:block; text-align:center; margin-top:22px; padding:15px; border-radius:12px; background:var(--accent); color:var(--accent-ink); font-weight:600; font-size:15.5px; letter-spacing:.01em; }
+.cta-b { display:flex; justify-content:space-between; align-items:baseline; margin-top:26px; }
+.cta-b .go { font-size:17px; font-weight:600; color:var(--ink); padding-bottom:3px; border-bottom:2px solid var(--coral); }
+.cta-c { display:block; text-align:center; margin-top:22px; padding:14px; border-radius:12px; box-shadow:inset 0 0 0 1px var(--faint); color:var(--ink); font-weight:600; font-size:15.5px; }
+.sub-c { text-align:center; margin-top:12px; font-size:14px; color:var(--muted); }
 </style>
 </head>
 <body>
@@ -128,6 +133,7 @@ const IC = {
   chev:'<path d="m6 9 6 6 6-6"/>'
 };
 const ic = n => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
+const tail = () => `<div class="sec-l" style="margin-top:0">Cómo empezar</div><div class="radio"><span class="t">3 días de monodieta<small>Recomendado por la guía</small></span><span class="ok"></span></div><div class="radio"><span class="t">Directo al menú depurativo</span></div>`;
 const recs = [['Agua de lino','5 min'],['Alcauciles con aliño de limón','40 min'],['Aliño cremoso de palta','5 min'],['Bowl de yamaní con crucíferas','25 min'],['Caldo détox alcalinizante','35 min']];
 
 const S = [
@@ -144,7 +150,7 @@ const S = [
      ${recs.map(([t,m])=>`<div class="rrow"><span class="t">${t}</span><span class="m">${m}</span></div>`).join('')}`,
    extra:{ cap:'<b>Después</b> · al tocar «Filtrar»', html:()=>`<div class="grab"></div><div class="sheet-h"><div class="h-mid disp">Filtrar</div><span class="muted">Limpiar</span></div>
      <div class="sec-l">Mostrar</div>
-     <div class="radio"><span class="t">Aptas para hoy<small>Según la fase del programa</small></span><span class="ok">${ic('check')}</span></div>
+     <div class="radio"><span class="t">Aptas para hoy<small>Según la fase del programa</small></span><span class="ok"></span></div>
      <div class="radio"><span class="t">Sin mis alergias</span></div>
      <div class="radio"><span class="t">Favoritas</span></div>
      <div class="radio"><span class="t">Rápidas, 20 min o menos</span></div>
@@ -168,7 +174,7 @@ const S = [
      <div class="sec-l">Preparación</div>
      <div class="step"><b>2</b><span>Llevá el agua con la sal a hervor, sin tapa y a fuego alto, y agregá el arroz.</span></div>
      <div class="step"><b>3</b><span>Cuando hierva, bajá a mínimo y tapá. No revuelvas hasta que se evapore el agua.</span></div>` },
- { t:'3 · Fecha y forma de empezar', d:'Las opciones son palabras, no botones: la elegida en negrita con un puntito coral. Las alternativas largas (cómo empezar) se eligen en una lista con una tilde, y la única forma rellena es «Empezar».',
+ { t:'3 · Fecha y forma de empezar', d:'Las opciones son palabras, no botones: la elegida en negrita con un puntito coral. Las alternativas largas (cómo empezar) se eligen en una lista con un punto verde, y la única forma rellena es «Empezar».',
    before:()=>`<div class="sec-l" style="margin-top:0">Fecha de inicio</div>
      <div class="old-pills"><span class="old-chip on">Hoy 18/11</span><span class="old-chip">Mañana 19/11</span><span class="old-chip">Próximo lunes 23/11</span></div>
      <div class="sec-l">Cómo empezar</div>
@@ -177,12 +183,19 @@ const S = [
      <div class="sec-l">Fecha de inicio</div>
      <div class="opts"><b>Hoy<small>18/11</small></b><span>Mañana<small>19/11</small></span><span>Lunes<small>23/11</small></span><span>Otra…</span></div>
      <div class="sec-l" style="margin-top:28px">Cómo empezar</div>
-     <div class="radio"><span class="t">3 días de monodieta<small>Recomendado por la guía</small></span><span class="ok">${ic('check')}</span></div>
+     <div class="radio"><span class="t">3 días de monodieta<small>Recomendado por la guía</small></span><span class="ok"></span></div>
      <div class="radio"><span class="t">2 días de monodieta</span></div>
      <div class="radio"><span class="t">1 día de monodieta</span></div>
      <div class="radio"><span class="t">Directo al menú depurativo</span></div>
      <div class="cta"><span class="btn-txt">Después</span><span class="btn-pri">Empezar</span></div>` },
- { t:'4 · El mismo sistema en «¿Cómo te sentís?»', d:'Para ver que la regla funciona en toda la app: la energía es una fila de números (el elegido subrayado en coral, con su palabra debajo) y las señales son palabras que se tildan, sin cápsulas.',
+ { t:'3b · El botón principal, sin cápsula', d:'La cápsula clara sobre fondo oscuro es lo que se siente barato. Tres alternativas; las tres usan la misma forma para TODAS las acciones principales de la app.',
+   frames:[
+    ['<b>Hoy</b> · cápsula', ()=>`${tail()}<div class="cta"><span class="btn-txt">Después</span><span class="btn-pri">Empezar</span></div>`],
+    ['<b>A</b> · barra ancha verde', ()=>`${tail()}<span class="cta-a">Empezar el detox</span><div class="sub-c">Después</div>`],
+    ['<b>B</b> · solo texto', ()=>`${tail()}<div class="cta-b"><span class="btn-txt">Después</span><span class="go">Empezar el detox</span></div>`],
+    ['<b>C</b> · barra ancha de línea fina', ()=>`${tail()}<span class="cta-c">Empezar el detox</span><div class="sub-c">Después</div>`]
+   ] },
+ { t:'4 · El mismo sistema en «¿Cómo te sentís?»', d:'Para ver que la regla funciona en toda la app: la energía es una fila de números (el elegido subrayado en coral, con su palabra debajo) y las señales son palabras que se marcan con un punto verde, sin cápsulas.',
    before:()=>`<div class="h-mid disp">¿Cómo te sentís hoy?</div>
      <div class="sec-l">Energía</div><div class="old-pills">${[1,2,3,4,5].map(n=>`<span class="old-chip ${n===4?'on':''}" style="width:44px;text-align:center">${n}</span>`).join('')}</div>
      <div class="sec-l">Señales</div><div class="old-pills"><span class="old-chip on">Ninguna</span><span class="old-chip">Cefalea leve</span><span class="old-chip">Sed intensa</span><span class="old-chip">Frío</span><span class="old-chip">+ Otra</span></div>`,
@@ -194,10 +207,10 @@ const S = [
 let M = 'dark';
 function render() {
   const sc = h => `<div class="scr ${M==='dark'?'dark':''}">${h}</div>`;
-  document.getElementById('out').innerHTML = S.map(s => `<section class="cmp"><h2>${s.t}</h2><p>${s.d}</p><div class="pair">
+  document.getElementById('out').innerHTML = S.map(s => `<section class="cmp"><h2>${s.t}</h2><p>${s.d}</p><div class="pair">${s.frames ? s.frames.map(([c,f])=>`<figure><figcaption>${c}</figcaption>${sc(f())}</figure>`).join('') : `
     <figure><figcaption><b>Antes</b> · como está hoy</figcaption>${sc(s.before())}</figure>
     <figure><figcaption><b>Después</b></figcaption>${sc(s.after())}</figure>
-    ${s.extra?`<figure><figcaption>${s.extra.cap}</figcaption>${sc(s.extra.html())}</figure>`:''}</div></section>`).join('');
+    ${s.extra?`<figure><figcaption>${s.extra.cap}</figcaption>${sc(s.extra.html())}</figure>`:''}`}</div></section>`).join('');
 }
 document.getElementById('selMode').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; [...e.currentTarget.children].forEach(x=>x.setAttribute('aria-pressed', x===b)); M = b.dataset.v; render(); });
 render();
